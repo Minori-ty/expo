@@ -28,16 +28,16 @@ export default function TabLayout() {
             }}
         >
             <Tabs.Screen
-                name="更新表"
+                name="index"
                 options={{
-                    title: 'Home',
+                    title: '更新表',
                     tabBarIcon: ({ color }) => <IconSymbol size={28} name="house.fill" color={color} />,
                 }}
             />
             <Tabs.Screen
-                name="我的追番"
+                name="animes"
                 options={{
-                    title: 'Explore',
+                    title: '我的追番',
                     tabBarIcon: ({ color }) => <IconSymbol size={28} name="paperplane.fill" color={color} />,
                 }}
             />
