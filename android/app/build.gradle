@@ -83,7 +83,7 @@ def enableProguardInReleaseBuilds = (findProperty('android.enableProguardInRelea
 def jscFlavor = 'io.github.react-native-community:jsc-android:2026004.+'
 
 def getAppVersion() {
-    def inputFile = new File("../../package.json")
+    def inputFile = new File(rootProject.projectDir.parent, 'package.json')
     def packageJson = new JsonSlurper().parseText(inputFile.text)
     return packageJson["version"]
 }
