@@ -1,0 +1,127 @@
+name: release
+
+on:
+    push:
+        branches:
+            - master
+
+permissions:
+    contents: write
+    pull-requests: write
+    repository-projects: write
+
+jobs:
+    install:
+        runs-on: ubuntu-latest
+
+        steps:
+            - uses: actions/checkout@v4
+
+            - name: 缓存 node modules
+              id: cache-npm
+              uses: actions/cache@v4
+              with:
+                  path: ~/.npm
+                  key: ${{ runner.os }}-npm-${{ hashFiles('**/package-lock.json') }}
+                  restore-keys: |
+                      ${{ runner.os }}-npm-
+                      ${{ runner.os }}-
+
+            - uses: actions/setup-node@v4
+              with:
+                  node-version: 20
+                  cache: 'npm'
+
+            - name: 安装依赖
+              run: |
+                  npm i -g eas-cli expo expo-doctor expo-cli typescript
+                  npm i
+
+    build:
+        runs-on: ubuntu-latest
+        env:
+            EXPO_TOKEN: ${{ secrets.EAS_TOKEN }}
+            NODE_ENV: production
+        needs: [install]
+        steps:
+            - uses: actions/checkout@v4
+
+            - name: 检查 EXPO_TOKEN 是否存在
+              run: |
+                  if [ -z "$EXPO_TOKEN" ]; then
+                    echo "EXPO_TOKEN 未设置"
+                    exit 1
+                  else
+                    echo "EXPO_TOKEN 已设置"
+                  fi
+
+            - name: 缓存 gradle
+              id: cache-gradle
+              uses: actions/cache@v4
+              with:
+                  path: |
+                      ~/.gradle/caches
+                      ~/.gradle/wrapper
+                  key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle') }}
+                  restore-keys: |
+                      ${{ runner.os }}-gradle-
+                      ${{ runner.os }}-
+
+            - uses: actions/setup-node@v4
+              with:
+                  node-version: 20
+                  cache: 'npm'
+
+            - name: 启动java 17
+              uses: actions/setup-java@v4
+              with:
+                  distribution: 'temurin'
+                  java-version: 17
+                  cache: 'gradle'
+
+            - name: 缓存 Android SDK
+              uses: actions/cache@v4
+              with:
+                  path: /usr/local/lib/android/sdk
+                  key: ${{ runner.os }}-android-sdk-${{ hashFiles('android/.sdk-cache-key') }}
+                  restore-keys: |
+                      ${{ runner.os }}-android-sdk-
+
+            - name: 安装 Android SDK
+              uses: android-actions/setup-android@v3
+
+            - name: 安装 安卓开发工具
+              run: |
+                  sdkmanager "platforms;android-35" \
+                             "build-tools;35.0.0" \
+                             "ndk;27.1.12297006"
+
+            - name: 打包expo应用
+              run: |
+                  npm i -g eas-cli expo expo-doctor expo-cli typescript
+                  npm i
+                  npm run build
+
+            - name: 获取版本号
+              id: version
+              run: echo "VERSION=$(npm pkg get version | tr -d '\"')" >> $GITHUB_ENV
+
+            - name: 重命名apk
+              run: |
+                  # 获取第一个 apk 文件名
+                  APK_FILE=$(ls *.apk | head -n 1)
+                  # 重命名
+                  mv "$APK_FILE" "v${{ env.VERSION }}.apk"
+
+            - name: 发布 Release
+              uses: softprops/action-gh-release@v2
+              env:
+                  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+              with:
+                  name: v${{ env.VERSION }}
+                  tag_name: v${{ env.VERSION }}
+                  body: |
+                      发布版本 v${{ env.VERSION }}
+                      - 更新了依赖
+                      - 修复了一些问题
+                  files: 'v${{ env.VERSION }}.apk'
