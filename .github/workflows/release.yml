@@ -69,10 +69,13 @@ jobs:
                   node-version: 20
                   cache: 'npm'
 
-            - name: 打包expo应用
+            - name: 安装 npm 依赖
               run: |
                   npm i -g eas-cli expo expo-doctor expo-cli typescript
                   npm i
+
+            - name: 打包expo应用
+              run: |
                   npm run build
 
             - name: 获取版本号
