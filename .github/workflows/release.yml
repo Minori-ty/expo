@@ -35,16 +35,16 @@ jobs:
                   java-version: 17
                   cache: 'gradle'
 
+            - name: 打印 Android SDK 路径
+              run: echo "ANDROID_HOME: $ANDROID_HOME"
+
             - name: 配置 Android SDK 缓存
               uses: actions/cache@v4
               with:
                   path: |
                       ~/.android
                       ~/.gradle
-                      /usr/local/lib/android/sdk
-                      /usr/local/lib/android/sdk/ndk/27.1.12297006
-                      /opt/hostedtoolcache/android/sdk
-                      /opt/hostedtoolcache/android/sdk/ndk/27.1.12297006
+                      ${{ env.ANDROID_HOME }}
                   key: android-sdk-${{ runner.os }}-${{ hashFiles('**/build.gradle*', '**/settings.gradle*', '**/gradle-wrapper.properties') }}
                   restore-keys: |
                       android-sdk-${{ runner.os }}-
