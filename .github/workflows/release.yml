@@ -37,7 +37,8 @@ jobs:
 
             - name: 打印 Android SDK 路径
               run: |
-                  echo "ANDROID_HOME: $ANDROID_HOME"
+                  cd ~
+                  ls
 
             - name: 配置 Android SDK 缓存
               uses: actions/cache@v4
@@ -45,7 +46,7 @@ jobs:
                   path: |
                       ~/.android
                       ~/.gradle
-                      ${{ env.ANDROID_HOME }}
+                      /usr/local/lib/android/sdk
                   key: android-sdk-${{ runner.os }}-${{ hashFiles('**/build.gradle*', '**/settings.gradle*', '**/gradle-wrapper.properties') }}
                   restore-keys: |
                       android-sdk-${{ runner.os }}-
@@ -81,6 +82,13 @@ jobs:
             - name: 打包expo应用
               run: |
                   npm run build
+
+            - name: 打印 Android SDK 路径
+              run: |
+                  cd /
+                  ls
+                  cd ~
+                  ls
 
             - name: 获取版本号
               id: version
