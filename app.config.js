@@ -28,7 +28,14 @@ export default {
         },
         plugins: [
             'expo-router',
-            'expo-notifications',
+            [
+                'expo-notifications',
+                {
+                    color: '#ffffff',
+                    defaultChannel: 'default',
+                    enableBackgroundRemoteNotifications: false,
+                },
+            ],
             [
                 'expo-splash-screen',
                 {

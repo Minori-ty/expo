@@ -1,3 +1,4 @@
+import Notification from '@/utils/Notification'
 import * as React from 'react'
 import { Dimensions, StyleSheet, Text, View } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
@@ -28,7 +29,7 @@ export default function MyTabs() {
     ])
 
     const renderScene = SceneMap({
-        first: FirstRoute,
+        first: Notification,
         second: SecondRoute,
         third: FirstRoute,
         third4: SecondRoute,
