@@ -28,6 +28,7 @@ export default {
         },
         plugins: [
             'expo-router',
+            'expo-notifications',
             [
                 'expo-splash-screen',
                 {
