@@ -41,7 +41,10 @@ jobs:
                   path: |
                       ~/.android
                       ~/.gradle
-                      ${{ env.ANDROID_SDK_ROOT || '$HOME/android-sdk' }}
+                      /usr/local/lib/android/sdk
+                      /usr/local/lib/android/sdk/ndk/27.1.12297006
+                      /opt/hostedtoolcache/android/sdk
+                      /opt/hostedtoolcache/android/sdk/ndk/27.1.12297006
                   key: android-sdk-${{ runner.os }}-${{ hashFiles('**/build.gradle*', '**/settings.gradle*', '**/gradle-wrapper.properties') }}
                   restore-keys: |
                       android-sdk-${{ runner.os }}-
