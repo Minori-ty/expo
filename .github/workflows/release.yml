@@ -36,7 +36,8 @@ jobs:
                   cache: 'gradle'
 
             - name: 打印 Android SDK 路径
-              run: echo "ANDROID_HOME: $ANDROID_HOME"
+              run: |
+                  echo "ANDROID_HOME: $ANDROID_HOME"
 
             - name: 配置 Android SDK 缓存
               uses: actions/cache@v4
