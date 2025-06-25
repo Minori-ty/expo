@@ -7,20 +7,21 @@ import { sendNotification } from './notifications'
 
 Notifications.setNotificationHandler({
     handleNotification: async () => ({
-        shouldPlaySound: false,
-        shouldSetBadge: false,
+        shouldPlaySound: true,
+        shouldSetBadge: true,
         shouldShowBanner: true,
         shouldShowList: true,
+        shouldShowAlert: true, // 允许系统弹出悬浮横幅
     }),
 })
 
 export default function App() {
-    const [expoPushToken, setExpoPushToken] = useState('')
+    // const [expoPushToken, setExpoPushToken] = useState('')
     const [channels, setChannels] = useState<Notifications.NotificationChannel[]>([])
     const [notification, setNotification] = useState<Notifications.Notification | undefined>(undefined)
 
     useEffect(() => {
-        registerForPushNotificationsAsync().then((token) => token && setExpoPushToken(token))
+        // registerForPushNotificationsAsync().then((token) => token && setExpoPushToken(token))
 
         if (Platform.OS === 'android') {
             Notifications.getNotificationChannelsAsync().then((value) => setChannels(value ?? []))
@@ -47,7 +48,6 @@ export default function App() {
                 justifyContent: 'space-around',
             }}
         >
-            <Text>Your expo push token: {expoPushToken}</Text>
             <Text>{`Channels: ${JSON.stringify(
                 channels.map((c) => c.id),
                 null,
