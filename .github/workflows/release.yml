@@ -35,7 +35,6 @@ jobs:
               with:
                   distribution: 'temurin'
                   java-version: 17
-                  cache: 'gradle'
 
             - name: 配置 Android SDK 缓存
               uses: actions/cache@v4
