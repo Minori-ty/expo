@@ -18,6 +18,8 @@ jobs:
             NODE_ENV: production
         steps:
             - uses: actions/checkout@v4
+              with:
+                  fetch-depth: 10 # 获取最近10个提交
 
             - name: 检查 EXPO_TOKEN 是否存在
               run: |
@@ -88,6 +90,22 @@ jobs:
                   # 重命名
                   mv "$APK_FILE" "v${{ env.VERSION }}.apk"
 
+            - name: 获取当前时间
+              run: |
+                  # 使用 date 命令格式化时间
+                  current_time=$(date +"%Y-%m-%d %H:%M")
+                  echo "FORMATTED_TIME=$current_time" >> $GITHUB_ENV
+
+            - name: 获取最近10个提交信息并存储到环境变量
+              id: get-commits
+              run: |
+                  # 将提交信息收集到环境变量，保留换行符
+                  COMMIT_MESSAGES=$(git log -n 10 --pretty=format:"%h - %an, %ar : %s")
+                  echo "COMMIT_MESSAGES<<EOF" >> $GITHUB_ENV
+                  echo "$COMMIT_MESSAGES" >> $GITHUB_ENV
+                  echo "EOF" >> $GITHUB_ENV
+                  echo "提交信息已存储到环境变量"
+
             - name: 发布 Release
               uses: softprops/action-gh-release@v2
               env:
@@ -97,6 +115,6 @@ jobs:
                   tag_name: v${{ env.VERSION }}
                   body: |
                       发布版本 v${{ env.VERSION }}
-                      - 更新了依赖
-                      - 修复了一些问题
+                      时间 ${{ env.FORMATTED_TIME }}
+                      ${{ env.COMMIT_MESSAGES }}
                   files: 'v${{ env.VERSION }}.apk'
