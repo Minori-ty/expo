@@ -21,17 +21,12 @@ export function registerBackgroundFetchAsync() {
 }
 
 export async function initializeBackgroundTask(appMountedPromise: Promise<void>) {
-    TaskManager.defineTask(BACKGROUND_TASK_NAME, async () => {
-        try {
-            // await appMountedPromise // 等待应用挂载完成
-            await sendNotification('番剧更新提醒', '有新的番剧更新啦！')
-            return BackgroundTask.BackgroundTaskResult.Success
-        } catch (error) {
-            console.error('后台任务执行失败:', error)
-            return BackgroundTask.BackgroundTaskResult.Failed
-        }
-    })
-
+    TaskManager.defineTask<Notifications.NotificationTaskPayload>(
+        BACKGROUND_TASK_NAME,
+        async ({ data, error, executionInfo }) => {
+        sendNotification()
+    )
+    Notifications.registerTaskAsync(BACKGROUND_TASK_NAME)
     if (!(await TaskManager.isTaskRegisteredAsync(BACKGROUND_TASK_NAME))) {
         // BackgroundTask.registerTaskAsync(BACKGROUND_TASK_NAME, {
         //     minimumInterval: 1 * 60, // 1分钟（单位：秒）

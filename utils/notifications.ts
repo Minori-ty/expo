@@ -39,6 +39,9 @@ export function sendNotification(title: string, body: string) {
                     title,
                     body,
                     priority: Notifications.AndroidNotificationPriority.HIGH, // 高优先级
+                    data: {
+                        extraData: '这里可以放一些额外的数据',
+                    },
                 },
                 trigger: {
                     channelId: '番剧推送',

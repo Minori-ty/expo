@@ -21,10 +21,7 @@ export default {
             edgeToEdgeEnabled: true,
             package: 'com.minority.app',
             permissions: [
-                'ACCESS_FINE_LOCATION',
-                'ACCESS_COARSE_LOCATION',
-                'ACCESS_BACKGROUND_LOCATION',
-                'FOREGROUND_SERVICE',
+                'android.permission.SCHEDULE_EXACT_ALARM',
                 'android.permission.ACCESS_COARSE_LOCATION',
                 'android.permission.ACCESS_FINE_LOCATION',
                 'android.permission.ACCESS_BACKGROUND_LOCATION',
@@ -57,6 +54,19 @@ export default {
                     imageWidth: 200,
                     resizeMode: 'contain',
                     backgroundColor: '#ffffff',
+                },
+            ],
+            [
+                'expo-build-properties',
+                {
+                    android: {
+                        compileSdkVersion: 35,
+                        targetSdkVersion: 35,
+                        buildToolsVersion: '35.0.0',
+                    },
+                    ios: {
+                        deploymentTarget: '15.1',
+                    },
                 },
             ],
         ],
