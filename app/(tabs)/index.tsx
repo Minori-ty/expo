@@ -1,4 +1,5 @@
 import Empty from '@/components/lottie/Empty'
+import Back from '@/utils/Back'
 import BackgroundPage from '@/utils/BackgroundPage'
 import Notification from '@/utils/Notification'
 import * as React from 'react'
@@ -34,7 +35,7 @@ export default function MyTabs() {
         first: Notification,
         second: BackgroundPage,
         third: Empty,
-        third4: SecondRoute,
+        third4: Back,
         third5: FirstRoute,
         third6: SecondRoute,
         third7: FirstRoute,
