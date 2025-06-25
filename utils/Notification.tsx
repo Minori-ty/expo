@@ -3,6 +3,7 @@ import * as Device from 'expo-device'
 import * as Notifications from 'expo-notifications'
 import { useEffect, useState } from 'react'
 import { Button, Platform, Text, View } from 'react-native'
+import { sendNotification } from './notifications'
 
 Notifications.setNotificationHandler({
     handleNotification: async () => ({
@@ -68,14 +69,7 @@ export default function App() {
 }
 
 async function schedulePushNotification() {
-    await Notifications.scheduleNotificationAsync({
-        content: {
-            title: "You've got mail! 📬",
-            body: 'Here is the notification body',
-            data: { data: 'goes here', test: { test1: 'more data' } },
-        },
-        trigger: null,
-    })
+    sendNotification('凡人修仙传', '第130集更新了')
 }
 
 async function registerForPushNotificationsAsync() {

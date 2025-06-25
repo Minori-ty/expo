@@ -7,13 +7,23 @@ export async function requestNotificationPermission() {
     let permission
     if (Platform.OS === 'ios') {
         // iOS 需要显式请求权限
-        permission = await Notifications.requestPermissionsAsync()
+        permission = await Notifications.requestPermissionsAsync({
+            ios: {
+                allowAlert: true,
+                allowBadge: true,
+                allowSound: true,
+            },
+        })
     } else {
         // Android 13 及以上需要请求通知权限
         permission = await Notifications.getPermissionsAsync()
         if (!permission.granted) {
             permission = await Notifications.requestPermissionsAsync()
         }
+        await Notifications.setNotificationChannelAsync('番剧推送', {
+            name: '番剧推送',
+            importance: Notifications.AndroidImportance.MAX, // MAX 会以悬浮横幅显示
+        })
     }
 
     if (permission.granted) {
@@ -29,7 +39,9 @@ export function sendNotification(title: string, body: string) {
             title,
             body,
         },
-        trigger: null,
+        trigger: {
+            channelId: '番剧推送',
+        },
     })
 }
 
