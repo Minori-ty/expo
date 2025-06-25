@@ -3,10 +3,13 @@ import * as Location from 'expo-location'
 import * as Notifications from 'expo-notifications'
 import * as TaskManager from 'expo-task-manager'
 import { Platform } from 'react-native'
+import { sendNotification } from './notifications'
 
 // 定义后台任务
 const BACKGROUND_FETCH_TASK = 'background-fetch-task'
 const LOCATION_TASK = 'location-task'
+// 定义后台任务名称
+const BACKGROUND_TASK_NAME = 'NOTIFICATION_TASK'
 
 // 注册后台获取任务
 TaskManager.defineTask(BACKGROUND_FETCH_TASK, async () => {
@@ -80,14 +83,24 @@ async function checkPermissions() {
     }
 }
 
-// 发送通知
-async function sendNotification(title: string, body: string) {
-    await Notifications.scheduleNotificationAsync({
-        content: {
-            title,
-            body,
-            sound: true,
-        },
-        trigger: null,
+const TASK_NAME = 'BACKGROUND_PUSH_TASK'
+
+export function runTask() {
+    const result = TaskManager.isTaskDefined(TASK_NAME)
+    if (!result) {
+        TaskManager.defineTask(TASK_NAME, async () => {
+            try {
+                await sendNotification('番剧更新提醒', '有新番剧更新了！')
+                return BackgroundTask.BackgroundTaskResult.Success
+            } catch (e) {
+                return BackgroundTask.BackgroundTaskResult.Failed
+            }
+        })
+    }
+}
+
+export async function registerBackgroundTask() {
+    await BackgroundTask.registerTaskAsync(TASK_NAME, {
+        minimumInterval: 60, // 最小60秒，系统实际可能更长
     })
 }

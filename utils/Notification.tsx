@@ -69,7 +69,7 @@ export default function App() {
 }
 
 async function schedulePushNotification() {
-    sendNotification('凡人修仙传', '第130集更新了')
+    await sendNotification('凡人修仙传', '第130集更新了')
 }
 
 async function registerForPushNotificationsAsync() {
@@ -87,11 +87,11 @@ async function registerForPushNotificationsAsync() {
     if (Device.isDevice) {
         const { status: existingStatus } = await Notifications.getPermissionsAsync()
         let finalStatus = existingStatus
-        if (existingStatus !== 'granted') {
+        if (existingStatus !== Notifications.PermissionStatus.GRANTED) {
             const { status } = await Notifications.requestPermissionsAsync()
             finalStatus = status
         }
-        if (finalStatus !== 'granted') {
+        if (finalStatus !== Notifications.PermissionStatus.GRANTED) {
             alert('Failed to get push token for push notification!')
             return
         }
