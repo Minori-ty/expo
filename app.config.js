@@ -21,24 +21,16 @@ export default {
             edgeToEdgeEnabled: true,
             package: 'com.minority.app',
             permissions: [
+                'ACCESS_FINE_LOCATION',
+                'ACCESS_COARSE_LOCATION',
+                'ACCESS_BACKGROUND_LOCATION',
+                'FOREGROUND_SERVICE',
+                'android.permission.ACCESS_COARSE_LOCATION',
+                'android.permission.ACCESS_FINE_LOCATION',
+                'android.permission.ACCESS_BACKGROUND_LOCATION',
                 'android.permission.FOREGROUND_SERVICE',
-                'android.permission.RECEIVE_BOOT_COMPLETED', // 自启动权限（需用户手动授权）
+                'android.permission.FOREGROUND_SERVICE_LOCATION',
             ],
-            manifest: {
-                'uses-permission': [
-                    { name: 'android.permission.FOREGROUND_SERVICE' },
-                    { name: 'android.permission.RECEIVE_BOOT_COMPLETED' },
-                ],
-                application: {
-                    receivers: [
-                        {
-                            name: '.BootReceiver',
-                            exported: true,
-                            'intent-filter': [{ action: 'android.intent.action.BOOT_COMPLETED' }],
-                        },
-                    ],
-                },
-            },
         },
         web: {
             bundler: 'metro',

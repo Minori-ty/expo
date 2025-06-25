@@ -26,7 +26,7 @@ function App() {
 
     return (
         <View style={styles.container}>
-            {isRegistered ? <Text>后台任务已注册!</Text> : <Text>后台任务未注册!</Text>}
+            {isRegistered ? <Text>注册{isRegistered.toString()}</Text> : <Text>后台任务未注册!</Text>}
         </View>
     )
 }
