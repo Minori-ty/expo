@@ -1,3 +1,4 @@
+import Empty from '@/components/lottie/Empty'
 import BackgroundPage from '@/utils/BackgroundPage'
 import Notification from '@/utils/Notification'
 import * as React from 'react'
@@ -32,7 +33,7 @@ export default function MyTabs() {
     const renderScene = SceneMap({
         first: Notification,
         second: BackgroundPage,
-        third: FirstRoute,
+        third: Empty,
         third4: SecondRoute,
         third5: FirstRoute,
         third6: SecondRoute,

@@ -40,6 +40,7 @@ export default {
         plugins: [
             'expo-router',
             'expo-background-task',
+            'expo-sqlite',
             [
                 'expo-notifications',
                 {
