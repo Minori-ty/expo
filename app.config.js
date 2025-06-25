@@ -13,6 +13,15 @@ export default {
         ios: {
             supportsTablet: true,
         },
+        android: {
+            adaptiveIcon: {
+                foregroundImage: './assets/images/adaptive-icon.png',
+                backgroundColor: '#ffffff',
+            },
+            edgeToEdgeEnabled: true,
+            package: 'com.minority.app',
+            permissions: ['RECEIVE_BOOT_COMPLETED', 'WAKE_LOCK', 'FOREGROUND_SERVICE'],
+        },
         web: {
             bundler: 'metro',
             output: 'static',
@@ -53,14 +62,10 @@ export default {
                 taskName: 'LOG_TASK',
                 allowsNetworking: true,
                 minInterval: 60, // 1分钟（单位：秒）
+                android: {
+                    permission: 'android.permission.RECEIVE_BOOT_COMPLETED',
+                },
             },
         ],
-        android: {
-             permissions: [
-                "RECEIVE_BOOT_COMPLETED",
-                "WAKE_LOCK",
-                "FOREGROUND_SERVICE"
-             ]
-        }
     },
 }
