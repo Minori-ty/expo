@@ -101,7 +101,7 @@ jobs:
               id: get-commits
               run: |
                   # 将提交信息收集到环境变量，保留换行符
-                  COMMIT_MESSAGES=$(git log -n 10 --pretty=format:"%h - %an, %ar : %s")
+                  COMMIT_MESSAGES=$(git log -n 10 --pretty=format:"- %s by @%an in #%h")
                   echo "COMMIT_MESSAGES<<EOF" >> $GITHUB_ENV
                   echo "$COMMIT_MESSAGES" >> $GITHUB_ENV
                   echo "EOF" >> $GITHUB_ENV
@@ -115,7 +115,8 @@ jobs:
                   name: v${{ env.VERSION }}
                   tag_name: v${{ env.VERSION }}
                   body: |
-                      发布版本 v${{ env.VERSION }}
-                      时间 ${{ env.FORMATTED_TIME }}
+                      # 发布版本 v${{ env.VERSION }}
+                      ***时间 ${{ env.FORMATTED_TIME }}***
+                      ## What's Changed
                       ${{ env.COMMIT_MESSAGES }}
                   files: 'v${{ env.VERSION }}.apk'
