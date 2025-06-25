@@ -5,7 +5,7 @@ import { StyleSheet, View } from 'react-native'
 export default function Empty() {
     return (
         <View style={styles.container}>
-            <LottieView source={require('./assets/lotties/empty.json')} autoPlay loop style={styles.lottie} />
+            <LottieView source={require('@/assets/lotties/empty.json')} autoPlay loop style={styles.lottie} />
         </View>
     )
 }
