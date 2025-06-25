@@ -1,3 +1,4 @@
+import BackgroundPage from '@/utils/BackgroundPage'
 import Notification from '@/utils/Notification'
 import * as React from 'react'
 import { Dimensions, StyleSheet, Text, View } from 'react-native'
@@ -30,7 +31,7 @@ export default function MyTabs() {
 
     const renderScene = SceneMap({
         first: Notification,
-        second: SecondRoute,
+        second: BackgroundPage,
         third: FirstRoute,
         third4: SecondRoute,
         third5: FirstRoute,

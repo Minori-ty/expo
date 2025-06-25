@@ -56,5 +56,18 @@ export default {
                 projectId: '5df2f02e-5af9-4191-8ad2-bbf3c5e8d468',
             },
         },
+        backgroundTasks: [
+            {
+                taskName: 'LOG_TASK',
+                allowsNetworking: true,
+                minInterval: 1 * 60, // 1分钟（单位：秒）
+                ios: {
+                    allowsExecutionWhileIdle: true,
+                },
+                android: {
+                    permission: 'android.permission.RECEIVE_BOOT_COMPLETED',
+                },
+            },
+        ],
     },
 }
