@@ -13,14 +13,6 @@ export default {
         ios: {
             supportsTablet: true,
         },
-        android: {
-            adaptiveIcon: {
-                foregroundImage: './assets/images/adaptive-icon.png',
-                backgroundColor: '#ffffff',
-            },
-            edgeToEdgeEnabled: true,
-            package: 'com.minority.app',
-        },
         web: {
             bundler: 'metro',
             output: 'static',
