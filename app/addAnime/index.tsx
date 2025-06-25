@@ -1,5 +1,6 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import React from 'react'
+import { useNavigation } from 'expo-router'
+import { useEffect } from 'react'
 import { useForm } from 'react-hook-form'
 import { Button, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native'
 import { z } from 'zod'
@@ -28,6 +29,13 @@ const schema = z.object({
 type FormData = z.infer<typeof schema>
 
 export default function BangumiForm() {
+    const navigation = useNavigation()
+    useEffect(() => {
+        navigation.setOptions({
+            headerTitle: '动漫追番',
+            headerTitleAlign: 'center',
+        })
+    }, [navigation])
     const {
         register,
         setValue,
@@ -46,7 +54,7 @@ export default function BangumiForm() {
         },
     })
 
-    React.useEffect(() => {
+    useEffect(() => {
         register('name')
         register('updateTime')
         register('currentEp')

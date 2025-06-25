@@ -28,6 +28,7 @@ export default {
         },
         plugins: [
             'expo-router',
+            'expo-background-task',
             [
                 'expo-notifications',
                 {

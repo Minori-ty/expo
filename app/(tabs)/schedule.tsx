@@ -1,18 +1,11 @@
 import PageHeader from '@/components/PageHeader'
 import { IconSymbol } from '@/components/ui/IconSymbol'
-import { useNavigation, useRouter } from 'expo-router'
-import React, { useEffect } from 'react'
+import { useRouter } from 'expo-router'
+import React from 'react'
 import { TouchableOpacity } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 
 const schedule = () => {
-    const navigation = useNavigation()
-    useEffect(() => {
-        navigation.setOptions({
-            headerTitle: '动漫追番',
-            headerTitleAlign: 'center',
-        })
-    }, [navigation])
     const router = useRouter()
     return (
         <SafeAreaView>

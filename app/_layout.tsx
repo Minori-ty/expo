@@ -5,6 +5,7 @@ import { StatusBar } from 'expo-status-bar'
 import 'react-native-reanimated'
 
 import { useColorScheme } from '@/hooks/useColorScheme'
+import { initializeBackgroundTasks } from '@/utils/background'
 import { requestNotificationPermission } from '@/utils/notifications'
 import { useEffect } from 'react'
 
@@ -18,6 +19,7 @@ export default function RootLayout() {
         // 只会在组件挂载时调用一次
         async function askPermission() {
             await requestNotificationPermission()
+            await initializeBackgroundTasks()
         }
         askPermission()
     }, [])
