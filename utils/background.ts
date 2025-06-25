@@ -1,4 +1,5 @@
 // backgroundTask.js
+import * as BackgroundFetch from 'expo-background-fetch'
 import * as BackgroundTask from 'expo-background-task'
 import * as Notifications from 'expo-notifications'
 import * as TaskManager from 'expo-task-manager'
@@ -22,7 +23,7 @@ export function registerBackgroundFetchAsync() {
 export async function initializeBackgroundTask(appMountedPromise: Promise<void>) {
     TaskManager.defineTask(BACKGROUND_TASK_NAME, async () => {
         try {
-            await appMountedPromise // 等待应用挂载完成
+            // await appMountedPromise // 等待应用挂载完成
             await sendNotification('番剧更新提醒', '有新的番剧更新啦！')
             return BackgroundTask.BackgroundTaskResult.Success
         } catch (error) {
@@ -32,8 +33,13 @@ export async function initializeBackgroundTask(appMountedPromise: Promise<void>)
     })
 
     if (!(await TaskManager.isTaskRegisteredAsync(BACKGROUND_TASK_NAME))) {
-        BackgroundTask.registerTaskAsync(BACKGROUND_TASK_NAME, {
-            minimumInterval: 1 * 60, // 1分钟（单位：秒）
+        // BackgroundTask.registerTaskAsync(BACKGROUND_TASK_NAME, {
+        //     minimumInterval: 1 * 60, // 1分钟（单位：秒）
+        // })
+        BackgroundFetch.registerTaskAsync(BACKGROUND_TASK_NAME, {
+            minimumInterval: 60,
+            startOnBoot: true,
+            stopOnTerminate: false,
         })
     }
 }
