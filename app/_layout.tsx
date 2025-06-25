@@ -6,7 +6,18 @@ import 'react-native-reanimated'
 
 import { useColorScheme } from '@/hooks/useColorScheme'
 import { requestNotificationPermission } from '@/utils/notifications'
+import * as Notifications from 'expo-notifications'
 import { useEffect } from 'react'
+
+Notifications.setNotificationHandler({
+    handleNotification: async () => ({
+        shouldPlaySound: true,
+        shouldSetBadge: true,
+        shouldShowBanner: true,
+        shouldShowList: true,
+        shouldShowAlert: true, // 允许系统弹出悬浮横幅
+    }),
+})
 
 export default function RootLayout() {
     const colorScheme = useColorScheme()

@@ -5,7 +5,7 @@ import { StyleSheet, View } from 'react-native'
 export default function Empty() {
     return (
         <View style={styles.container}>
-            <LottieView source={require('@/assets/lotties/empty.json')} autoPlay loop style={styles.lottie} />
+            <LottieView source={require('@/assets/lottie/empty.json')} autoPlay loop style={styles.lottie} />
         </View>
     )
 }
@@ -18,12 +18,7 @@ const styles = StyleSheet.create({
         backgroundColor: '#fff', // 可选：设置背景色
     },
     lottie: {
-        position: 'absolute',
-        top: 0,
-        left: 0,
-        right: 0,
-        bottom: 0,
-        width: '100%',
-        height: '100%',
+        width: 200, // 设置Lottie动画的宽度
+        height: 200, // 设置Lottie动画的高度
     },
 })

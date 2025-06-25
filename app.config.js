@@ -30,6 +30,7 @@ export default {
                 'android.permission.ACCESS_BACKGROUND_LOCATION',
                 'android.permission.FOREGROUND_SERVICE',
                 'android.permission.FOREGROUND_SERVICE_LOCATION',
+                'android.permission.RECEIVE_BOOT_COMPLETED',
             ],
         },
         web: {
@@ -74,7 +75,7 @@ export default {
                 allowsNetworking: true,
                 minInterval: 60, // 1分钟（单位：秒）
                 android: {
-                    permission: 'android.permission.RECEIVE_BOOT_COMPLETED',
+                    permission: ['android.permission.RECEIVE_BOOT_COMPLETED'],
                 },
             },
         ],
