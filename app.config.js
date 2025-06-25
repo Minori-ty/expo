@@ -20,7 +20,25 @@ export default {
             },
             edgeToEdgeEnabled: true,
             package: 'com.minority.app',
-            permissions: ['RECEIVE_BOOT_COMPLETED', 'WAKE_LOCK', 'FOREGROUND_SERVICE'],
+            permissions: [
+                'android.permission.FOREGROUND_SERVICE',
+                'android.permission.RECEIVE_BOOT_COMPLETED', // 自启动权限（需用户手动授权）
+            ],
+            manifest: {
+                'uses-permission': [
+                    { name: 'android.permission.FOREGROUND_SERVICE' },
+                    { name: 'android.permission.RECEIVE_BOOT_COMPLETED' },
+                ],
+                application: {
+                    receivers: [
+                        {
+                            name: '.BootReceiver',
+                            exported: true,
+                            'intent-filter': [{ action: 'android.intent.action.BOOT_COMPLETED' }],
+                        },
+                    ],
+                },
+            },
         },
         web: {
             bundler: 'metro',
