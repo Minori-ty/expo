@@ -1,6 +1,8 @@
 // backgroundTask.js
 import * as BackgroundTask from 'expo-background-task'
 import * as Notifications from 'expo-notifications'
+import * as TaskManager from 'expo-task-manager'
+import { sendNotification } from './notifications'
 
 // 定义任务名称
 export const BACKGROUND_TASK_NAME = 'LOG_TASK'
@@ -17,7 +19,21 @@ export function registerBackgroundFetchAsync() {
     Notifications.registerTaskAsync(BACKGROUND_TASK_NAME)
 }
 
-// 取消注册任务（可选）
-export async function unregisterBackgroundFetchAsync() {
-    return BackgroundTask.unregisterTaskAsync(BACKGROUND_TASK_NAME)
+export async function initializeBackgroundTask(appMountedPromise: Promise<void>) {
+    TaskManager.defineTask(BACKGROUND_TASK_NAME, async () => {
+        try {
+            await appMountedPromise // 等待应用挂载完成
+            await sendNotification('番剧更新提醒', '有新的番剧更新啦！')
+            return BackgroundTask.BackgroundTaskResult.Success
+        } catch (error) {
+            console.error('后台任务执行失败:', error)
+            return BackgroundTask.BackgroundTaskResult.Failed
+        }
+    })
+
+    if (!(await TaskManager.isTaskRegisteredAsync(BACKGROUND_TASK_NAME))) {
+        BackgroundTask.registerTaskAsync(BACKGROUND_TASK_NAME, {
+            minimumInterval: 1 * 60, // 1分钟（单位：秒）
+        })
+    }
 }
