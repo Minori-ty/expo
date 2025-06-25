@@ -2,7 +2,7 @@ import pkg from './package.json' assert { type: 'json' }
 
 export default {
     expo: {
-        name: 'app',
+        name: pkg.name,
         slug: 'app',
         version: pkg.version,
         orientation: 'portrait',

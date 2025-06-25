@@ -15,11 +15,12 @@ TaskManager.defineTask(BACKGROUND_TASK_NAME, async () => {
     }
 })
 
+registerBackgroundFetchAsync()
+
 function App() {
     const [isRegistered, setIsRegistered] = useState(false)
     useEffect(() => {
         // 应用启动时注册后台任务
-        registerBackgroundFetchAsync()
         const isDefined = TaskManager.isTaskDefined(BACKGROUND_TASK_NAME)
         setIsRegistered(isDefined)
     }, [])

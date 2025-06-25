@@ -1,5 +1,6 @@
 // backgroundTask.js
 import * as BackgroundTask from 'expo-background-task'
+import * as Notifications from 'expo-notifications'
 
 // 定义任务名称
 export const BACKGROUND_TASK_NAME = 'LOG_TASK'
@@ -12,6 +13,8 @@ export function registerBackgroundFetchAsync() {
     BackgroundTask.registerTaskAsync(BACKGROUND_TASK_NAME, {
         minimumInterval: 1 * 60, // 1分钟（单位：秒）
     })
+
+    Notifications.registerTaskAsync(BACKGROUND_TASK_NAME)
 }
 
 // 取消注册任务（可选）
