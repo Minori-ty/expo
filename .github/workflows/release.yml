@@ -93,6 +93,7 @@ jobs:
             - name: 获取当前时间
               run: |
                   # 使用 date 命令格式化时间
+                  export TZ='Asia/Shanghai'
                   current_time=$(date +"%Y-%m-%d %H:%M")
                   echo "FORMATTED_TIME=$current_time" >> $GITHUB_ENV
 
