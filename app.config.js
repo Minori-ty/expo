@@ -55,5 +55,12 @@ export default {
                 minInterval: 60, // 1分钟（单位：秒）
             },
         ],
+        android: {
+             permissions: [
+                "RECEIVE_BOOT_COMPLETED",
+                "WAKE_LOCK",
+                "FOREGROUND_SERVICE"
+             ]
+        }
     },
 }
