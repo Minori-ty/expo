@@ -22,8 +22,8 @@ const dataSchema = z.object({
     cover: z.string(),
     createdAt: z.number().int(),
 })
-
-type TData = z.infer<typeof dataSchema>
+type TData = typeof animeTable.$inferInsert
+type TSelect = typeof animeTable.$inferSelect
 const blurhash =
     '|rF?hV%2WCj[ayj[a|j[az_NaeWBj@ayfRayfQfQM{M|azj[azf6fQfQfQIpWXofj[ayj[j[fQayWCoeoeaya}j[ayfQa{oLj?j[WVj[ayayj[fQoff7azayj[ayj[j[ayofayayayj[fQj[ayayj[ayfjj[j[ayjuayj['
 
@@ -70,12 +70,11 @@ const Notification: React.FC = () => {
             isOver: false,
             cover: 'https://sfaf',
             createdAt: dayjs().unix(),
-        } satisfies TData
+        }
         const result = insertAnimeSchema.safeParse(data)
-        console.log(result)
 
         if (result.success) {
-            await db.insert(animeTable).values(result.data)
+            await db.insert(animeTable).values(result.data as TData)
             search()
         } else {
             console.log('插入数据验证失败:', result.error)
@@ -84,9 +83,8 @@ const Notification: React.FC = () => {
 
     async function search() {
         const row = await db.select().from(animeTable)
-
-        const parseData = row.map((item) => selectAnimeSchema.parse(item))
-        setList(parseData)
+        const list = selectAnimeSchema.array().parse(row)
+        setList(list as TAnime[])
     }
 
     useEffect(() => {

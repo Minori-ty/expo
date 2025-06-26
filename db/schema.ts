@@ -1,11 +1,16 @@
 import { sql } from 'drizzle-orm'
-import { integer, SQLiteColumnBuilderBase, sqliteTable, text } from 'drizzle-orm/sqlite-core'
+import { integer, type SQLiteColumnBuilderBase, sqliteTable, text } from 'drizzle-orm/sqlite-core'
 import { createInsertSchema, createSelectSchema } from 'drizzle-zod'
 
+type TUpdateWeekday = 1 | 2 | 3 | 4 | 5 | 6 | 7
+
+function isTUpdateWeekday(value: number): value is TUpdateWeekday {
+    return value >= 1 && value <= 7 && Number.isInteger(value)
+}
 const table = {
     id: integer('id').primaryKey({ autoIncrement: true }),
     name: text('name').notNull(),
-    updateWeekday: integer('update_weekday').notNull(),
+    updateWeekday: integer('update_weekday').$type<TUpdateWeekday>().notNull(),
     updateTimeHHmm: text('update_time_hhmm').notNull(),
     currentEpisode: integer('current_episode').notNull(),
     totalEpisode: integer('total_episode').notNull(),
@@ -24,12 +29,8 @@ export const animeTable = sqliteTable('anime', table)
 // 生成 Zod 验证模式
 export const insertAnimeSchema = createInsertSchema(animeTable, {
     // 注意这里修改为函数形式
-    updateWeekday: (schema) => schema.int().min(1).max(7),
+    updateWeekday: (schema) => schema.refine((val) => isTUpdateWeekday(val)),
     updateTimeHHmm: (schema) => schema.regex(/^([01]\d|2[0-3]):([0-5]\d)$/),
-    // isOver: (schema) =>
-    //     schema.int().refine((val) => val === 0 || val === 1, {
-    //         error: 'isOver must be 0 or 1',
-    //     }),
     isOver: (shema) => shema,
     createdAt: (schema) => schema.int().gte(0),
 })
@@ -44,10 +45,6 @@ export const insertSchduleSchema = createInsertSchema(schduleTable, {
     // 注意这里修改为函数形式
     updateWeekday: (schema) => schema.int().min(1).max(7),
     updateTimeHHmm: (schema) => schema.regex(/^([01]\d|2[0-3]):([0-5]\d)$/),
-    // isOver: (schema) =>
-    //     schema.int().refine((val) => val === 0 || val === 1, {
-    //         error: 'isOver must be 0 or 1',
-    //     }),
     isOver: (shema) => shema,
     createdAt: (schema) => schema.int().gte(0),
 })
