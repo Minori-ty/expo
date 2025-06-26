@@ -1,7 +1,7 @@
 {
   "version": "6",
   "dialect": "sqlite",
-  "id": "5e5705b2-f9b7-4e3c-a2d2-ab50d33cc8f9",
+  "id": "ab768e5f-86cc-411d-8e1e-7e22ad2201d9",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "tables": {
     "anime": {
@@ -55,7 +55,7 @@
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false,
-          "default": false
+          "default": "0"
         },
         "cover": {
           "name": "cover",
@@ -130,7 +130,7 @@
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false,
-          "default": false
+          "default": "0"
         },
         "cover": {
           "name": "cover",

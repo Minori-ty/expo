@@ -5,7 +5,7 @@ CREATE TABLE `anime` (
 	`update_time_hhmm` text NOT NULL,
 	`current_episode` integer NOT NULL,
 	`total_episode` integer NOT NULL,
-	`is_over` integer DEFAULT false NOT NULL,
+	`is_over` integer DEFAULT 0 NOT NULL,
 	`cover` text NOT NULL,
 	`created_at` integer DEFAULT (unixepoch()) NOT NULL
 );
@@ -17,7 +17,7 @@ CREATE TABLE `schdule` (
 	`update_time_hhmm` text NOT NULL,
 	`current_episode` integer NOT NULL,
 	`total_episode` integer NOT NULL,
-	`is_over` integer DEFAULT false NOT NULL,
+	`is_over` integer DEFAULT 0 NOT NULL,
 	`cover` text NOT NULL,
 	`created_at` integer DEFAULT (unixepoch()) NOT NULL
 );

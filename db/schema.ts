@@ -9,7 +9,9 @@ const table = {
     updateTimeHHmm: text('update_time_hhmm').notNull(),
     currentEpisode: integer('current_episode').notNull(),
     totalEpisode: integer('total_episode').notNull(),
-    isOver: integer('is_over', { mode: 'boolean' }).notNull().default(false),
+    isOver: integer('is_over', { mode: 'boolean' })
+        .notNull()
+        .default(sql`0`),
     cover: text('cover').notNull(),
     createdAt: integer('created_at')
         .notNull()
