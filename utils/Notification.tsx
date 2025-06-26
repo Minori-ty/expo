@@ -51,7 +51,7 @@ const Notification: React.FC = () => {
             updateTimeHHmm: '12:00',
             currentEpisode: 2,
             totalEpisode: 13,
-            isOver: 0,
+            isOver: false,
             cover: 'https://sfaf',
             createdAt: dayjs().unix(),
         }
@@ -99,7 +99,7 @@ const Notification: React.FC = () => {
             <Button title="添加数据" onPress={insert} />
             <Button title="添加日历提醒" onPress={addEventWithReminder} />
             {list.map((item) => {
-                return <Text key={item.id}>{item.createdAt && dayjs(item.createdAt * 1000).format('YYYY-MM-DD')}</Text>
+                return <Text key={item.id}>{JSON.stringify(item)}</Text>
             })}
         </ScrollView>
     )

@@ -20,7 +20,7 @@ const table = {
     updateTimeHHmm: text('update_time_hhmm').notNull(),
     currentEpisode: integer('current_episode').notNull(),
     totalEpisode: integer('total_episode').notNull(),
-    isOver: integer('is_over').notNull().default(0),
+    isOver: integer('is_over', { mode: 'boolean' }).notNull().default(false),
     cover: text('cover').notNull(),
     createdAt: integer('created_at')
         .notNull()
@@ -40,10 +40,11 @@ export const insertAnimeSchema = createInsertSchema(animeTable, {
             error: 'updateWeekday must be between 1 and 7',
         }),
     updateTimeHHmm: (schema) => schema.regex(/^([01]\d|2[0-3]):([0-5]\d)$/),
-    isOver: (schema) =>
-        schema.int().refine((val) => val === 0 || val === 1, {
-            error: 'isOver must be 0 or 1',
-        }),
+    // isOver: (schema) =>
+    //     schema.int().refine((val) => val === 0 || val === 1, {
+    //         error: 'isOver must be 0 or 1',
+    //     }),
+    isOver: (shema) => shema,
     createdAt: (schema) => schema.int().gte(0),
 })
 
@@ -60,10 +61,11 @@ export const insertSchduleSchema = createInsertSchema(schduleTable, {
             error: 'updateWeekday must be between 1 and 7',
         }),
     updateTimeHHmm: (schema) => schema.regex(/^([01]\d|2[0-3]):([0-5]\d)$/),
-    isOver: (schema) =>
-        schema.int().refine((val) => val === 0 || val === 1, {
-            error: 'isOver must be 0 or 1',
-        }),
+    // isOver: (schema) =>
+    //     schema.int().refine((val) => val === 0 || val === 1, {
+    //         error: 'isOver must be 0 or 1',
+    //     }),
+    isOver: (shema) => shema,
     createdAt: (schema) => schema.int().gte(0),
 })
 
