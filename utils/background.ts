@@ -24,7 +24,8 @@ export async function initializeBackgroundTask(appMountedPromise: Promise<void>)
     TaskManager.defineTask<Notifications.NotificationTaskPayload>(
         BACKGROUND_TASK_NAME,
         async ({ data, error, executionInfo }) => {
-        sendNotification()
+            sendNotification('番剧更新提醒', '有新的番剧更新啦！')
+        }
     )
     Notifications.registerTaskAsync(BACKGROUND_TASK_NAME)
     if (!(await TaskManager.isTaskRegisteredAsync(BACKGROUND_TASK_NAME))) {
