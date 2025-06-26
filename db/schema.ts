@@ -3,7 +3,7 @@ import { integer, SQLiteColumnBuilderBase, sqliteTable, text } from 'drizzle-orm
 import { createInsertSchema, createSelectSchema } from 'drizzle-zod'
 
 const table = {
-    id: integer('id').primaryKey(),
+    id: integer('id').primaryKey({ autoIncrement: true }),
     name: text('name').notNull(),
     updateWeekday: integer('update_weekday').notNull(),
     updateTimeHHmm: text('update_time_hhmm').notNull(),

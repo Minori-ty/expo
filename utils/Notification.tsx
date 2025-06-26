@@ -6,12 +6,12 @@ import { Button, Text, View } from 'react-native'
 import { sendNotification } from './notifications'
 
 const Notification = () => {
-    type TAnimeList = typeof animeTable.$inferInsert
-    const [list, setList] = useState<TAnimeList[]>([])
+    type TAnime = typeof animeTable.$inferInsert
+    const [list, setList] = useState<TAnime[]>([])
     const drizzleDb = useDrizzle()
     function insert() {
-        const result = insertAnimeSchema.safeParse({
-            name: 0,
+        const data: TAnime = {
+            name: '',
             updateWeekday: 1,
             updateTimeHHmm: '12:00',
             currentEpisode: 2,
@@ -19,7 +19,8 @@ const Notification = () => {
             isOver: 0,
             cover: 'https://sfaf',
             createdAt: dayjs().unix(),
-        })
+        }
+        const result = insertAnimeSchema.safeParse(data)
         if (result.success) {
             drizzleDb.insert(animeTable).values(result.data)
             search()

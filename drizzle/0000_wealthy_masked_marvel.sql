@@ -1,5 +1,5 @@
 CREATE TABLE `anime` (
-	`id` integer PRIMARY KEY NOT NULL,
+	`id` integer PRIMARY KEY AUTOINCREMENT NOT NULL,
 	`name` text NOT NULL,
 	`update_weekday` integer NOT NULL,
 	`update_time_hhmm` text NOT NULL,
@@ -11,7 +11,7 @@ CREATE TABLE `anime` (
 );
 --> statement-breakpoint
 CREATE TABLE `schdule` (
-	`id` integer PRIMARY KEY NOT NULL,
+	`id` integer PRIMARY KEY AUTOINCREMENT NOT NULL,
 	`name` text NOT NULL,
 	`update_weekday` integer NOT NULL,
 	`update_time_hhmm` text NOT NULL,

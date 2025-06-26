@@ -1,7 +1,7 @@
 {
   "version": "6",
   "dialect": "sqlite",
-  "id": "cdd75a8f-b68a-4d79-a2bb-b137c25fbf87",
+  "id": "a447d865-5f4c-474a-84be-75b135b15157",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "tables": {
     "anime": {
@@ -12,7 +12,7 @@
           "type": "integer",
           "primaryKey": true,
           "notNull": true,
-          "autoincrement": false
+          "autoincrement": true
         },
         "name": {
           "name": "name",
@@ -87,7 +87,7 @@
           "type": "integer",
           "primaryKey": true,
           "notNull": true,
-          "autoincrement": false
+          "autoincrement": true
         },
         "name": {
           "name": "name",
