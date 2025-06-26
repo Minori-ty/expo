@@ -62,7 +62,7 @@ const config = {
                 'expo-notifications',
                 {
                     color: '#ffffff',
-                    defaultChannel: 'default',
+                    defaultChannel: '番剧推送',
                     enableBackgroundRemoteNotifications: false,
                     backgroundFetchEnabled: true,
                 },
