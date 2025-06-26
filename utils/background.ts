@@ -27,15 +27,11 @@ export async function initializeBackgroundTask(appMountedPromise: Promise<void>)
             sendNotification('番剧更新提醒', '有新的番剧更新啦！')
         }
     )
-    Notifications.registerTaskAsync(BACKGROUND_TASK_NAME)
+ 
     if (!(await TaskManager.isTaskRegisteredAsync(BACKGROUND_TASK_NAME))) {
-        // BackgroundTask.registerTaskAsync(BACKGROUND_TASK_NAME, {
-        //     minimumInterval: 1 * 60, // 1分钟（单位：秒）
-        // })
-        BackgroundFetch.registerTaskAsync(BACKGROUND_TASK_NAME, {
-            minimumInterval: 60,
-            startOnBoot: true,
-            stopOnTerminate: false,
-        })
+         BackgroundTask.registerTaskAsync(BACKGROUND_TASK_NAME, {
+             minimumInterval: 1 * 60, // 1分钟（单位：秒）
+         })
+        
     }
 }
