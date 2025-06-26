@@ -33,6 +33,8 @@ const config = {
                 'ACCESS_BACKGROUND_LOCATION',
                 'FOREGROUND_SERVICE_LOCATION',
                 'IGNORE_BATTERY_OPTIMIZATION',
+                'READ_CALENDAR',
+                'WRITE_CALENDAR',
             ],
         },
         web: {
@@ -88,6 +90,12 @@ const config = {
                     ios: {
                         deploymentTarget: '15.1',
                     },
+                },
+            ],
+            [
+                'expo-calendar',
+                {
+                    calendarPermission: '描述',
                 },
             ],
         ],

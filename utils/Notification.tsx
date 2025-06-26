@@ -1,6 +1,8 @@
 import { db } from '@/db'
 import { animeTable, insertAnimeSchema, selectAnimeSchema } from '@/db/schema'
+import { getCalendarPermission } from '@/permissions'
 import dayjs from 'dayjs'
+import * as Calendar from 'expo-calendar'
 import { Image } from 'expo-image'
 import React, { useEffect, useState } from 'react'
 import { Button, ScrollView, StyleSheet, Text, View } from 'react-native'
@@ -9,7 +11,36 @@ import { sendNotification } from './notifications'
 const blurhash =
     '|rF?hV%2WCj[ayj[a|j[az_NaeWBj@ayfRayfQfQM{M|azj[azf6fQfQfQIpWXofj[ayj[j[fQayWCoeoeaya}j[ayfQa{oLj?j[WVj[ayayj[fQoff7azayj[ayj[j[ayofayayayj[fQj[ayayj[ayfjj[j[ayjuayj['
 
-const Notification = () => {
+async function addEventWithReminder() {
+    const hasPermission = await getCalendarPermission()
+    if (!hasPermission) {
+        console.log('没有日历权限')
+        return
+    }
+
+    // 获得默认日历ID
+    const calendars = await Calendar.getCalendarsAsync()
+    const defaultCalendar = calendars.find((cal) => cal.allowsModifications)
+
+    if (!defaultCalendar) {
+        console.log('没有找到可修改的默认日历')
+        return
+    }
+
+    const eventId = await Calendar.createEventAsync(defaultCalendar.id, {
+        title: '测试事件',
+        startDate: new Date(Date.now() + 2 * 60 * 1000),
+        endDate: new Date(Date.now() + 26 * 60 * 1000),
+        timeZone: 'Asia/Shanghai',
+        alarms: [
+            { relativeOffset: 0 }, // 提前10分钟通知
+        ],
+    })
+    console.log('事件已添加，ID:', eventId)
+    return eventId
+}
+
+const Notification: React.FC = () => {
     type TAnime = typeof animeTable.$inferInsert
     const [list, setList] = useState<TAnime[]>([])
     async function insert() {
@@ -43,6 +74,7 @@ const Notification = () => {
 
     useEffect(() => {
         search()
+        getCalendarPermission()
     }, [])
     return (
         <ScrollView>
@@ -64,6 +96,7 @@ const Notification = () => {
                 />
             </View>
             <Button title="添加数据" onPress={insert} />
+            <Button title="添加日历提醒" onPress={addEventWithReminder} />
             {list.map((item) => {
                 return <Text key={item.id}>{item.createdAt && dayjs(item.createdAt * 1000).format('YYYY-MM-DD')}</Text>
             })}
