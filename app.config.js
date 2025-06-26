@@ -62,6 +62,7 @@ export default {
                     color: '#ffffff',
                     defaultChannel: 'default',
                     enableBackgroundRemoteNotifications: false,
+                    backgroundFetchEnabled: true,
                 },
             ],
             [
@@ -98,7 +99,7 @@ export default {
         },
         backgroundTasks: [
             {
-                taskName: 'LOG_TASK',
+                taskName: 'background-task',
                 allowsNetworking: true,
                 minInterval: 60, // 1分钟（单位：秒）
                 android: {

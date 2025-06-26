@@ -2,6 +2,7 @@ import * as BackgroundTask from 'expo-background-task'
 import * as TaskManager from 'expo-task-manager'
 import { useEffect, useState } from 'react'
 import { Button, StyleSheet, Text, View } from 'react-native'
+import { sendNotification } from './notifications'
 
 const BACKGROUND_TASK_IDENTIFIER = 'background-task'
 
@@ -10,8 +11,7 @@ const BACKGROUND_TASK_IDENTIFIER = 'background-task'
 // Note: This needs to be called in the global scope, not in a React component.
 TaskManager.defineTask(BACKGROUND_TASK_IDENTIFIER, async () => {
     try {
-        const now = Date.now()
-        console.log(`Got background task call at date: ${new Date(now).toISOString()}`)
+        sendNotification('测试通知', '这是一个测试通知内容')
     } catch (error) {
         console.error('Failed to execute the background task:', error)
         return BackgroundTask.BackgroundTaskResult.Failed
