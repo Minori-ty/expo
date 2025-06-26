@@ -1,6 +1,8 @@
 import pkg from './package.json' assert { type: 'json' }
-
-export default {
+/**
+ * @type {import('expo/config').ExpoConfig}
+ */
+const config = {
     expo: {
         name: pkg.name,
         slug: 'app',
@@ -109,3 +111,5 @@ export default {
         ],
     },
 }
+
+export default config

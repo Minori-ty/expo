@@ -5,9 +5,15 @@ import { StatusBar } from 'expo-status-bar'
 import 'react-native-reanimated'
 
 import { useColorScheme } from '@/hooks/useColorScheme'
+import { DrizzleContextProvider, migrateAsync } from '@/hooks/useDrizzle'
 import { requestNotificationPermission } from '@/utils/notifications'
 import * as Notifications from 'expo-notifications'
-import { useEffect } from 'react'
+import { SQLiteProvider } from 'expo-sqlite'
+import { Suspense, useEffect } from 'react'
+import { ActivityIndicator } from 'react-native'
+
+export const ANIME_DATABASE = 'anime'
+export const SCHDULE_DATABASE = 'schdule'
 
 Notifications.setNotificationHandler({
     handleNotification: async () => ({
@@ -15,7 +21,6 @@ Notifications.setNotificationHandler({
         shouldSetBadge: true,
         shouldShowBanner: true,
         shouldShowList: true,
-        shouldShowAlert: true, // 允许系统弹出悬浮横幅
     }),
 })
 
@@ -39,12 +44,30 @@ export default function RootLayout() {
     }
 
     return (
-        <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-            <Stack>
-                <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-                <Stack.Screen name="+not-found" />
-            </Stack>
-            <StatusBar style="auto" />
-        </ThemeProvider>
+        <Suspense fallback={<ActivityIndicator size="large" />}>
+            <SQLiteProvider
+                databaseName={SCHDULE_DATABASE}
+                options={{ enableChangeListener: true }}
+                useSuspense
+                onInit={migrateAsync}
+            >
+                <SQLiteProvider
+                    databaseName={ANIME_DATABASE}
+                    options={{ enableChangeListener: true }}
+                    useSuspense
+                    onInit={migrateAsync}
+                >
+                    <DrizzleContextProvider>
+                        <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
+                            <Stack>
+                                <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+                                <Stack.Screen name="+not-found" />
+                            </Stack>
+                            <StatusBar style="auto" />
+                        </ThemeProvider>
+                    </DrizzleContextProvider>
+                </SQLiteProvider>
+            </SQLiteProvider>
+        </Suspense>
     )
 }

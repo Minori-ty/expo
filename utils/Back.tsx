@@ -12,6 +12,7 @@ const BACKGROUND_TASK_IDENTIFIER = 'background-task'
 TaskManager.defineTask(BACKGROUND_TASK_IDENTIFIER, async () => {
     try {
         sendNotification('测试通知', '这是一个测试通知内容')
+        console.log('开始定时任务')
     } catch (error) {
         console.error('Failed to execute the background task:', error)
         return BackgroundTask.BackgroundTaskResult.Failed
@@ -22,7 +23,10 @@ TaskManager.defineTask(BACKGROUND_TASK_IDENTIFIER, async () => {
 // 2. Register the task at some point in your app by providing the same name
 // Note: This does NOT need to be in the global scope and CAN be used in your React components!
 async function registerBackgroundTaskAsync() {
-    return BackgroundTask.registerTaskAsync(BACKGROUND_TASK_IDENTIFIER)
+    console.log('注册通知任务')
+    return BackgroundTask.registerTaskAsync(BACKGROUND_TASK_IDENTIFIER, {
+        minimumInterval: 60,
+    })
 }
 
 // 3. (Optional) Unregister tasks by specifying the task name
@@ -56,6 +60,10 @@ export default function BackgroundTaskScreen() {
         await updateAsync()
     }
 
+    function startTask() {
+        BackgroundTask.triggerTaskWorkerForTestingAsync()
+    }
+
     return (
         <View style={styles.screen}>
             <View style={styles.textContainer}>
@@ -66,10 +74,11 @@ export default function BackgroundTaskScreen() {
             </View>
             <Button
                 disabled={status === BackgroundTask.BackgroundTaskStatus.Restricted}
-                title={isRegistered ? 'Cancel Background Task' : 'Schedule Background Task'}
+                title={isRegistered ? '取消任务' : '开始任务'}
                 onPress={toggle}
             />
-            <Button title="Check Background Task Status" onPress={updateAsync} />
+            <Button title="查看任务状态" onPress={updateAsync} />
+            <Button title="开始任务" onPress={startTask} />
         </View>
     )
 }
