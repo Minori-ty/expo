@@ -2,10 +2,21 @@ import { sql } from 'drizzle-orm'
 import { integer, SQLiteColumnBuilderBase, sqliteTable, text } from 'drizzle-orm/sqlite-core'
 import { createInsertSchema, createSelectSchema } from 'drizzle-zod'
 
+// 定义星期枚举值
+enum Weekday {
+    Monday = 1,
+    Tuesday = 2,
+    Wednesday = 3,
+    Thursday = 4,
+    Friday = 5,
+    Saturday = 6,
+    Sunday = 7,
+}
+
 const table = {
     id: integer('id').primaryKey({ autoIncrement: true }),
     name: text('name').notNull(),
-    updateWeekday: integer('update_weekday').notNull(),
+    updateWeekday: integer('update_weekday').$type<Weekday>().notNull(),
     updateTimeHHmm: text('update_time_hhmm').notNull(),
     currentEpisode: integer('current_episode').notNull(),
     totalEpisode: integer('total_episode').notNull(),
@@ -19,14 +30,19 @@ const table = {
 /** 动漫列表数据表 */
 export const animeTable = sqliteTable('anime', table)
 
+const enumValues = Object.values(Weekday).filter((v) => typeof v === 'number') as Weekday[]
+
 // 生成 Zod 验证模式
 export const insertAnimeSchema = createInsertSchema(animeTable, {
     // 注意这里修改为函数形式
-    updateWeekday: (schema) => schema.int().min(1).max(7),
+    updateWeekday: (schema) =>
+        schema.refine((value) => enumValues.includes(value), {
+            error: 'updateWeekday must be between 1 and 7',
+        }),
     updateTimeHHmm: (schema) => schema.regex(/^([01]\d|2[0-3]):([0-5]\d)$/),
     isOver: (schema) =>
         schema.int().refine((val) => val === 0 || val === 1, {
-            message: 'isOver must be 0 or 1',
+            error: 'isOver must be 0 or 1',
         }),
     createdAt: (schema) => schema.int().gte(0),
 })
@@ -39,9 +55,15 @@ export const schduleTable = sqliteTable('schdule', table)
 // 生成 Zod 验证模式
 export const insertSchduleSchema = createInsertSchema(schduleTable, {
     // 注意这里修改为函数形式
-    updateWeekday: (schema) => schema.int().min(1).max(7),
+    updateWeekday: (schema) =>
+        schema.refine((value) => enumValues.includes(value), {
+            error: 'updateWeekday must be between 1 and 7',
+        }),
     updateTimeHHmm: (schema) => schema.regex(/^([01]\d|2[0-3]):([0-5]\d)$/),
-    isOver: (schema) => schema,
+    isOver: (schema) =>
+        schema.int().refine((val) => val === 0 || val === 1, {
+            error: 'isOver must be 0 or 1',
+        }),
     createdAt: (schema) => schema.int().gte(0),
 })
 

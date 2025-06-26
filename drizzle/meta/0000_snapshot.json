@@ -1,7 +1,7 @@
 {
   "version": "6",
   "dialect": "sqlite",
-  "id": "a447d865-5f4c-474a-84be-75b135b15157",
+  "id": "e64a6074-b347-46dd-b3c9-d1ea7cdbbb9f",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "tables": {
     "anime": {
