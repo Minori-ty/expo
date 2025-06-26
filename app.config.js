@@ -21,13 +21,15 @@ export default {
             edgeToEdgeEnabled: true,
             package: 'com.minority.app',
             permissions: [
-                'android.permission.SCHEDULE_EXACT_ALARM',
-                'android.permission.ACCESS_COARSE_LOCATION',
-                'android.permission.ACCESS_FINE_LOCATION',
-                'android.permission.ACCESS_BACKGROUND_LOCATION',
-                'android.permission.FOREGROUND_SERVICE',
-                'android.permission.FOREGROUND_SERVICE_LOCATION',
-                'android.permission.RECEIVE_BOOT_COMPLETED',
+                'ACCESS_NETWORK_STATE',
+                'FOREGROUND_SERVICE',
+                'RECEIVE_BOOT_COMPLETED',
+                'WAKE_LOCK',
+                'SCHEDULE_EXACT_ALARM', // 可选，用于高频任务
+                'ACCESS_COARSE_LOCATION',
+                'ACCESS_FINE_LOCATION',
+                'ACCESS_BACKGROUND_LOCATION',
+                'FOREGROUND_SERVICE_LOCATION',
             ],
         },
         web: {
@@ -38,7 +40,22 @@ export default {
         plugins: [
             'expo-router',
             'expo-background-task',
-            'expo-sqlite',
+            [
+                'expo-sqlite',
+                {
+                    enableFTS: true,
+                    useSQLCipher: true,
+                    android: {
+                        // Override the shared configuration for Android
+                        enableFTS: false,
+                        useSQLCipher: false,
+                    },
+                    ios: {
+                        // You can also override the shared configurations for iOS
+                        customBuildFlags: ['-DSQLITE_ENABLE_DBSTAT_VTAB=1 -DSQLITE_ENABLE_SNAPSHOT=1'],
+                    },
+                },
+            ],
             [
                 'expo-notifications',
                 {
@@ -85,7 +102,7 @@ export default {
                 allowsNetworking: true,
                 minInterval: 60, // 1分钟（单位：秒）
                 android: {
-                    permission: ['android.permission.RECEIVE_BOOT_COMPLETED'],
+                    permission: ['RECEIVE_BOOT_COMPLETED'],
                 },
             },
         ],
