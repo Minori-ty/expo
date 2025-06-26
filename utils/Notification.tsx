@@ -6,24 +6,9 @@ import * as Calendar from 'expo-calendar'
 import { Image } from 'expo-image'
 import React, { useEffect, useState } from 'react'
 import { Button, ScrollView, StyleSheet, Text, View } from 'react-native'
-import { z } from 'zod'
 import { sendNotification } from './notifications'
 
-const WeekdayEnum = z.number().int().min(1).max(7)
-const HHmmString = z.string().regex(/^([01]\d|2[0-3]):([0-5]\d)$/)
-
-const dataSchema = z.object({
-    name: z.string(),
-    updateWeekday: WeekdayEnum,
-    updateTimeHHmm: HHmmString,
-    currentEpisode: z.number(),
-    totalEpisode: z.number(),
-    isOver: z.boolean(),
-    cover: z.string(),
-    createdAt: z.number().int(),
-})
 type TData = typeof animeTable.$inferInsert
-type TSelect = typeof animeTable.$inferSelect
 const blurhash =
     '|rF?hV%2WCj[ayj[a|j[az_NaeWBj@ayfRayfQfQM{M|azj[azf6fQfQfQIpWXofj[ayj[j[fQayWCoeoeaya}j[ayfQa{oLj?j[WVj[ayayj[fQoff7azayj[ayj[j[ayofayayayj[fQj[ayayj[ayfjj[j[ayjuayj['
 
