@@ -1,5 +1,6 @@
 import { animeTable, insertAnimeSchema, selectAnimeSchema } from '@/db/schema'
 import { useDrizzle } from '@/hooks/useDrizzle'
+import dayjs from 'dayjs'
 import React, { useEffect, useState } from 'react'
 import { Button, Text, View } from 'react-native'
 import { sendNotification } from './notifications'
@@ -16,7 +17,8 @@ const Notification = () => {
             currentEpisode: 2,
             totalEpisode: 13,
             isOver: false,
-            cover: 'https://www.bilibili.com/bangumi/play/ss27440',
+            cover: 'https://sfaf',
+            createdAt: dayjs().unix(),
         })
         drizzleDb.insert(animeTable).values(parse)
         search()

@@ -9,9 +9,9 @@ const table = {
     updateTimeHHmm: text('update_time_hhmm').notNull(),
     currentEpisode: integer('current_episode').notNull(),
     totalEpisode: integer('total_episode').notNull(),
-    isOver: integer('is_over', { mode: 'boolean' }).notNull().default(false),
+    isOver: integer('is_over').notNull().default(0),
     cover: text('cover').notNull(),
-    createAt: integer('create_at')
+    createdAt: integer('created_at')
         .notNull()
         .default(sql`(unixepoch())`),
 } satisfies Record<string, SQLiteColumnBuilderBase>
@@ -24,8 +24,11 @@ export const insertAnimeSchema = createInsertSchema(animeTable, {
     // 注意这里修改为函数形式
     updateWeekday: (schema) => schema.int().min(1).max(7),
     updateTimeHHmm: (schema) => schema.regex(/^([01]\d|2[0-3]):([0-5]\d)$/),
-    isOver: (schema) => schema,
-    createAt: (schema) => schema.int().gte(0),
+    isOver: (schema) =>
+        schema.int().refine((val) => val === 0 || val === 1, {
+            message: 'isOver must be 0 or 1',
+        }),
+    createdAt: (schema) => schema.int().gte(0),
 })
 
 export const selectAnimeSchema = createSelectSchema(animeTable)
@@ -39,7 +42,7 @@ export const insertSchduleSchema = createInsertSchema(schduleTable, {
     updateWeekday: (schema) => schema.int().min(1).max(7),
     updateTimeHHmm: (schema) => schema.regex(/^([01]\d|2[0-3]):([0-5]\d)$/),
     isOver: (schema) => schema,
-    createAt: (schema) => schema.int().gte(0),
+    createdAt: (schema) => schema.int().gte(0),
 })
 
 export const selectSchduleSchema = createSelectSchema(schduleTable)

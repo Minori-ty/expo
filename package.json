@@ -1,7 +1,7 @@
 {
     "name": "app",
     "main": "expo-router/entry",
-    "version": "0.0.4",
+    "version": "0.0.5",
     "scripts": {
         "start": "expo start",
         "reset-project": "node ./scripts/reset-project.js",
@@ -21,6 +21,7 @@
         "babel-plugin-inline-import": "^3.0.0",
         "babel-plugin-module-resolver": "^5.0.2",
         "babel-preset-expo": "13.2.1",
+        "dayjs": "^1.11.13",
         "drizzle-orm": "^0.44.2",
         "drizzle-zod": "^0.8.2",
         "expo": "~53.0.12",
