@@ -5,22 +5,8 @@
     {
       "idx": 0,
       "version": "6",
-      "when": 1750918930644,
-      "tag": "0000_robust_starbolt",
-      "breakpoints": true
-    },
-    {
-      "idx": 1,
-      "version": "6",
-      "when": 1750921425062,
-      "tag": "0001_dazzling_rumiko_fujikawa",
-      "breakpoints": true
-    },
-    {
-      "idx": 2,
-      "version": "6",
-      "when": 1750927346571,
-      "tag": "0002_lush_eddie_brock",
+      "when": 1750929051117,
+      "tag": "0000_amazing_viper",
       "breakpoints": true
     }
   ]
