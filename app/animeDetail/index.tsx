@@ -9,7 +9,7 @@ const promise = new Promise<void>((resolve) => {
     resolver = resolve
 })
 
-initializeBackgroundTask(promise)
+initializeBackgroundTask()
 
 const index = () => {
     const navigation = useNavigation()
