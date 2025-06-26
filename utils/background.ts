@@ -13,6 +13,6 @@ export async function registerBackgroundTask() {
     if (status) return
     // 注册任务（iOS/Android 通用 API）
     BackgroundTask.registerTaskAsync(BACKGROUND_TASK_NAME, {
-        minimumInterval: 1 * 60, // 1分钟（单位：秒）
+        minimumInterval: 10, // 1分钟（单位：秒）
     })
 }

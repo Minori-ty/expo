@@ -32,6 +32,7 @@ const config = {
                 'ACCESS_FINE_LOCATION',
                 'ACCESS_BACKGROUND_LOCATION',
                 'FOREGROUND_SERVICE_LOCATION',
+                'IGNORE_BATTERY_OPTIMIZATION',
             ],
         },
         web: {

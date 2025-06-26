@@ -7,10 +7,10 @@ import 'react-native-reanimated'
 import { db } from '@/db'
 import migrations from '@/drizzle/migrations'
 import { useColorScheme } from '@/hooks/useColorScheme'
-import { requestNotificationPermission, sendNotification } from '@/utils/notifications'
+import { requestNotificationPermission } from '@/utils/notifications'
 import { useMigrations } from 'drizzle-orm/expo-sqlite/migrator'
 import * as Notifications from 'expo-notifications'
-import { useEffect, useState } from 'react'
+import { useEffect } from 'react'
 
 Notifications.setNotificationHandler({
     handleNotification: async () => ({
@@ -23,7 +23,6 @@ Notifications.setNotificationHandler({
 
 export default function RootLayout() {
     const colorScheme = useColorScheme()
-    const [count, setCount] = useState(0)
     const { success, error } = useMigrations(db, migrations)
     const [loaded] = useFonts({
         SpaceMono: require('../assets/fonts/SpaceMono-Regular.ttf'),
@@ -33,8 +32,6 @@ export default function RootLayout() {
         // 只会在组件挂载时调用一次
         async function askPermission() {
             await requestNotificationPermission()
-            sendNotification(count + '', '请允许通知权限以获取最新番剧更新提醒')
-            setCount((pre) => pre + 1)
         }
         askPermission()
     }, [])
