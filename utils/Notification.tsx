@@ -6,8 +6,24 @@ import * as Calendar from 'expo-calendar'
 import { Image } from 'expo-image'
 import React, { useEffect, useState } from 'react'
 import { Button, ScrollView, StyleSheet, Text, View } from 'react-native'
+import { z } from 'zod'
 import { sendNotification } from './notifications'
 
+const WeekdayEnum = z.number().int().min(1).max(7)
+const HHmmString = z.string().regex(/^([01]\d|2[0-3]):([0-5]\d)$/)
+
+const dataSchema = z.object({
+    name: z.string(),
+    updateWeekday: WeekdayEnum,
+    updateTimeHHmm: HHmmString,
+    currentEpisode: z.number(),
+    totalEpisode: z.number(),
+    isOver: z.boolean(),
+    cover: z.string(),
+    createdAt: z.number().int(),
+})
+
+type TData = z.infer<typeof dataSchema>
 const blurhash =
     '|rF?hV%2WCj[ayj[a|j[az_NaeWBj@ayfRayfQfQM{M|azj[azf6fQfQfQIpWXofj[ayj[j[fQayWCoeoeaya}j[ayfQa{oLj?j[WVj[ayayj[fQoff7azayj[ayj[j[ayofayayayj[fQj[ayayj[ayfjj[j[ayjuayj['
 
@@ -42,10 +58,10 @@ async function addEventWithReminder() {
 }
 
 const Notification: React.FC = () => {
-    type TAnime = typeof animeTable.$inferInsert
+    type TAnime = typeof animeTable.$inferSelect
     const [list, setList] = useState<TAnime[]>([])
     async function insert() {
-        const data: TAnime = {
+        const data = {
             name: 'a',
             updateWeekday: 1,
             updateTimeHHmm: '12:00',
@@ -54,7 +70,7 @@ const Notification: React.FC = () => {
             isOver: false,
             cover: 'https://sfaf',
             createdAt: dayjs().unix(),
-        }
+        } satisfies TData
         const result = insertAnimeSchema.safeParse(data)
         console.log(result)
 
