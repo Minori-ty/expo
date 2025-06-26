@@ -15,6 +15,7 @@ async function addEventWithReminder() {
     const hasPermission = await getCalendarPermission()
     if (!hasPermission) {
         console.log('没有日历权限')
+        sendNotification('没有日历权限', '没有日历权限')
         return
     }
 

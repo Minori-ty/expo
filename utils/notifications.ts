@@ -46,10 +46,10 @@ export function sendNotification(title: string, body: string) {
                     },
                 },
                 trigger: {
-                    type: Notifications.SchedulableTriggerInputTypes.TIME_INTERVAL,
-                    seconds: 10,
+                    // type: Notifications.SchedulableTriggerInputTypes.TIME_INTERVAL,
+                    // seconds: 10,
                     channelId: '番剧推送',
-                    repeats: true,
+                    // repeats: true,
                 },
             })
             resolve('通知已发送')
