@@ -10,18 +10,20 @@ const Notification = () => {
     const [list, setList] = useState<TAnimeList[]>([])
     const drizzleDb = useDrizzle()
     function insert() {
-        const parse = insertAnimeSchema.parse({
-            name: '1',
+        const result = insertAnimeSchema.safeParse({
+            name: 0,
             updateWeekday: 1,
             updateTimeHHmm: '12:00',
             currentEpisode: 2,
             totalEpisode: 13,
-            isOver: false,
+            isOver: 0,
             cover: 'https://sfaf',
             createdAt: dayjs().unix(),
         })
-        drizzleDb.insert(animeTable).values(parse)
-        search()
+        if (result.success) {
+            drizzleDb.insert(animeTable).values(result.data)
+            search()
+        }
     }
     async function search() {
         const row = await drizzleDb.select().from(animeTable)
