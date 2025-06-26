@@ -36,9 +36,9 @@ export default function MyTabs() {
         second: BackgroundPage,
         third: Empty,
         third4: Back,
-        third5: FirstRoute,
-        third6: SecondRoute,
-        third7: FirstRoute,
+        third5: Empty,
+        third6: Empty,
+        third7: Empty,
     })
 
     return (
@@ -55,6 +55,7 @@ export default function MyTabs() {
                         tabStyle={{ width: 80, backgroundColor: '#eee' }}
                         activeColor="#000"
                         inactiveColor="#888"
+                        indicatorStyle={{ backgroundColor: '#000' }}
                     />
                 )}
             ></TabView>

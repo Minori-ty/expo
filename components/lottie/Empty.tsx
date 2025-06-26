@@ -18,7 +18,7 @@ const styles = StyleSheet.create({
         backgroundColor: '#fff', // 可选：设置背景色
     },
     lottie: {
-        width: 200, // 设置Lottie动画的宽度
-        height: 200, // 设置Lottie动画的高度
+        width: 150, // 设置Lottie动画的宽度
+        height: 150, // 设置Lottie动画的高度
     },
 })

@@ -11,7 +11,6 @@ import { requestNotificationPermission } from '@/utils/notifications'
 import { useMigrations } from 'drizzle-orm/expo-sqlite/migrator'
 import * as Notifications from 'expo-notifications'
 import { useEffect } from 'react'
-import { Text } from 'react-native'
 
 Notifications.setNotificationHandler({
     handleNotification: async () => ({
@@ -42,12 +41,12 @@ export default function RootLayout() {
         return null
     }
 
-    if (error) {
-        return <Text>Migration 错误: {error.message}</Text>
-    }
-    if (!success) {
-        return <Text>正在 Migration...</Text>
-    }
+    // if (error) {
+    //     return <Text>Migration 错误: {error.message}</Text>
+    // }
+    // if (!success) {
+    //     return <Text>正在 Migration...</Text>
+    // }
 
     return (
         <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>

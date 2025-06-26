@@ -23,7 +23,6 @@ TaskManager.defineTask(BACKGROUND_TASK_IDENTIFIER, async () => {
 // 2. Register the task at some point in your app by providing the same name
 // Note: This does NOT need to be in the global scope and CAN be used in your React components!
 async function registerBackgroundTaskAsync() {
-    console.log('注册通知任务')
     return BackgroundTask.registerTaskAsync(BACKGROUND_TASK_IDENTIFIER, {
         minimumInterval: 60,
     })

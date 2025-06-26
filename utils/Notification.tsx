@@ -2,13 +2,13 @@ import { db } from '@/db'
 import { animeTable, insertAnimeSchema, selectAnimeSchema } from '@/db/schema'
 import dayjs from 'dayjs'
 import React, { useEffect, useState } from 'react'
-import { Button, Text, View } from 'react-native'
+import { Button, ScrollView, Text } from 'react-native'
 import { sendNotification } from './notifications'
 
 const Notification = () => {
     type TAnime = typeof animeTable.$inferInsert
     const [list, setList] = useState<TAnime[]>([])
-    function insert() {
+    async function insert() {
         const data: TAnime = {
             name: 'a',
             updateWeekday: 1,
@@ -20,15 +20,19 @@ const Notification = () => {
             createdAt: dayjs().unix(),
         }
         const result = insertAnimeSchema.safeParse(data)
+        console.log(result)
+
         if (result.success) {
-            db.insert(animeTable).values(result.data)
+            await db.insert(animeTable).values(result.data)
             search()
-        }else{
-sendNotification('测试通知', JSON.stringify(result))
-}
+        } else {
+            console.log('插入数据验证失败:', result.error)
+        }
     }
+
     async function search() {
         const row = await db.select().from(animeTable)
+
         const parseData = row.map((item) => selectAnimeSchema.parse(item))
         setList(parseData)
     }
@@ -37,7 +41,7 @@ sendNotification('测试通知', JSON.stringify(result))
         search()
     }, [])
     return (
-        <View>
+        <ScrollView>
             <Text>Notification</Text>
             <Button
                 title="发送通知"
@@ -47,9 +51,9 @@ sendNotification('测试通知', JSON.stringify(result))
             />
             <Button title="添加数据" onPress={insert} />
             {list.map((item) => {
-                return <Text>{item.name}</Text>
+                return <Text key={item.id}>{item.createdAt && dayjs(item.createdAt * 1000).format('YYYY-MM-DD')}</Text>
             })}
-        </View>
+        </ScrollView>
     )
 }
 

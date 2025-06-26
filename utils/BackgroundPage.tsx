@@ -24,7 +24,6 @@ function App() {
         // 应用启动时注册后台任务
         const isDefined = TaskManager.isTaskDefined(BACKGROUND_TASK_NAME)
         setIsRegistered(isDefined)
-        sendNotification(isDefined + '', isDefined + '')
     }, [])
 
     return (
