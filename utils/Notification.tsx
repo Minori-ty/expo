@@ -1,5 +1,5 @@
+import { db } from '@/db'
 import { animeTable, insertAnimeSchema, selectAnimeSchema } from '@/db/schema'
-import { useDrizzle } from '@/hooks/useDrizzle'
 import dayjs from 'dayjs'
 import React, { useEffect, useState } from 'react'
 import { Button, Text, View } from 'react-native'
@@ -8,7 +8,6 @@ import { sendNotification } from './notifications'
 const Notification = () => {
     type TAnime = typeof animeTable.$inferInsert
     const [list, setList] = useState<TAnime[]>([])
-    const drizzleDb = useDrizzle()
     function insert() {
         const data: TAnime = {
             name: '',
@@ -22,12 +21,12 @@ const Notification = () => {
         }
         const result = insertAnimeSchema.safeParse(data)
         if (result.success) {
-            drizzleDb.insert(animeTable).values(result.data)
+            db.insert(animeTable).values(result.data)
             search()
         }
     }
     async function search() {
-        const row = await drizzleDb.select().from(animeTable)
+        const row = await db.select().from(animeTable)
         const parseData = row.map((item) => selectAnimeSchema.parse(item))
         setList(parseData)
     }
