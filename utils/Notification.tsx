@@ -10,7 +10,7 @@ const Notification = () => {
     const [list, setList] = useState<TAnime[]>([])
     function insert() {
         const data: TAnime = {
-            name: '',
+            name: 'a',
             updateWeekday: 1,
             updateTimeHHmm: '12:00',
             currentEpisode: 2,
@@ -23,7 +23,9 @@ const Notification = () => {
         if (result.success) {
             db.insert(animeTable).values(result.data)
             search()
-        }
+        }else{
+sendNotification('测试通知', JSON.stringify(result))
+}
     }
     async function search() {
         const row = await db.select().from(animeTable)
@@ -45,7 +47,7 @@ const Notification = () => {
             />
             <Button title="添加数据" onPress={insert} />
             {list.map((item) => {
-                return <Text>{JSON.stringify(item)}</Text>
+                return <Text>{item.name}</Text>
             })}
         </View>
     )
