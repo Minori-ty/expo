@@ -30,7 +30,7 @@ export const animeTable = sqliteTable('anime', table)
 export const insertAnimeSchema = createInsertSchema(animeTable, {
     // 注意这里修改为函数形式
     updateWeekday: (schema) => schema.refine((val) => isTUpdateWeekday(val)),
-    updateTimeHHmm: (schema) => schema.regex(/^([01]\d|2[0-3]):([0-5]\d)$/),
+    updateTimeHHmm: (schema) => schema.regex(/^([01]?[0-9]|2[0-3]):[0-5][0-9]$/),
     isOver: (shema) => shema,
     createdAt: (schema) => schema.int().gte(0),
 })
@@ -44,7 +44,7 @@ export const schduleTable = sqliteTable('schdule', table)
 export const insertSchduleSchema = createInsertSchema(schduleTable, {
     // 注意这里修改为函数形式
     updateWeekday: (schema) => schema.int().min(1).max(7),
-    updateTimeHHmm: (schema) => schema.regex(/^([01]\d|2[0-3]):([0-5]\d)$/),
+    updateTimeHHmm: (schema) => schema.regex(/^([01]?[0-9]|2[0-3]):[0-5][0-9]$/),
     isOver: (shema) => shema,
     createdAt: (schema) => schema.int().gte(0),
 })
