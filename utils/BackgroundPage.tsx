@@ -5,24 +5,26 @@ import { useEffect, useState } from 'react'
 import { StyleSheet, Text, View } from 'react-native'
 import { BACKGROUND_TASK_NAME, registerBackgroundTask } from './background'
 
-TaskManager.defineTask(BACKGROUND_TASK_NAME, async () => {
-    try {
-        console.log('运行定时任务')
+const isTaskDefined = TaskManager.isTaskDefined(BACKGROUND_TASK_NAME)
+if (!isTaskDefined) {
+    TaskManager.defineTask(BACKGROUND_TASK_NAME, async () => {
+        try {
+            console.log('运行定时任务')
 
-        await sendNotifications('番剧更新提醒', '有新的番剧更新啦！')
-        return BackgroundTask.BackgroundTaskResult.Success
-    } catch (error) {
-        console.error('后台任务执行失败:', error)
-        return BackgroundTask.BackgroundTaskResult.Failed
-    }
-})
+            await sendNotifications('番剧更新提醒', '有新的番剧更新啦！')
+            return BackgroundTask.BackgroundTaskResult.Success
+        } catch (error) {
+            console.error('后台任务执行失败:', error)
+            return BackgroundTask.BackgroundTaskResult.Failed
+        }
+    })
+}
 
 function App() {
     const [isRegistered, setIsRegistered] = useState(false)
     useEffect(() => {
         registerBackgroundTask()
         init()
-        BackgroundTask.triggerTaskWorkerForTestingAsync()
         // 应用启动时注册后台任务
     }, [])
 

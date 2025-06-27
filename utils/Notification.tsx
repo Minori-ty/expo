@@ -68,16 +68,16 @@ const Notification: React.FC = () => {
         mutationFn: insert,
         onSuccess: () => {
             queryClient.invalidateQueries({
-                queryKey: ['search'],
+                queryKey: ['my-anime'],
             })
             queryClient.invalidateQueries({
-                queryKey: ['schdule'],
+                queryKey: ['schedule'],
             })
         },
     })
 
     const { data: list = [] } = useQuery({
-        queryKey: ['search'],
+        queryKey: ['notification'],
         queryFn: search,
     })
 

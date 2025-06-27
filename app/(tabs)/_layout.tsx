@@ -35,7 +35,7 @@ export default function TabLayout() {
                 }}
             />
             <Tabs.Screen
-                name="schedule"
+                name="myAnime"
                 options={{
                     title: '我的追番',
                     tabBarIcon: ({ color }) => <IconSymbol size={28} name="bookmark.fill" color={color} />,

@@ -36,7 +36,7 @@ interface ModalContextValue {
 
 const ModalContext = createContext<ModalContextValue | undefined>(undefined)
 
-export const useModal = () => {
+const useModal = () => {
     const ctx = useContext(ModalContext)
     if (!ctx) throw new Error('useModal must be used within ModalProvider')
     return ctx
@@ -55,7 +55,7 @@ function Schedual() {
     }
 
     const { data: list = [] } = useQuery({
-        queryKey: ['schdule'],
+        queryKey: ['my-anime'],
         queryFn: search,
     })
 
@@ -72,7 +72,10 @@ function Schedual() {
                 queryKey: ['search'],
             })
             queryClient.invalidateQueries({
-                queryKey: ['schdule'],
+                queryKey: ['my-anime'],
+            })
+            queryClient.invalidateQueries({
+                queryKey: ['schedule'],
             })
         },
     })
@@ -100,15 +103,19 @@ function Schedual() {
                             <View style={styles.modalPanel}>
                                 <View style={styles.modalContent}>
                                     <Text style={styles.modalHeader}>确认删除</Text>
-                                    <Text style={{ fontSize: 12 }}>你确定要删除 "{animeData.name}" 吗？</Text>
+                                    <Text style={{ fontSize: 14 }}>你确定要删除 "{animeData.name}" 吗？</Text>
                                 </View>
                                 <View style={styles.modalFooter}>
-                                    <Pressable onPress={() => setModalVisible(false)}>
-                                        <Text style={styles.modalButton}>取消</Text>
-                                    </Pressable>
-                                    <Pressable onPress={() => deleteItem()}>
-                                        <Text style={styles.modalButton}>删除</Text>
-                                    </Pressable>
+                                    <View style={styles.modalButtonWrapper}>
+                                        <Pressable onPress={() => setModalVisible(false)}>
+                                            <Text style={styles.modalButton}>取消</Text>
+                                        </Pressable>
+                                    </View>
+                                    <View style={styles.modalButtonWrapper}>
+                                        <Pressable onPress={() => deleteItem()}>
+                                            <Text style={styles.modalButton}>删除</Text>
+                                        </Pressable>
+                                    </View>
                                 </View>
                             </View>
                         </View>
@@ -245,7 +252,7 @@ const styles = StyleSheet.create({
         paddingTop: 30,
         paddingBottom: 40,
         borderRadius: 25,
-        width: 250,
+        width: 300,
     },
     closeButton: {
         marginTop: 20,
@@ -265,7 +272,9 @@ const styles = StyleSheet.create({
     },
     modalButton: {
         color: '#6c5ce7',
+        fontSize: 14,
+    },
+    modalButtonWrapper: {
         marginHorizontal: 20,
-        fontSize: 12,
     },
 })
