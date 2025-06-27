@@ -51,8 +51,8 @@ const Notification: React.FC = () => {
             name: 'a',
             updateWeekday: 1,
             updateTimeHHmm: '12:00',
-            currentEpisode: 2,
-            totalEpisode: 13,
+            currentEpisode: 0,
+            totalEpisode: 1,
             isOver: false,
             cover: 'https://sfaf',
         }
