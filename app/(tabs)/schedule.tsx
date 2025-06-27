@@ -109,7 +109,7 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
     },
     animeContainerItem: {
-        height: 220,
+        height: 210,
         width: (Dimensions.get('window').width - GAP * 4) / 3,
     },
     imageContainer: {
