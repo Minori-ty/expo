@@ -1,6 +1,7 @@
 import { db } from '@/db'
 import { animeTable, insertAnimeSchema } from '@/db/schema'
 import dayjs from 'dayjs'
+import { eq } from 'drizzle-orm'
 import { z } from 'zod/v4'
 
 const insertAnimeData = insertAnimeSchema
@@ -88,4 +89,8 @@ function hasEpisodeUpdated(updateDay: number, updateTime: string): boolean {
 
     // 判断当前时间是否已过更新时间点
     return now.isAfter(updateDateTime)
+}
+
+export async function useDeleteAnime(id: number) {
+    return await db.delete(animeTable).where(eq(animeTable.id, id))
 }

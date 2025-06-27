@@ -1,5 +1,5 @@
 import { animeTable } from '@/db/schema'
-import { useInsertAnime, useSelectAnime } from '@/hooks/useDrizzle'
+import { useInsertAnime, useSelectAnime } from '@/hooks/useAnime'
 import { getCalendarPermission } from '@/permissions'
 import { sendNotifications } from '@/permissions/notifications'
 import { useMutation, useQuery } from '@tanstack/react-query'
