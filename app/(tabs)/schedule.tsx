@@ -69,8 +69,12 @@ interface IAnimeContainerItemProps {
     data: Awaited<ReturnType<typeof useSelectAnime>>[number]
 }
 function AnimeContainerItem({ data }: IAnimeContainerItemProps) {
+    const router = useRouter()
+    function toAnimeDetail() {
+        router.push(`/animeDetail/${data.id}`)
+    }
     return (
-        <View style={styles.animeContainerItem}>
+        <TouchableOpacity style={styles.animeContainerItem} onPress={toAnimeDetail} activeOpacity={0.5}>
             <View style={styles.imageContainer}>
                 <Image
                     style={styles.image}
@@ -84,7 +88,7 @@ function AnimeContainerItem({ data }: IAnimeContainerItemProps) {
             </View>
             <Text style={styles.text}>{data.name}</Text>
             <Text style={styles.text}>更新 第{data.currentEpisode}集</Text>
-        </View>
+        </TouchableOpacity>
     )
 }
 

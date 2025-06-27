@@ -105,7 +105,7 @@ const Notification: React.FC = () => {
             </View>
             <Button title="添加数据" onPress={() => inserItem()} />
             <Button title="添加日历提醒" onPress={addEventWithReminder} />
-            {list?.map((item) => {
+            {list.map((item) => {
                 return <Text key={item.id}>{JSON.stringify(item)}</Text>
             })}
         </ScrollView>

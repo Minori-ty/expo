@@ -1,4 +1,4 @@
-import { useNavigation } from 'expo-router'
+import { useLocalSearchParams, useNavigation } from 'expo-router'
 import React, { useEffect } from 'react'
 import { Text, View } from 'react-native'
 
@@ -10,10 +10,10 @@ const index = () => {
             headerTitleAlign: 'center',
         })
     }, [navigation])
-
+    const { id } = useLocalSearchParams()
     return (
         <View>
-            <Text>index</Text>
+            <Text>动漫id-{id}</Text>
         </View>
     )
 }
