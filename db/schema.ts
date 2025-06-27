@@ -14,13 +14,15 @@ const table = {
     updateTimeHHmm: text('update_time_hhmm').notNull(),
     currentEpisode: integer('current_episode').notNull(),
     totalEpisode: integer('total_episode').notNull(),
-    isOver: integer('is_over', { mode: 'boolean' })
+    isFinished: integer('is_finished', { mode: 'boolean' })
         .notNull()
         .default(sql`0`),
     cover: text('cover').notNull(),
     createdAt: integer('created_at')
         .notNull()
         .default(sql`(unixepoch())`),
+    firstEpisodeDateTime: integer('first_episode_date_time').notNull(),
+    lastEpisodeDateTime: integer('last_episode_date_time').notNull(),
 } satisfies Record<string, SQLiteColumnBuilderBase>
 
 /** 动漫列表数据表 */
@@ -31,22 +33,29 @@ export const insertAnimeSchema = createInsertSchema(animeTable, {
     // 注意这里修改为函数形式
     updateWeekday: (schema) => schema.refine((val) => isTUpdateWeekday(val)),
     updateTimeHHmm: (schema) => schema.regex(/^([01]?[0-9]|2[0-3]):[0-5][0-9]$/),
-    isOver: (shema) => shema,
-    createdAt: (schema) => schema.int().gte(0),
+    isFinished: (shema) => shema,
+    createdAt: (schema) => schema.int().gte(1750972800),
+    firstEpisodeDateTime: (schema) => schema.int().gte(1750972800),
+    lastEpisodeDateTime: (schema) => schema.int().gte(1750972800),
 })
 
 export const selectAnimeSchema = createSelectSchema(animeTable)
 
 /** 动漫更新表数据表 */
-export const schduleTable = sqliteTable('schdule', table)
+export const schduleTable = sqliteTable('schdule', {
+    id: integer('id').primaryKey({ autoIncrement: true }),
+    animeId: integer('anime_id')
+        .notNull()
+        .references(() => animeTable.id),
+    isNotification: integer('is_notification', { mode: 'boolean' })
+        .notNull()
+        .default(sql`0`),
+})
 
 // 生成 Zod 验证模式
 export const insertSchduleSchema = createInsertSchema(schduleTable, {
-    // 注意这里修改为函数形式
-    updateWeekday: (schema) => schema.int().min(1).max(7),
-    updateTimeHHmm: (schema) => schema.regex(/^([01]?[0-9]|2[0-3]):[0-5][0-9]$/),
-    isOver: (shema) => shema,
-    createdAt: (schema) => schema.int().gte(0),
+    animeId: (schema) => schema.int().gte(0),
+    isNotification: (shema) => shema,
 })
 
 export const selectSchduleSchema = createSelectSchema(schduleTable)

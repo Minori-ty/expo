@@ -1,8 +1,8 @@
 import { db } from '@/db'
-import { animeTable, insertAnimeSchema, selectAnimeSchema } from '@/db/schema'
+import { animeTable, selectAnimeSchema } from '@/db/schema'
+import { insertAnime } from '@/hooks/useDrizzle'
 import { getCalendarPermission } from '@/permissions'
 import { sendNotifications } from '@/permissions/notifications'
-import dayjs from 'dayjs'
 import * as Calendar from 'expo-calendar'
 import { Image } from 'expo-image'
 import React, { useEffect, useState } from 'react'
@@ -54,16 +54,16 @@ const Notification: React.FC = () => {
             totalEpisode: 13,
             isOver: false,
             cover: 'https://sfaf',
-            createdAt: dayjs().unix(),
         }
-        const result = insertAnimeSchema.safeParse(data)
+        // const result = insertAnimeSchema.safeParse(data)
 
-        if (result.success) {
-            await db.insert(animeTable).values(result.data as TData)
-            search()
-        } else {
-            console.log('插入数据验证失败:', result.error)
-        }
+        // if (result.success) {
+        //     await db.insert(animeTable).values(result.data as TData)
+        //     search()
+        // } else {
+        //     console.log('插入数据验证失败:', result.error)
+        // }
+        await insertAnime(data)
     }
 
     async function search() {
