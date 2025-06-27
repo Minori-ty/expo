@@ -32,7 +32,7 @@ export default function BangumiForm() {
     const navigation = useNavigation()
     useEffect(() => {
         navigation.setOptions({
-            headerTitle: '动漫追番',
+            headerTitle: '添加动漫',
             headerTitleAlign: 'center',
         })
     }, [navigation])
