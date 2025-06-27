@@ -7,7 +7,7 @@ import 'react-native-reanimated'
 import { db } from '@/db'
 import migrations from '@/drizzle/migrations'
 import { useColorScheme } from '@/hooks/useColorScheme'
-import { requestNotificationPermission } from '@/utils/notifications'
+import { getNotificationPermission } from '@/permissions'
 import { useMigrations } from 'drizzle-orm/expo-sqlite/migrator'
 import * as Notifications from 'expo-notifications'
 import { useEffect } from 'react'
@@ -31,7 +31,7 @@ export default function RootLayout() {
     useEffect(() => {
         // 只会在组件挂载时调用一次
         async function askPermission() {
-            await requestNotificationPermission()
+            await getNotificationPermission()
         }
         askPermission()
     }, [])

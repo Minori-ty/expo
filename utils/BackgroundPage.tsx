@@ -1,15 +1,15 @@
+import { sendNotifications } from '@/permissions/notifications'
 import * as BackgroundTask from 'expo-background-task'
 import * as TaskManager from 'expo-task-manager'
 import { useEffect, useState } from 'react'
 import { StyleSheet, Text, View } from 'react-native'
 import { BACKGROUND_TASK_NAME, registerBackgroundTask } from './background'
-import { sendNotification } from './notifications'
 
 TaskManager.defineTask(BACKGROUND_TASK_NAME, async () => {
     try {
         console.log('运行定时任务')
 
-        await sendNotification('番剧更新提醒', '有新的番剧更新啦！')
+        await sendNotifications('番剧更新提醒', '有新的番剧更新啦！')
         return BackgroundTask.BackgroundTaskResult.Success
     } catch (error) {
         console.error('后台任务执行失败:', error)

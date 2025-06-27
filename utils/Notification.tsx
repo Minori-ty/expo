@@ -1,12 +1,12 @@
 import { db } from '@/db'
 import { animeTable, insertAnimeSchema, selectAnimeSchema } from '@/db/schema'
 import { getCalendarPermission } from '@/permissions'
+import { sendNotifications } from '@/permissions/notifications'
 import dayjs from 'dayjs'
 import * as Calendar from 'expo-calendar'
 import { Image } from 'expo-image'
 import React, { useEffect, useState } from 'react'
 import { Button, ScrollView, StyleSheet, Text, View } from 'react-native'
-import { sendNotification } from './notifications'
 
 type TData = typeof animeTable.$inferInsert
 const blurhash =
@@ -16,7 +16,7 @@ async function addEventWithReminder() {
     const hasPermission = await getCalendarPermission()
     if (!hasPermission) {
         console.log('没有日历权限')
-        sendNotification('没有日历权限', '没有日历权限')
+        sendNotifications('没有日历权限', '没有日历权限')
         return
     }
 
@@ -82,7 +82,7 @@ const Notification: React.FC = () => {
             <Button
                 title="发送通知"
                 onPress={() => {
-                    sendNotification('测试通知', '这是一个测试通知内容')
+                    sendNotifications('测试通知', '这是一个测试通知内容')
                 }}
             />
             <View style={styles.container}>
