@@ -1,12 +1,13 @@
-import { db } from '@/db'
-import { animeTable, selectAnimeSchema } from '@/db/schema'
-import { insertAnime } from '@/hooks/useDrizzle'
+import { animeTable } from '@/db/schema'
+import { useInsertAnime, useSelectAnime } from '@/hooks/useDrizzle'
 import { getCalendarPermission } from '@/permissions'
 import { sendNotifications } from '@/permissions/notifications'
+import { useMutation, useQuery } from '@tanstack/react-query'
 import * as Calendar from 'expo-calendar'
 import { Image } from 'expo-image'
-import React, { useEffect, useState } from 'react'
+import React, { useEffect } from 'react'
 import { Button, ScrollView, StyleSheet, Text, View } from 'react-native'
+import { queryClient } from './react-query'
 
 type TData = typeof animeTable.$inferInsert
 const blurhash =
@@ -44,7 +45,7 @@ async function addEventWithReminder() {
 
 const Notification: React.FC = () => {
     type TAnime = typeof animeTable.$inferSelect
-    const [list, setList] = useState<TAnime[]>([])
+    // const [list, setList] = useState<Awaited<ReturnType<typeof useSelectAnime>>>([])
     async function insert() {
         const data = {
             name: 'a',
@@ -55,25 +56,32 @@ const Notification: React.FC = () => {
             isOver: false,
             cover: 'https://sfaf',
         }
-        // const result = insertAnimeSchema.safeParse(data)
-
-        // if (result.success) {
-        //     await db.insert(animeTable).values(result.data as TData)
-        //     search()
-        // } else {
-        //     console.log('插入数据验证失败:', result.error)
-        // }
-        await insertAnime(data)
+        return await useInsertAnime(data)
     }
 
     async function search() {
-        const row = await db.select().from(animeTable)
-        const list = selectAnimeSchema.array().parse(row)
-        setList(list as TAnime[])
+        const data = await useSelectAnime()
+        // setList(data)
+        return data
     }
+    const { mutate: inserItem } = useMutation({
+        mutationFn: insert,
+        onSuccess: () => {
+            queryClient.invalidateQueries({
+                queryKey: ['search'],
+            })
+            queryClient.invalidateQueries({
+                queryKey: ['schdule'],
+            })
+        },
+    })
+
+    const { data: list = [] } = useQuery({
+        queryKey: ['search'],
+        queryFn: search,
+    })
 
     useEffect(() => {
-        search()
         getCalendarPermission()
     }, [])
     return (
@@ -95,9 +103,9 @@ const Notification: React.FC = () => {
                     cachePolicy={'memory-disk'}
                 />
             </View>
-            <Button title="添加数据" onPress={insert} />
+            <Button title="添加数据" onPress={() => inserItem()} />
             <Button title="添加日历提醒" onPress={addEventWithReminder} />
-            {list.map((item) => {
+            {list?.map((item) => {
                 return <Text key={item.id}>{JSON.stringify(item)}</Text>
             })}
         </ScrollView>

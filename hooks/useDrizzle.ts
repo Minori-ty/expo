@@ -8,7 +8,7 @@ const insertAnimeData = insertAnimeSchema
     .extend({})
 type TFormData = z.infer<typeof insertAnimeData>
 
-export function insertAnime(formData: TFormData) {
+export function useInsertAnime(formData: TFormData) {
     return new Promise(async (resolve, reject) => {
         // 获取当前日期
         const now = dayjs()
@@ -47,10 +47,22 @@ export function insertAnime(formData: TFormData) {
         type TData = typeof animeTable.$inferInsert
         if (result.success) {
             const data = await db.insert(animeTable).values(result.data as TData)
-            resolve(data)
+            resolve(data.lastInsertRowId)
         } else {
             reject(result.error)
             console.log('插入数据验证失败:', result.error)
+        }
+    })
+}
+
+export async function useSelectAnime() {
+    const row = await db.select().from(animeTable)
+    return row.map((item) => {
+        return {
+            ...item,
+            firstEpisodeDateTime: dayjs.unix(item.firstEpisodeDateTime).format('YYYY-MM-DD HH:mm'),
+            lastEpisodeDateTime: dayjs.unix(item.lastEpisodeDateTime).format('YYYY-MM-DD HH:mm'),
+            createdAt: dayjs.unix(item.createdAt).format('YYYY-MM-DD HH:mm'),
         }
     })
 }

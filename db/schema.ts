@@ -34,9 +34,9 @@ export const insertAnimeSchema = createInsertSchema(animeTable, {
     updateWeekday: (schema) => schema.refine((val) => isTUpdateWeekday(val)),
     updateTimeHHmm: (schema) => schema.regex(/^([01]?[0-9]|2[0-3]):[0-5][0-9]$/),
     isFinished: (shema) => shema,
-    createdAt: (schema) => schema.int().gte(1750972800),
-    firstEpisodeDateTime: (schema) => schema.int().gte(1750972800),
-    lastEpisodeDateTime: (schema) => schema.int().gte(1750972800),
+    createdAt: (schema) => schema.int().gte(1735689600),
+    firstEpisodeDateTime: (schema) => schema.int().gte(1735689600),
+    lastEpisodeDateTime: (schema) => schema.int().gte(1735689600),
 })
 
 export const selectAnimeSchema = createSelectSchema(animeTable)

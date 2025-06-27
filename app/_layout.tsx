@@ -8,6 +8,8 @@ import { db } from '@/db'
 import migrations from '@/drizzle/migrations'
 import { useColorScheme } from '@/hooks/useColorScheme'
 import { getNotificationPermission } from '@/permissions'
+import { queryClient } from '@/utils/react-query'
+import { QueryClientProvider } from '@tanstack/react-query'
 import { useMigrations } from 'drizzle-orm/expo-sqlite/migrator'
 import * as Notifications from 'expo-notifications'
 import { useEffect } from 'react'
@@ -50,12 +52,14 @@ export default function RootLayout() {
     }
 
     return (
-        <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-            <Stack>
-                <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-                <Stack.Screen name="+not-found" />
-            </Stack>
-            <StatusBar style="auto" />
-        </ThemeProvider>
+        <QueryClientProvider client={queryClient}>
+            <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
+                <Stack>
+                    <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+                    <Stack.Screen name="+not-found" />
+                </Stack>
+                <StatusBar style="auto" />
+            </ThemeProvider>
+        </QueryClientProvider>
     )
 }

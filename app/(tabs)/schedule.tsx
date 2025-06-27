@@ -1,10 +1,11 @@
 import PageHeader from '@/components/PageHeader'
 import { IconSymbol } from '@/components/ui/IconSymbol'
-import { db } from '@/db'
-import { animeTable, selectAnimeSchema } from '@/db/schema'
+import { animeTable } from '@/db/schema'
+import { useSelectAnime } from '@/hooks/useDrizzle'
+import { useQuery } from '@tanstack/react-query'
 import { Image } from 'expo-image'
 import { useRouter } from 'expo-router'
-import React, { useEffect, useState } from 'react'
+import React from 'react'
 import { Dimensions, FlatList, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 
@@ -13,17 +14,16 @@ const blurhash =
 type TAnime = typeof animeTable.$inferSelect
 const schedule = () => {
     const router = useRouter()
-    const [list, setList] = useState<TAnime[]>([])
-
-    async function getAnimeList() {
-        const row = await db.select().from(animeTable)
-        const list = selectAnimeSchema.array().parse(row)
-        setList(list as TAnime[])
+    async function search() {
+        const data = await useSelectAnime()
+        return data
     }
 
-    useEffect(() => {
-        getAnimeList()
-    }, [])
+    const { data: list = [] } = useQuery({
+        queryKey: ['schdule'],
+        queryFn: search,
+    })
+
     return (
         <SafeAreaView style={styles.container}>
             <PageHeader
@@ -50,7 +50,7 @@ function Empty() {
 }
 const GAP = 10
 interface IAnimeContainerProps {
-    list: TAnime[]
+    list: Awaited<ReturnType<typeof useSelectAnime>>
 }
 function AnimeContainer({ list }: IAnimeContainerProps) {
     return (
@@ -66,7 +66,7 @@ function AnimeContainer({ list }: IAnimeContainerProps) {
 }
 
 interface IAnimeContainerItemProps {
-    data: TAnime
+    data: Awaited<ReturnType<typeof useSelectAnime>>[number]
 }
 function AnimeContainerItem({ data }: IAnimeContainerItemProps) {
     return (
@@ -80,7 +80,7 @@ function AnimeContainerItem({ data }: IAnimeContainerItemProps) {
                     transition={1000}
                     cachePolicy={'memory-disk'}
                 />
-                <UpdateLabel isOver={data.isOver} />
+                <UpdateLabel isOver={data.isFinished} />
             </View>
             <Text style={styles.text}>{data.name}</Text>
             <Text style={styles.text}>更新 第{data.currentEpisode}集</Text>
