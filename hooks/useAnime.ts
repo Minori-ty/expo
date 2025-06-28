@@ -83,6 +83,23 @@ export async function useSelectAnime() {
  * @param idList 动漫的id列表
  * @returns
  */
+export async function useSelectAnimeById(id: number) {
+    const result = await db.select().from(animeTable).where(eq(animeTable.id, id))
+    const data = result.map((item) => {
+        return {
+            ...item,
+            firstEpisodeDateTime: dayjs.unix(item.firstEpisodeDateTime).format('YYYY-MM-DD HH:mm'),
+            lastEpisodeDateTime: dayjs.unix(item.lastEpisodeDateTime).format('YYYY-MM-DD HH:mm'),
+            createdAt: dayjs.unix(item.createdAt).format('YYYY-MM-DD HH:mm'),
+        }
+    })
+    return data[0]
+}
+/**
+ *
+ * @param idList 动漫的id列表
+ * @returns
+ */
 export async function useSelectAnimeByIdList(idList: number[]) {
     const row = db.select().from(animeTable).where(inArray(animeTable.id, idList)).all()
     return row.map((item) => {

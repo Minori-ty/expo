@@ -97,7 +97,7 @@ const Notification: React.FC = () => {
             <View style={styles.container}>
                 <Image
                     style={styles.image}
-                    source="https://picsum.photos/seed/696/3000/2000"
+                    source="https://cdn.sm.cn/static/25/01/14/b8e93c8d92fc345d8e717bbd6333324c.png?x-oss-process=image/format,avif"
                     placeholder={{ blurhash }}
                     contentFit="cover"
                     transition={1000}
