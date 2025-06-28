@@ -98,28 +98,31 @@ function Schedual() {
                     animationType="fade"
                     onRequestClose={() => setModalVisible(false)}
                 >
-                    <TouchableWithoutFeedback onPress={() => setModalVisible(false)}>
-                        <View style={styles.modalBackground}>
-                            <View style={styles.modalPanel}>
-                                <View style={styles.modalContent}>
-                                    <Text style={styles.modalHeader}>确认删除</Text>
-                                    <Text style={{ fontSize: 14 }}>你确定要删除 "{animeData.name}" 吗？</Text>
+                    <View style={styles.modalBackground}>
+                        {/* 背景点击关闭 */}
+                        <TouchableWithoutFeedback onPress={() => setModalVisible(false)}>
+                            <View style={StyleSheet.absoluteFill} />
+                        </TouchableWithoutFeedback>
+                        {/* 内容区域，点击不会关闭 */}
+                        <View style={styles.modalPanel} pointerEvents="box-none">
+                            <View style={styles.modalContent}>
+                                <Text style={styles.modalHeader}>确认删除</Text>
+                                <Text style={{ fontSize: 14 }}>你确定要删除 "{animeData.name}" 吗？</Text>
+                            </View>
+                            <View style={styles.modalFooter}>
+                                <View style={styles.modalButtonWrapper}>
+                                    <Pressable onPress={() => setModalVisible(false)}>
+                                        <Text style={styles.modalButton}>取消</Text>
+                                    </Pressable>
                                 </View>
-                                <View style={styles.modalFooter}>
-                                    <View style={styles.modalButtonWrapper}>
-                                        <Pressable onPress={() => setModalVisible(false)}>
-                                            <Text style={styles.modalButton}>取消</Text>
-                                        </Pressable>
-                                    </View>
-                                    <View style={styles.modalButtonWrapper}>
-                                        <Pressable onPress={() => deleteItem()}>
-                                            <Text style={styles.modalButton}>删除</Text>
-                                        </Pressable>
-                                    </View>
+                                <View style={styles.modalButtonWrapper}>
+                                    <Pressable onPress={() => deleteItem()}>
+                                        <Text style={styles.modalButton}>删除</Text>
+                                    </Pressable>
                                 </View>
                             </View>
                         </View>
-                    </TouchableWithoutFeedback>
+                    </View>
                 </Modal>
             </SafeAreaView>
         </ModalContext.Provider>
