@@ -12,6 +12,7 @@ import { queryClient } from '@/utils/react-query'
 import { QueryClientProvider } from '@tanstack/react-query'
 import { useMigrations } from 'drizzle-orm/expo-sqlite/migrator'
 import * as Notifications from 'expo-notifications'
+import * as SplashScreen from 'expo-splash-screen'
 import { useEffect } from 'react'
 import { Text } from 'react-native'
 
@@ -37,6 +38,7 @@ export default function RootLayout() {
             await getNotificationPermission()
         }
         askPermission()
+        SplashScreen.hideAsync()
     }, [])
 
     if (!loaded) {

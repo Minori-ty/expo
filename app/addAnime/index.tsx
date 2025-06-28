@@ -1,4 +1,5 @@
 import { addAnime } from '@/api/anime'
+import { RadioGroup } from '@/components/RadioGroup'
 import { queryClient } from '@/utils/react-query'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Picker } from '@react-native-picker/picker'
@@ -59,7 +60,7 @@ const AnimeForm = () => {
             cover: '',
         },
     })
-
+    const [selected, setSelected] = useState(1)
     const { mutate: addAnimeMution } = useMutation({
         mutationFn: addAnime,
         onSuccess: () => {
@@ -108,6 +109,10 @@ const AnimeForm = () => {
         }
     }, [])
 
+    const options = [
+        { label: '苹果', value: 1 },
+        { label: '香蕉', value: 2 },
+    ]
     return (
         <SafeAreaView style={styles.container}>
             <KeyboardAvoidingView
@@ -137,6 +142,7 @@ const AnimeForm = () => {
                         />
                         {errors.name && <Text style={styles.errorText}>{errors.name.message}</Text>}
                     </View>
+                    <RadioGroup options={options} value={selected} onChange={setSelected} />
                     <View style={styles.formGroup}>
                         <Text style={styles.label}>更新周</Text>
                         <Controller

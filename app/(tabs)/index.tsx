@@ -1,12 +1,11 @@
 import { getSchedule } from '@/api/anime'
 import Empty from '@/components/lottie/Empty'
 import { useSelectAnime } from '@/hooks/useAnime'
-import Notification from '@/utils/Notification'
 import { useQuery } from '@tanstack/react-query'
 import dayjs from 'dayjs'
 import customParseFormat from 'dayjs/plugin/customParseFormat'
 import isSameOrBefore from 'dayjs/plugin/isSameOrBefore'
-import weekday from 'dayjs/plugin/weekday'
+import isoWeek from 'dayjs/plugin/isoWeek'
 import { Image } from 'expo-image'
 import React, { createContext, useContext, useEffect, useState } from 'react'
 import { Dimensions, ScrollView, StyleSheet, Text, TouchableWithoutFeedback, View } from 'react-native'
@@ -15,7 +14,7 @@ import { SceneMap, TabBar, TabView } from 'react-native-tab-view'
 
 dayjs.extend(customParseFormat)
 dayjs.extend(isSameOrBefore)
-dayjs.extend(weekday)
+dayjs.extend(isoWeek)
 
 interface IScheduleContext {
     list: Awaited<ReturnType<typeof useSelectAnime>>
@@ -126,7 +125,7 @@ export default function MyTabs() {
     ])
 
     useEffect(() => {
-        setIndex(dayjs().weekday())
+        setIndex(dayjs().isoWeekday)
     }, [])
     async function search() {
         const data = await getSchedule()
@@ -145,7 +144,7 @@ export default function MyTabs() {
         thursday: () => <Schedule updateWeekday={4} />,
         friday: () => <Schedule updateWeekday={5} />,
         saturday: () => <Schedule updateWeekday={6} />,
-        sunday: Notification,
+        sunday: () => <Schedule updateWeekday={7} />,
     })
 
     return (
@@ -181,7 +180,7 @@ export default function MyTabs() {
                                             <Text
                                                 style={{
                                                     color: focused ? '#fb7299' : '#9E9E9E',
-                                                    fontWeight: focused ? '900' : '400',
+                                                    fontWeight: focused ? '800' : '400',
                                                     fontSize: focused ? 24 : 18,
                                                     textAlign: 'center',
                                                 }}
