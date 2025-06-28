@@ -6,14 +6,16 @@ import { useQuery } from '@tanstack/react-query'
 import dayjs from 'dayjs'
 import customParseFormat from 'dayjs/plugin/customParseFormat'
 import isSameOrBefore from 'dayjs/plugin/isSameOrBefore'
+import weekday from 'dayjs/plugin/weekday'
 import { Image } from 'expo-image'
-import React, { createContext, useContext, useState } from 'react'
+import React, { createContext, useContext, useEffect, useState } from 'react'
 import { Dimensions, ScrollView, StyleSheet, Text, TouchableWithoutFeedback, View } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { SceneMap, TabBar, TabView } from 'react-native-tab-view'
 
 dayjs.extend(customParseFormat)
 dayjs.extend(isSameOrBefore)
+dayjs.extend(weekday)
 
 interface IScheduleContext {
     list: Awaited<ReturnType<typeof useSelectAnime>>
@@ -106,17 +108,9 @@ interface IEpisodeTipProps {
 }
 function EpisodeTip({ updateTimeHHmm, currentEpisode, updateWeekday }: IEpisodeTipProps) {
     if (isTimePassed(updateTimeHHmm, updateWeekday)) {
-        return (
-            <Text style={{ marginTop: 5, color: '#fb7299', fontSize: 12, width: '100%', backgroundColor: 'skyblue' }}>
-                更新到 第{currentEpisode}集
-            </Text>
-        )
+        return <Text style={{ marginTop: 5, color: '#fb7299', fontSize: 12 }}>更新到 第{currentEpisode}集</Text>
     }
-    return (
-        <Text style={{ marginTop: 5, color: '#9E9E9E', fontSize: 12, width: '100%', backgroundColor: 'skyblue' }}>
-            即将更新 第{currentEpisode} 集
-        </Text>
-    )
+    return <Text style={{ marginTop: 5, color: '#9E9E9E', fontSize: 12 }}>即将更新 第{currentEpisode} 集</Text>
 }
 
 export default function MyTabs() {
@@ -131,6 +125,9 @@ export default function MyTabs() {
         { key: 'sunday', title: '周日' },
     ])
 
+    useEffect(() => {
+        setIndex(dayjs().weekday())
+    }, [])
     async function search() {
         const data = await getSchedule()
         return data
