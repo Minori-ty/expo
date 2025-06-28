@@ -4,11 +4,16 @@ import { useSelectAnime } from '@/hooks/useAnime'
 import Notification from '@/utils/Notification'
 import { useQuery } from '@tanstack/react-query'
 import dayjs from 'dayjs'
+import customParseFormat from 'dayjs/plugin/customParseFormat'
+import isSameOrBefore from 'dayjs/plugin/isSameOrBefore'
 import { Image } from 'expo-image'
 import React, { createContext, useContext, useState } from 'react'
 import { Dimensions, StyleSheet, Text, View } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { SceneMap, TabBar, TabView } from 'react-native-tab-view'
+
+dayjs.extend(customParseFormat)
+dayjs.extend(isSameOrBefore)
 
 interface IScheduleContext {
     list: Awaited<ReturnType<typeof useSelectAnime>>
@@ -80,7 +85,11 @@ function ScheduleItem({ time, animeList }: IScheduleItemProps) {
                             />
                             <View>
                                 <Text style={{ fontWeight: '900' }}>{item.name}</Text>
-                                <EpisodeTip updateTimeHHmm={item.updateTimeHHmm} currentEpisode={item.currentEpisode} />
+                                <EpisodeTip
+                                    updateTimeHHmm={item.updateTimeHHmm}
+                                    currentEpisode={item.currentEpisode}
+                                    updateWeekday={item.updateWeekday}
+                                />
                             </View>
                         </View>
                     )
@@ -93,9 +102,10 @@ function ScheduleItem({ time, animeList }: IScheduleItemProps) {
 interface IEpisodeTipProps {
     updateTimeHHmm: string
     currentEpisode: number
+    updateWeekday: number
 }
-function EpisodeTip({ updateTimeHHmm, currentEpisode }: IEpisodeTipProps) {
-    if (isTimePassed(updateTimeHHmm)) {
+function EpisodeTip({ updateTimeHHmm, currentEpisode, updateWeekday }: IEpisodeTipProps) {
+    if (isTimePassed(updateTimeHHmm, updateWeekday)) {
         return <Text style={{ marginTop: 5, color: '#fb7299', fontSize: 12 }}>更新到 第{currentEpisode}集</Text>
     }
     return <Text style={{ marginTop: 5, color: '#9E9E9E', fontSize: 12 }}>即将更新 第{currentEpisode}集</Text>
@@ -202,27 +212,22 @@ const styles = StyleSheet.create({
 })
 
 /**
- * 判断给定的时间字符串是否已超过当前时间
- * @param  timeStr - 格式为 "HH:mm" 的时间字符串
- * @returns - 如果给定时间已过，返回 true；否则返回 false
+ * 判断当前时间是否超过了给定的时间
+ * @param updateTimeHHmm
+ * @param currentEpisode
+ * @returns
  */
-function isTimePassed(timeStr: string) {
-    // 验证输入格式
-    if (!/^\d{2}:\d{2}$/.test(timeStr)) {
-        throw new Error('时间格式必须为 "HH:mm"')
-    }
-
-    // 解析输入时间
-    const [hours, minutes] = timeStr.split(':').map(Number)
-    const targetTime = dayjs().set('hour', hours).set('minute', minutes).set('second', 0).set('millisecond', 0)
-
-    // 如果解析后的时间比当前时间早，则视为明天的时间
+function isTimePassed(updateTimeHHmm: string, updateWeekday: number) {
+    // 获取当前时间
     const now = dayjs()
-    let adjustedTime = targetTime
-    if (targetTime.isBefore(now)) {
-        adjustedTime = targetTime.add(1, 'day')
-    }
 
-    // 判断调整后的时间是否已过
-    return adjustedTime.isBefore(now)
+    // 解析输入的时间字符串
+    const [hours, minutes] = updateTimeHHmm.split(':').map(Number)
+
+    // 计算目标时间：本周指定星期的指定时间
+    const target = now.day(updateWeekday).hour(hours).minute(minutes).second(0).millisecond(0)
+
+    // 如果计算出的目标时间在当前时间之前，返回 true
+    // 如果目标时间是未来的时间，则返回 false
+    return now.isAfter(target)
 }
