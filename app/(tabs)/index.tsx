@@ -1,13 +1,14 @@
 import { getSchedule } from '@/api/anime'
 import Empty from '@/components/lottie/Empty'
 import { selectAnime } from '@/hooks/useAnime'
+import { sendNotifications } from '@/permissions/notifications'
 import { useQuery } from '@tanstack/react-query'
 import dayjs from 'dayjs'
 import customParseFormat from 'dayjs/plugin/customParseFormat'
 import isSameOrBefore from 'dayjs/plugin/isSameOrBefore'
 import isoWeek from 'dayjs/plugin/isoWeek'
 import { Image } from 'expo-image'
-import React, { createContext, useContext, useState } from 'react'
+import React, { createContext, useContext, useEffect, useState } from 'react'
 import { Dimensions, ScrollView, StyleSheet, Text, TouchableWithoutFeedback, View } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { SceneMap, TabBar, TabView } from 'react-native-tab-view'
@@ -113,7 +114,7 @@ function EpisodeTip({ updateTimeHHmm, currentEpisode, updateWeekday }: IEpisodeT
 }
 
 export default function MyTabs() {
-    const [index, setIndex] = useState(dayjs().isoWeekday())
+    const [index, setIndex] = useState(1)
     const [routes] = useState([
         { key: 'monday', title: '周一' },
         { key: 'tuesday', title: '周二' },
@@ -123,6 +124,10 @@ export default function MyTabs() {
         { key: 'saturday', title: '周六' },
         { key: 'sunday', title: '周日' },
     ])
+
+    useEffect(() => {
+        sendNotifications(dayjs().isoWeekday() + '', dayjs().isoWeekday() + '')
+    }, [])
 
     async function search() {
         const data = await getSchedule()
