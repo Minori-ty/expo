@@ -106,9 +106,17 @@ interface IEpisodeTipProps {
 }
 function EpisodeTip({ updateTimeHHmm, currentEpisode, updateWeekday }: IEpisodeTipProps) {
     if (isTimePassed(updateTimeHHmm, updateWeekday)) {
-        return <Text style={{ marginTop: 5, color: '#fb7299', fontSize: 12 }}>更新到 第{currentEpisode}集</Text>
+        return (
+            <Text style={{ marginTop: 5, color: '#fb7299', fontSize: 12, width: '100%' }}>
+                更新到 第{currentEpisode}集
+            </Text>
+        )
     }
-    return <Text style={{ marginTop: 5, color: '#9E9E9E', fontSize: 12 }}>即将更新 第{currentEpisode}集</Text>
+    return (
+        <Text style={{ marginTop: 5, color: '#9E9E9E', fontSize: 12, width: '100%' }}>
+            即将更新 第{currentEpisode}集
+        </Text>
+    )
 }
 
 export default function MyTabs() {
@@ -175,7 +183,7 @@ export default function MyTabs() {
                                         <Text
                                             style={{
                                                 color: focused ? '#fb7299' : '#9E9E9E',
-                                                fontWeight: focused ? '900' : '800',
+                                                fontWeight: focused ? '900' : '400',
                                                 fontSize: focused ? 24 : 18,
                                                 textAlign: 'center',
                                             }}
