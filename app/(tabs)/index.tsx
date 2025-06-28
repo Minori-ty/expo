@@ -5,7 +5,7 @@ import { useQuery } from '@tanstack/react-query'
 import dayjs from 'dayjs'
 import { Image } from 'expo-image'
 import React, { createContext, useContext, useState } from 'react'
-import { Dimensions, StyleSheet, Text, View } from 'react-native'
+import { Animated, Dimensions, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { SceneMap, TabBar, TabView } from 'react-native-tab-view'
 
@@ -62,7 +62,7 @@ const blurhash =
 function ScheduleItem({ time, animeList }: IScheduleItemProps) {
     return (
         <View style={styles.scheduleItem}>
-            <View style={{ width: 60 }}>
+            <View style={{ width: 60, justifyContent: 'center' }}>
                 <Text>{time}</Text>
             </View>
             <View style={{ flex: 1 }}>
@@ -95,9 +95,9 @@ interface IEpisodeTipProps {
 }
 function EpisodeTip({ updateTimeHHmm, currentEpisode }: IEpisodeTipProps) {
     if (isTimePassed(updateTimeHHmm)) {
-        return <Text style={{ marginTop: 5, color: '#fb7299' }}>更新到 第{currentEpisode}集</Text>
+        return <Text style={{ marginTop: 5, color: '#fb7299', fontSize: 12 }}>更新到 第{currentEpisode}集</Text>
     }
-    return <Text style={{ marginTop: 5, color: '#9E9E9E' }}>即将更新 第{currentEpisode}集</Text>
+    return <Text style={{ marginTop: 5, color: '#9E9E9E', fontSize: 12 }}>即将更新 第{currentEpisode}集</Text>
 }
 
 export default function MyTabs() {
@@ -146,10 +146,60 @@ export default function MyTabs() {
                             {...props}
                             scrollEnabled
                             tabStyle={{ width: 80, backgroundColor: '#fff' }}
-                            activeColor="#000"
-                            inactiveColor="#888"
+                            activeColor="#fb7299"
+                            inactiveColor="#9E9E9E"
                             style={styles.tabBar}
-                            indicatorStyle={{ backgroundColor: 'red', height: 4, borderRadius: 2 }}
+                            renderIndicator={({ navigationState, width, style }) => {
+                                const tabWidth = typeof width === 'number' ? width / navigationState.routes.length : 80
+
+                                const translateX = props.position.interpolate({
+                                    inputRange: navigationState.routes.map((_, i) => i),
+                                    outputRange: navigationState.routes.map((_, i) => i * tabWidth),
+                                })
+
+                                return (
+                                    <Animated.View
+                                        style={[
+                                            {
+                                                position: 'absolute',
+                                                left: 0,
+                                                bottom: 0,
+                                                width: tabWidth,
+                                                height: 3,
+                                                backgroundColor: '#fb7299',
+                                                transform: [{ translateX }],
+                                            },
+                                            style,
+                                        ]}
+                                    />
+                                )
+                            }}
+                            renderTabBarItem={({ route, navigationState, onPress, onLongPress }) => {
+                                const focused = navigationState.routes[navigationState.index].key === route.key
+                                return (
+                                    <TouchableOpacity
+                                        style={{
+                                            width: 80,
+                                            paddingVertical: 12,
+                                            backgroundColor: focused ? '#fff6f9' : '#fff',
+                                        }}
+                                        onPress={onPress}
+                                        onLongPress={onLongPress}
+                                        key={route.key}
+                                    >
+                                        <Text
+                                            style={{
+                                                color: focused ? '#fb7299' : '#9E9E9E',
+                                                fontWeight: focused ? 'bold' : 'normal',
+                                                fontSize: 16,
+                                                textAlign: 'center',
+                                            }}
+                                        >
+                                            {route.title}
+                                        </Text>
+                                    </TouchableOpacity>
+                                )
+                            }}
                         />
                     )}
                 ></TabView>
@@ -158,7 +208,7 @@ export default function MyTabs() {
     )
 }
 
-const coverWidth = 70
+const coverWidth = 60
 const styles = StyleSheet.create({
     schedule: {
         padding: 10,
