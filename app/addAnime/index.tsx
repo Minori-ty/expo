@@ -234,7 +234,6 @@ const AnimeForm = () => {
                         {errors.cover && <Text style={styles.errorText}>{errors.cover.message}</Text>}
                     </View>
                     <Button title="提交" onPress={handleSubmit(onSubmit)} />
-                    <View style={{ height: 60 }} /> {/* 底部添加额外间距 */}
                 </ScrollView>
             </KeyboardAvoidingView>
         </SafeAreaView>

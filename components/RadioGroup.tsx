@@ -32,6 +32,8 @@ export function RadioItem<T extends string | number>(props: RadioItemProps<T>) {
                         width: size,
                         height: size,
                         borderRadius: size / 2,
+                        alignItems: 'center',
+                        justifyContent: 'center',
                     },
                 ]}
             >
@@ -81,7 +83,7 @@ export interface RadioGroupProps<T extends string | number> {
 export function RadioGroup<T extends string | number>(props: RadioGroupProps<T>) {
     const { options, value, onChange, size = 20, color = '#fb7299', labelStyle, style } = props
     return (
-        <View style={style}>
+        <View style={[{ flexDirection: 'row', gap: 20 }, style]}>
             {options.map((opt) => (
                 <RadioItem
                     key={String(opt.value)}

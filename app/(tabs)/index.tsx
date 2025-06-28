@@ -125,7 +125,7 @@ export default function MyTabs() {
     ])
 
     useEffect(() => {
-        setIndex(dayjs().isoWeekday)
+        setIndex(dayjs().isoWeekday())
     }, [])
     async function search() {
         const data = await getSchedule()

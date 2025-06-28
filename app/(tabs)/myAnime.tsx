@@ -78,7 +78,7 @@ function Schedual() {
                 <PageHeader
                     title="动漫追番"
                     actions={[
-                        <TouchableOpacity onPress={() => router.push('/addAnime')}>
+                        <TouchableOpacity onPress={() => router.push('/addAnime')} key={'header'}>
                             <IconSymbol size={35} name="plus.app.fill" color="black" />
                         </TouchableOpacity>,
                     ]}
@@ -118,7 +118,7 @@ function Schedual() {
                     <View style={styles.modalPanel} pointerEvents="box-none">
                         <View>
                             <Text style={styles.modalHeader}>确认删除</Text>
-                            <Text style={{ fontSize: 14 }}>你确定要删除 "{animeData.name}" 吗？</Text>
+                            <Text style={{ fontSize: 14 }}>你确定要删除 &quot;{animeData.name}&quot; 吗？</Text>
                         </View>
                         <View style={styles.modalFooter}>
                             <View style={styles.modalButtonWrapper}>
