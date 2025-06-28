@@ -92,15 +92,6 @@ const AnimeDetail = () => {
                         {anime.isFinished && <Text style={styles.dateText}>完结: {anime.lastEpisodeDateTime}</Text>}
                     </View>
                 </View>
-
-                {/* 简介区域（示例） */}
-                <View style={styles.summaryContainer}>
-                    <Text style={styles.sectionTitle}>动漫简介</Text>
-                    <Text style={styles.summaryText}>
-                        这里是动漫的详细简介内容，介绍动漫的背景故事、主要角色等信息。
-                        可以根据实际需求从API获取或在组件中设置。
-                    </Text>
-                </View>
             </ScrollView>
         </SafeAreaView>
     )

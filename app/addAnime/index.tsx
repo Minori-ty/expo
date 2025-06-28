@@ -1,5 +1,9 @@
+import { addAnime } from '@/api/anime'
+import { queryClient } from '@/utils/react-query'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Picker } from '@react-native-picker/picker'
+import { useMutation } from '@tanstack/react-query'
+import { router } from 'expo-router'
 import React, { useEffect, useState } from 'react'
 import { Controller, SubmitHandler, useForm } from 'react-hook-form'
 import {
@@ -49,19 +53,34 @@ const AnimeForm = () => {
         defaultValues: {
             name: '',
             updateWeekday: 1,
-            updateTimeHHmm: '00:00',
+            updateTimeHHmm: '',
             currentEpisode: 1,
             totalEpisode: 1,
             cover: '',
         },
     })
 
-    const onSubmit: SubmitHandler<AnimeFormData> = (data) => {
-        console.log('提交表单数据:', data)
-        // 这里可以添加API调用逻辑
-        reset() // 重置表单
-    }
+    const { mutate: addAnimeMution } = useMutation({
+        mutationFn: addAnime,
+        onSuccess: () => {
+            queryClient.invalidateQueries({
+                queryKey: ['search'],
+            })
+            queryClient.invalidateQueries({
+                queryKey: ['my-anime'],
+            })
+            queryClient.invalidateQueries({
+                queryKey: ['schedule'],
+            })
+            reset()
+            router.back()
+        },
+    })
 
+    const onSubmit: SubmitHandler<AnimeFormData> = async (data) => {
+        console.log('提交表单数据:', data)
+        addAnimeMution(data)
+    }
     const weekdays = [
         { label: '周一', value: 1 },
         { label: '周二', value: 2 },
@@ -242,7 +261,8 @@ const styles = StyleSheet.create({
         borderWidth: 1,
         borderColor: '#ccc',
         borderRadius: 4,
-        padding: 10,
+        paddingLeft: 10,
+        alignItems: 'center',
         fontSize: 16,
         height: 40, // 固定高度
     },

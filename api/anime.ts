@@ -24,6 +24,7 @@ export async function addAnime(formData: TFormData) {
         } else {
             console.log('插入数据验证失败:', result.error)
             new Error(result.error.message)
+            return void 0
         }
     })
 }

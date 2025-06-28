@@ -8,7 +8,7 @@ import customParseFormat from 'dayjs/plugin/customParseFormat'
 import isSameOrBefore from 'dayjs/plugin/isSameOrBefore'
 import { Image } from 'expo-image'
 import React, { createContext, useContext, useState } from 'react'
-import { Dimensions, ScrollView, StyleSheet, Text, View } from 'react-native'
+import { Dimensions, ScrollView, StyleSheet, Text, TouchableWithoutFeedback, View } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { SceneMap, TabBar, TabView } from 'react-native-tab-view'
 
@@ -107,14 +107,14 @@ interface IEpisodeTipProps {
 function EpisodeTip({ updateTimeHHmm, currentEpisode, updateWeekday }: IEpisodeTipProps) {
     if (isTimePassed(updateTimeHHmm, updateWeekday)) {
         return (
-            <Text style={{ marginTop: 5, color: '#fb7299', fontSize: 12, width: '100%' }}>
+            <Text style={{ marginTop: 5, color: '#fb7299', fontSize: 12, width: '100%', backgroundColor: 'skyblue' }}>
                 更新到 第{currentEpisode}集
             </Text>
         )
     }
     return (
-        <Text style={{ marginTop: 5, color: '#9E9E9E', fontSize: 12, width: '100%' }}>
-            即将更新 第{currentEpisode}集
+        <Text style={{ marginTop: 5, color: '#9E9E9E', fontSize: 12, width: '100%', backgroundColor: 'skyblue' }}>
+            即将更新 第{currentEpisode} 集
         </Text>
     )
 }
@@ -168,29 +168,31 @@ export default function MyTabs() {
                             activeColor="#fb7299"
                             inactiveColor="#9E9E9E"
                             style={styles.tabBar}
-                            renderTabBarItem={({ route, navigationState, defaultTabWidth }) => {
+                            renderTabBarItem={({ route, navigationState, defaultTabWidth, onPress }) => {
                                 const focused = navigationState.routes[navigationState.index].key === route.key
                                 return (
-                                    <View
-                                        style={{
-                                            width: defaultTabWidth,
-                                            height: 50,
-                                            justifyContent: 'center',
-                                            alignItems: 'center',
-                                            backgroundColor: '#fff',
-                                        }}
-                                    >
-                                        <Text
+                                    <TouchableWithoutFeedback onPress={onPress}>
+                                        <View
                                             style={{
-                                                color: focused ? '#fb7299' : '#9E9E9E',
-                                                fontWeight: focused ? '900' : '400',
-                                                fontSize: focused ? 24 : 18,
-                                                textAlign: 'center',
+                                                width: defaultTabWidth,
+                                                height: 50,
+                                                justifyContent: 'center',
+                                                alignItems: 'center',
+                                                backgroundColor: '#fff',
                                             }}
                                         >
-                                            {route.title}
-                                        </Text>
-                                    </View>
+                                            <Text
+                                                style={{
+                                                    color: focused ? '#fb7299' : '#9E9E9E',
+                                                    fontWeight: focused ? '900' : '400',
+                                                    fontSize: focused ? 24 : 18,
+                                                    textAlign: 'center',
+                                                }}
+                                            >
+                                                {route.title}
+                                            </Text>
+                                        </View>
+                                    </TouchableWithoutFeedback>
                                 )
                             }}
                         />
