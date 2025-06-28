@@ -47,7 +47,7 @@ export async function getSchedule(): Promise<ReturnType<typeof useSelectAnime>> 
 }
 
 export async function deleteAnime(id: number) {
-    db.transaction(async (tx) => {
+    return db.transaction(async (tx) => {
         await tx.delete(animeTable).where(eq(animeTable.id, id))
         const returning = await tx.select().from(schduleTable).where(eq(schduleTable.animeId, id))
         if (returning.length) {
