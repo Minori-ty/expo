@@ -76,6 +76,8 @@ const AnimeForm = () => {
                                 {...field}
                                 style={[styles.input, errors.name && styles.errorInput]}
                                 placeholder="请输入番剧名称"
+                                onChangeText={field.onChange}
+                                value={field.value}
                             />
                         )}
                     />
@@ -113,6 +115,8 @@ const AnimeForm = () => {
                                 style={[styles.input, errors.updateTimeHHmm && styles.errorInput]}
                                 placeholder="例如: 12:00"
                                 keyboardType="numeric"
+                                onChangeText={field.onChange}
+                                value={field.value}
                             />
                         )}
                     />
@@ -124,14 +128,14 @@ const AnimeForm = () => {
                     <Controller
                         control={control}
                         name="currentEpisode"
-                        render={({ field: { onChange, value, ...rest } }) => (
+                        render={({ field }) => (
                             <TextInput
-                                {...rest}
-                                onChangeText={(text) => onChange(parseInt(text) || 0)}
-                                value={value.toString()}
+                                {...field}
                                 style={[styles.input, errors.currentEpisode && styles.errorInput]}
                                 placeholder="请输入当前更新集数"
                                 keyboardType="numeric"
+                                onChangeText={(text) => field.onChange(parseInt(text) || 0)}
+                                value={field.value?.toString() || ''}
                             />
                         )}
                     />
@@ -143,14 +147,14 @@ const AnimeForm = () => {
                     <Controller
                         control={control}
                         name="totalEpisode"
-                        render={({ field: { onChange, value, ...rest } }) => (
+                        render={({ field }) => (
                             <TextInput
-                                {...rest}
-                                onChangeText={(text) => onChange(parseInt(text) || 0)}
-                                value={value.toString()}
+                                {...field}
                                 style={[styles.input, errors.totalEpisode && styles.errorInput]}
                                 placeholder="请输入总集数"
                                 keyboardType="numeric"
+                                onChangeText={(text) => field.onChange(parseInt(text) || 0)}
+                                value={field.value?.toString() || ''}
                             />
                         )}
                     />
@@ -167,6 +171,8 @@ const AnimeForm = () => {
                                 {...field}
                                 style={[styles.input, errors.cover && styles.errorInput]}
                                 placeholder="请输入封面图片URL"
+                                onChangeText={field.onChange}
+                                value={field.value}
                             />
                         )}
                     />
@@ -207,6 +213,7 @@ const styles = StyleSheet.create({
         borderRadius: 4,
         padding: 10,
         fontSize: 16,
+        height: 40, // 添加固定高度
     },
     picker: {
         borderWidth: 1,
