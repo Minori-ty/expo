@@ -1,167 +1,227 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { useNavigation } from 'expo-router'
-import { useEffect } from 'react'
-import { useForm } from 'react-hook-form'
-import { Button, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native'
-import { z } from 'zod'
+import { Picker } from '@react-native-picker/picker'
+import React from 'react'
+import { Controller, SubmitHandler, useForm } from 'react-hook-form'
+import { Button, KeyboardAvoidingView, Platform, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native'
+import { z, ZodIssueCode } from 'zod'
 
-const weekDays = [
-    { label: '周一', value: 'Monday' },
-    { label: '周二', value: 'Tuesday' },
-    { label: '周三', value: 'Wednesday' },
-    { label: '周四', value: 'Thursday' },
-    { label: '周五', value: 'Friday' },
-    { label: '周六', value: 'Saturday' },
-    { label: '周日', value: 'Sunday' },
-]
+// 表单验证规则
+const animeSchema = z
+    .object({
+        name: z.string().min(1, '请输入番剧名称'),
+        updateWeekday: z.coerce.number().min(1, '请选择更新周').max(7, '更新周必须在1-7之间'),
+        updateTimeHHmm: z.string().regex(/^([01]\d|2[0-3]):([0-5]\d)$/, '请输入正确的时间格式HH:mm'),
+        currentEpisode: z.coerce.number().min(1, '当前集数至少为1'),
+        totalEpisode: z.coerce.number().min(1, '总集数至少为1'),
+        cover: z.string().url('请输入有效的URL'),
+    })
+    .superRefine((values, ctx) => {
+        if (values.totalEpisode < values.currentEpisode) {
+            ctx.addIssue({
+                code: ZodIssueCode.custom,
+                path: ['totalEpisode'],
+                message: '总集数不能小于当前集数',
+            })
+        }
+    })
 
-const schema = z.object({
-    name: z.string().min(1, '请输入番剧名称'),
-    weekDay: z.enum(['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'], {
-        required_error: '请选择更新周',
-    }),
-    updateTime: z.string().regex(/^([01]\d|2[0-3]):([0-5]\d)$/, '时间格式为HH:mm'),
-    currentEp: z.coerce.number().int().min(0, '必须为非负整数'),
-    totalEp: z.coerce.number().int().min(1, '必须为正整数'),
-    coverUrl: z.string().url('请输入合法的URL'),
-})
+type AnimeFormData = z.infer<typeof animeSchema>
 
-type FormData = z.infer<typeof schema>
-
-export default function BangumiForm() {
-    const navigation = useNavigation()
-    useEffect(() => {
-        navigation.setOptions({
-            headerTitle: '添加动漫',
-            headerTitleAlign: 'center',
-        })
-    }, [navigation])
+const AnimeForm = () => {
     const {
-        register,
-        setValue,
+        control,
         handleSubmit,
-        watch,
         formState: { errors },
-    } = useForm<FormData>({
-        resolver: zodResolver(schema),
+        reset,
+    } = useForm<AnimeFormData>({
+        resolver: zodResolver(animeSchema),
         defaultValues: {
             name: '',
-            weekDay: 'Monday',
-            updateTime: '',
-            currentEp: 0,
-            totalEp: 1,
-            coverUrl: '',
+            updateWeekday: 1,
+            updateTimeHHmm: '00:00',
+            currentEpisode: 1,
+            totalEpisode: 1,
+            cover: '',
         },
     })
 
-    useEffect(() => {
-        register('name')
-        register('updateTime')
-        register('currentEp')
-        register('totalEp')
-        register('coverUrl')
-        register('weekDay')
-    }, [register])
-
-    const weekDay = watch('weekDay')
-
-    const onSubmit = (data: FormData) => {
-        alert(JSON.stringify(data, null, 2))
+    const onSubmit: SubmitHandler<AnimeFormData> = (data) => {
+        console.log('提交表单数据:', data)
+        // 这里可以添加API调用逻辑
+        reset() // 重置表单
     }
 
+    const weekdays = [
+        { label: '周一', value: 1 },
+        { label: '周二', value: 2 },
+        { label: '周三', value: 3 },
+        { label: '周四', value: 4 },
+        { label: '周五', value: 5 },
+        { label: '周六', value: 6 },
+        { label: '周日', value: 7 },
+    ]
+
     return (
-        <View style={styles.container}>
-            <Text style={styles.label}>番剧名称</Text>
-            <TextInput
-                style={styles.input}
-                onChangeText={(text) => setValue('name', text)}
-                placeholder="请输入番剧名称"
-            />
-            {errors.name && <Text style={styles.error}>{errors.name.message}</Text>}
+        <KeyboardAvoidingView style={styles.container} behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
+            <ScrollView contentContainerStyle={styles.scrollView}>
+                <Text style={styles.title}>添加动漫</Text>
 
-            <Text style={styles.label}>更新周</Text>
-            <View style={styles.row}>
-                {weekDays.map((day) => (
-                    <TouchableOpacity
-                        key={day.value}
-                        style={[styles.weekBtn, weekDay === day.value && styles.weekBtnActive]}
-                        onPress={() => setValue('weekDay', day.value as z.infer<typeof schema.shape.weekDay>)}
-                    >
-                        <Text style={weekDay === day.value ? styles.weekBtnTextActive : styles.weekBtnText}>
-                            {day.label}
-                        </Text>
-                    </TouchableOpacity>
-                ))}
-            </View>
-            {errors.weekDay && <Text style={styles.error}>{errors.weekDay.message}</Text>}
+                <View style={styles.formGroup}>
+                    <Text style={styles.label}>番剧名称</Text>
+                    <Controller
+                        control={control}
+                        name="name"
+                        render={({ field }) => (
+                            <TextInput
+                                {...field}
+                                style={[styles.input, errors.name && styles.errorInput]}
+                                placeholder="请输入番剧名称"
+                            />
+                        )}
+                    />
+                    {errors.name && <Text style={styles.errorText}>{errors.name.message}</Text>}
+                </View>
 
-            <Text style={styles.label}>更新时间点 (HH:mm)</Text>
-            <TextInput
-                style={styles.input}
-                onChangeText={(text) => setValue('updateTime', text)}
-                placeholder="例如 20:00"
-            />
-            {errors.updateTime && <Text style={styles.error}>{errors.updateTime.message}</Text>}
+                <View style={styles.formGroup}>
+                    <Text style={styles.label}>更新周</Text>
+                    <Controller
+                        control={control}
+                        name="updateWeekday"
+                        render={({ field }) => (
+                            <Picker
+                                {...field}
+                                selectedValue={field.value}
+                                style={[styles.picker, errors.updateWeekday && styles.errorInput]}
+                            >
+                                {weekdays.map((day) => (
+                                    <Picker.Item label={day.label} value={day.value} key={day.value} />
+                                ))}
+                            </Picker>
+                        )}
+                    />
+                    {errors.updateWeekday && <Text style={styles.errorText}>{errors.updateWeekday.message}</Text>}
+                </View>
 
-            <Text style={styles.label}>当前更新集数</Text>
-            <TextInput
-                style={styles.input}
-                keyboardType="numeric"
-                onChangeText={(text) => setValue('currentEp', Number(text))}
-                placeholder="0"
-            />
-            {errors.currentEp && <Text style={styles.error}>{errors.currentEp.message}</Text>}
+                <View style={styles.formGroup}>
+                    <Text style={styles.label}>更新时间(HH:mm)</Text>
+                    <Controller
+                        control={control}
+                        name="updateTimeHHmm"
+                        render={({ field }) => (
+                            <TextInput
+                                {...field}
+                                style={[styles.input, errors.updateTimeHHmm && styles.errorInput]}
+                                placeholder="例如: 12:00"
+                                keyboardType="numeric"
+                            />
+                        )}
+                    />
+                    {errors.updateTimeHHmm && <Text style={styles.errorText}>{errors.updateTimeHHmm.message}</Text>}
+                </View>
 
-            <Text style={styles.label}>总集数</Text>
-            <TextInput
-                style={styles.input}
-                keyboardType="numeric"
-                onChangeText={(text) => setValue('totalEp', Number(text))}
-                placeholder="1"
-            />
-            {errors.totalEp && <Text style={styles.error}>{errors.totalEp.message}</Text>}
+                <View style={styles.formGroup}>
+                    <Text style={styles.label}>当前更新集数</Text>
+                    <Controller
+                        control={control}
+                        name="currentEpisode"
+                        render={({ field: { onChange, value, ...rest } }) => (
+                            <TextInput
+                                {...rest}
+                                onChangeText={(text) => onChange(parseInt(text) || 0)}
+                                value={value.toString()}
+                                style={[styles.input, errors.currentEpisode && styles.errorInput]}
+                                placeholder="请输入当前更新集数"
+                                keyboardType="numeric"
+                            />
+                        )}
+                    />
+                    {errors.currentEpisode && <Text style={styles.errorText}>{errors.currentEpisode.message}</Text>}
+                </View>
 
-            <Text style={styles.label}>封面URL</Text>
-            <TextInput
-                style={styles.input}
-                onChangeText={(text) => setValue('coverUrl', text)}
-                placeholder="请输入图片链接"
-            />
-            {errors.coverUrl && <Text style={styles.error}>{errors.coverUrl.message}</Text>}
+                <View style={styles.formGroup}>
+                    <Text style={styles.label}>总集数</Text>
+                    <Controller
+                        control={control}
+                        name="totalEpisode"
+                        render={({ field: { onChange, value, ...rest } }) => (
+                            <TextInput
+                                {...rest}
+                                onChangeText={(text) => onChange(parseInt(text) || 0)}
+                                value={value.toString()}
+                                style={[styles.input, errors.totalEpisode && styles.errorInput]}
+                                placeholder="请输入总集数"
+                                keyboardType="numeric"
+                            />
+                        )}
+                    />
+                    {errors.totalEpisode && <Text style={styles.errorText}>{errors.totalEpisode.message}</Text>}
+                </View>
 
-            <Button title="提交" onPress={handleSubmit(onSubmit)} />
-        </View>
+                <View style={styles.formGroup}>
+                    <Text style={styles.label}>封面URL</Text>
+                    <Controller
+                        control={control}
+                        name="cover"
+                        render={({ field }) => (
+                            <TextInput
+                                {...field}
+                                style={[styles.input, errors.cover && styles.errorInput]}
+                                placeholder="请输入封面图片URL"
+                            />
+                        )}
+                    />
+                    {errors.cover && <Text style={styles.errorText}>{errors.cover.message}</Text>}
+                </View>
+
+                <Button title="提交" onPress={handleSubmit(onSubmit)} />
+            </ScrollView>
+        </KeyboardAvoidingView>
     )
 }
 
 const styles = StyleSheet.create({
-    container: { padding: 20 },
-    label: { marginTop: 10 },
+    container: {
+        flex: 1,
+        backgroundColor: '#fff',
+    },
+    scrollView: {
+        padding: 16,
+    },
+    title: {
+        fontSize: 24,
+        fontWeight: 'bold',
+        marginBottom: 20,
+        textAlign: 'center',
+    },
+    formGroup: {
+        marginBottom: 16,
+    },
+    label: {
+        fontSize: 16,
+        marginBottom: 8,
+        fontWeight: '500',
+    },
     input: {
         borderWidth: 1,
         borderColor: '#ccc',
         borderRadius: 4,
-        paddingVertical: 0,
-        height: 50,
-        // padding: 8,
-        // marginTop: 4,
+        padding: 10,
+        fontSize: 16,
     },
-    row: { flexDirection: 'row', flexWrap: 'wrap', marginVertical: 8 },
-    weekBtn: {
+    picker: {
         borderWidth: 1,
-        borderColor: '#888',
-        borderRadius: 16,
-        paddingHorizontal: 12,
-        paddingVertical: 6,
-        marginRight: 8,
-        marginBottom: 8,
-        backgroundColor: '#fff',
+        borderColor: '#ccc',
+        borderRadius: 4,
+        height: 40,
     },
-    weekBtnActive: {
-        backgroundColor: '#007AFF',
-        borderColor: '#007AFF',
+    errorInput: {
+        borderColor: 'red',
     },
-    weekBtnText: { color: '#333' },
-    weekBtnTextActive: { color: '#fff' },
-    error: { color: 'red', fontSize: 12 },
+    errorText: {
+        color: 'red',
+        fontSize: 14,
+        marginTop: 4,
+    },
 })
+
+export default AnimeForm
