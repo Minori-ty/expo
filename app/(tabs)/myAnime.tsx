@@ -1,6 +1,7 @@
+import { deleteAnime } from '@/api/anime'
 import PageHeader from '@/components/PageHeader'
 import { IconSymbol } from '@/components/ui/IconSymbol'
-import { useDeleteAnime, useSelectAnime } from '@/hooks/useAnime'
+import { useSelectAnime } from '@/hooks/useAnime'
 import { queryClient } from '@/utils/react-query'
 import { useMutation, useQuery } from '@tanstack/react-query'
 import { Image } from 'expo-image'
@@ -59,14 +60,14 @@ function Schedual() {
         queryFn: search,
     })
 
-    async function deleteAnime() {
-        const result = await useDeleteAnime(animeData.id)
+    async function onDeleteAnime() {
+        const result = await deleteAnime(animeData.id)
         setModalVisible(false)
         return result
     }
 
     const { mutate: deleteItem } = useMutation({
-        mutationFn: deleteAnime,
+        mutationFn: onDeleteAnime,
         onSuccess: () => {
             queryClient.invalidateQueries({
                 queryKey: ['search'],

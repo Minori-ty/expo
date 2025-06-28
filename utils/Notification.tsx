@@ -1,5 +1,6 @@
+import { addAnime } from '@/api/anime'
 import { animeTable } from '@/db/schema'
-import { useInsertAnime, useSelectAnime } from '@/hooks/useAnime'
+import { useSelectAnime } from '@/hooks/useAnime'
 import { getCalendarPermission } from '@/permissions'
 import { sendNotifications } from '@/permissions/notifications'
 import { useMutation, useQuery } from '@tanstack/react-query'
@@ -56,7 +57,7 @@ const Notification: React.FC = () => {
             isOver: false,
             cover: 'https://sfaf',
         }
-        return await useInsertAnime(data)
+        return await addAnime(data)
     }
 
     async function search() {
@@ -104,7 +105,7 @@ const Notification: React.FC = () => {
                 />
             </View>
             <Button title="添加数据" onPress={() => inserItem()} />
-            <Button title="添加日历提醒" onPress={addEventWithReminder} />
+            {/* <Button title="添加日历提醒" onPress={addEventWithReminder} /> */}
             {list.map((item) => {
                 return <Text key={item.id}>{JSON.stringify(item)}</Text>
             })}

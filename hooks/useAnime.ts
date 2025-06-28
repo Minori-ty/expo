@@ -1,49 +1,17 @@
 import { db } from '@/db'
 import { animeTable, insertAnimeSchema } from '@/db/schema'
 import dayjs from 'dayjs'
-import { eq } from 'drizzle-orm'
+import { eq, inArray } from 'drizzle-orm'
 import { z } from 'zod/v4'
 
 const insertAnimeData = insertAnimeSchema
     .omit({ id: true, createdAt: true, isFinished: true, firstEpisodeDateTime: true, lastEpisodeDateTime: true })
     .extend({})
-type TFormData = z.infer<typeof insertAnimeData>
+export type TFormData = z.infer<typeof insertAnimeData>
 
 export function useInsertAnime(formData: TFormData) {
     return new Promise(async (resolve, reject) => {
-        // 获取当前日期
-        const now = dayjs()
-
-        // 判断是否已过本周更新时间
-        const isUpdated = hasEpisodeUpdated(formData.updateWeekday, formData.updateTimeHHmm)
-        // 解析更新时间（时和分）
-        const [hours, minutes] = formData.updateTimeHHmm.split(':').map(Number)
-
-        // 构建本周更新时间点
-        let updateDateTime = now.day(formData.updateWeekday).hour(hours).minute(minutes).second(0).millisecond(0)
-
-        // 根据是否已更新调整集数和日期
-        let effectiveEpisode = formData.currentEpisode
-        if (!isUpdated) {
-            // 还没到本周更新时间，使用上周的集数
-            effectiveEpisode = formData.currentEpisode - 1
-            // 将更新时间调整到上周
-            updateDateTime = updateDateTime.subtract(1, 'week')
-        }
-
-        // 计算第一集的日期时间
-        const firstEpisodeDateTime = updateDateTime.subtract((effectiveEpisode - 1) * 7, 'day')
-        const lastEpisodeDateTime = firstEpisodeDateTime.add((formData.totalEpisode - 1) * 7, 'day')
-        // 判断是否完结：当前时间是否晚于最后一集更新时间
-        const isFinished = now.isAfter(lastEpisodeDateTime)
-
-        const data: z.infer<typeof insertAnimeSchema> = {
-            ...formData,
-            createdAt: dayjs().unix(),
-            firstEpisodeDateTime: firstEpisodeDateTime.unix(),
-            lastEpisodeDateTime: lastEpisodeDateTime.unix(),
-            isFinished,
-        }
+        const data = generateAnimeData(formData)
         const result = insertAnimeSchema.safeParse(data)
         type TData = typeof animeTable.$inferInsert
         if (result.success) {
@@ -56,8 +24,67 @@ export function useInsertAnime(formData: TFormData) {
     })
 }
 
+export function generateAnimeData(formData: TFormData) {
+    // 获取当前日期
+    const now = dayjs()
+
+    // 判断是否已过本周更新时间
+    const isUpdated = hasEpisodeUpdated(formData.updateWeekday, formData.updateTimeHHmm)
+    // 解析更新时间（时和分）
+    const [hours, minutes] = formData.updateTimeHHmm.split(':').map(Number)
+
+    // 构建本周更新时间点
+    let updateDateTime = now.day(formData.updateWeekday).hour(hours).minute(minutes).second(0).millisecond(0)
+
+    // 根据是否已更新调整集数和日期
+    let effectiveEpisode = formData.currentEpisode
+    if (!isUpdated) {
+        // 还没到本周更新时间，使用上周的集数
+        effectiveEpisode = formData.currentEpisode - 1
+        // 将更新时间调整到上周
+        updateDateTime = updateDateTime.subtract(1, 'week')
+    }
+
+    // 计算第一集的日期时间
+    const firstEpisodeDateTime = updateDateTime.subtract((effectiveEpisode - 1) * 7, 'day')
+    const lastEpisodeDateTime = firstEpisodeDateTime.add((formData.totalEpisode - 1) * 7, 'day')
+    // 判断是否完结：当前时间是否晚于最后一集更新时间
+    const isFinished = now.isAfter(lastEpisodeDateTime)
+
+    const data: z.infer<typeof insertAnimeSchema> = {
+        ...formData,
+        createdAt: dayjs().unix(),
+        firstEpisodeDateTime: firstEpisodeDateTime.unix(),
+        lastEpisodeDateTime: lastEpisodeDateTime.unix(),
+        isFinished,
+    }
+
+    return data
+}
+
+/**
+ * 查询全部
+ * @returns
+ */
 export async function useSelectAnime() {
     const row = await db.select().from(animeTable)
+    return row.map((item) => {
+        return {
+            ...item,
+            firstEpisodeDateTime: dayjs.unix(item.firstEpisodeDateTime).format('YYYY-MM-DD HH:mm'),
+            lastEpisodeDateTime: dayjs.unix(item.lastEpisodeDateTime).format('YYYY-MM-DD HH:mm'),
+            createdAt: dayjs.unix(item.createdAt).format('YYYY-MM-DD HH:mm'),
+        }
+    })
+}
+
+/**
+ *
+ * @param idList 动漫的id列表
+ * @returns
+ */
+export async function useSelectAnimeByIdList(idList: number[]) {
+    const row = db.select().from(animeTable).where(inArray(animeTable.id, idList)).all()
     return row.map((item) => {
         return {
             ...item,

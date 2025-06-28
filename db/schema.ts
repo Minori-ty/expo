@@ -1,5 +1,5 @@
 import { sql } from 'drizzle-orm'
-import { integer, type SQLiteColumnBuilderBase, sqliteTable, text } from 'drizzle-orm/sqlite-core'
+import { integer, sqliteTable, text } from 'drizzle-orm/sqlite-core'
 import { createInsertSchema, createSelectSchema } from 'drizzle-zod'
 
 type TUpdateWeekday = 1 | 2 | 3 | 4 | 5 | 6 | 7
@@ -7,8 +7,10 @@ type TUpdateWeekday = 1 | 2 | 3 | 4 | 5 | 6 | 7
 function isTUpdateWeekday(value: number): value is TUpdateWeekday {
     return value >= 1 && value <= 7 && Number.isInteger(value)
 }
-const table = {
-    id: integer('id').primaryKey({ autoIncrement: true }),
+
+/** 动漫列表数据表 */
+export const animeTable = sqliteTable('anime', {
+    id: integer('id').primaryKey({ autoIncrement: true }).notNull(),
     name: text('name').notNull(),
     updateWeekday: integer('update_weekday').$type<TUpdateWeekday>().notNull(),
     updateTimeHHmm: text('update_time_hhmm').notNull(),
@@ -23,10 +25,7 @@ const table = {
         .default(sql`(unixepoch())`),
     firstEpisodeDateTime: integer('first_episode_date_time').notNull(),
     lastEpisodeDateTime: integer('last_episode_date_time').notNull(),
-} satisfies Record<string, SQLiteColumnBuilderBase>
-
-/** 动漫列表数据表 */
-export const animeTable = sqliteTable('anime', table)
+})
 
 // 生成 Zod 验证模式
 export const insertAnimeSchema = createInsertSchema(animeTable, {
@@ -43,7 +42,7 @@ export const selectAnimeSchema = createSelectSchema(animeTable)
 
 /** 动漫更新表数据表 */
 export const schduleTable = sqliteTable('schdule', {
-    id: integer('id').primaryKey({ autoIncrement: true }),
+    id: integer('id').primaryKey({ autoIncrement: true }).notNull(),
     animeId: integer('anime_id')
         .notNull()
         .references(() => animeTable.id),

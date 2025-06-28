@@ -1,3 +1,4 @@
+import { getSchedule } from '@/api/anime'
 import Empty from '@/components/lottie/Empty'
 import { useSelectAnime } from '@/hooks/useAnime'
 import Notification from '@/utils/Notification'
@@ -5,7 +6,7 @@ import { useQuery } from '@tanstack/react-query'
 import dayjs from 'dayjs'
 import { Image } from 'expo-image'
 import React, { createContext, useContext, useState } from 'react'
-import { Animated, Dimensions, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
+import { Dimensions, StyleSheet, Text, View } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { SceneMap, TabBar, TabView } from 'react-native-tab-view'
 
@@ -62,7 +63,7 @@ const blurhash =
 function ScheduleItem({ time, animeList }: IScheduleItemProps) {
     return (
         <View style={styles.scheduleItem}>
-            <View style={{ width: 60, justifyContent: 'center' }}>
+            <View style={{ width: 60, justifyContent: 'flex-start', alignItems: 'center' }}>
                 <Text>{time}</Text>
             </View>
             <View style={{ flex: 1 }}>
@@ -113,7 +114,7 @@ export default function MyTabs() {
     ])
 
     async function search() {
-        const data = await useSelectAnime()
+        const data = await getSchedule()
         return data
     }
 
@@ -149,55 +150,19 @@ export default function MyTabs() {
                             activeColor="#fb7299"
                             inactiveColor="#9E9E9E"
                             style={styles.tabBar}
-                            renderIndicator={({ navigationState, width, style }) => {
-                                const tabWidth = typeof width === 'number' ? width / navigationState.routes.length : 80
-
-                                const translateX = props.position.interpolate({
-                                    inputRange: navigationState.routes.map((_, i) => i),
-                                    outputRange: navigationState.routes.map((_, i) => i * tabWidth),
-                                })
-
-                                return (
-                                    <Animated.View
-                                        style={[
-                                            {
-                                                position: 'absolute',
-                                                left: 0,
-                                                bottom: 0,
-                                                width: tabWidth,
-                                                height: 3,
-                                                backgroundColor: '#fb7299',
-                                                transform: [{ translateX }],
-                                            },
-                                            style,
-                                        ]}
-                                    />
-                                )
-                            }}
-                            renderTabBarItem={({ route, navigationState, onPress, onLongPress }) => {
+                            renderTabBarItem={({ route, navigationState }) => {
                                 const focused = navigationState.routes[navigationState.index].key === route.key
                                 return (
-                                    <TouchableOpacity
+                                    <Text
                                         style={{
-                                            width: 80,
-                                            paddingVertical: 12,
-                                            backgroundColor: focused ? '#fff6f9' : '#fff',
+                                            color: focused ? '#fb7299' : '#9E9E9E',
+                                            fontWeight: focused ? '900' : '800',
+                                            fontSize: focused ? 18 : 16,
+                                            textAlign: 'center',
                                         }}
-                                        onPress={onPress}
-                                        onLongPress={onLongPress}
-                                        key={route.key}
                                     >
-                                        <Text
-                                            style={{
-                                                color: focused ? '#fb7299' : '#9E9E9E',
-                                                fontWeight: focused ? 'bold' : 'normal',
-                                                fontSize: 16,
-                                                textAlign: 'center',
-                                            }}
-                                        >
-                                            {route.title}
-                                        </Text>
-                                    </TouchableOpacity>
+                                        {route.title}
+                                    </Text>
                                 )
                             }}
                         />
