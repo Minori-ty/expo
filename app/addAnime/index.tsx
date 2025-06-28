@@ -25,7 +25,7 @@ const animeSchema = z
     .object({
         name: z.string().min(1, '请输入番剧名称'),
         updateWeekday: z.coerce.number().min(1, '请选择更新周').max(7, '更新周必须在1-7之间'),
-        updateTimeHHmm: z.string().regex(/^([01]\d|2[0-3]):([0-5]\d)$/, '请输入正确的时间格式HH:mm'),
+        updateTimeHHmm: z.string().regex(/(0[0-9]|1[0-9]|2[0-3]):[0-5][0-9]/, '请输入正确的时间格式HH:mm'),
         currentEpisode: z.coerce.number().min(1, '当前集数至少为1'),
         totalEpisode: z.coerce.number().min(1, '总集数至少为1'),
         cover: z.string().url('请输入有效的URL'),
@@ -55,7 +55,7 @@ const AnimeForm = () => {
             updateWeekday: 1,
             updateTimeHHmm: '',
             currentEpisode: 1,
-            totalEpisode: 1,
+            totalEpisode: 13,
             cover: '',
         },
     })

@@ -31,7 +31,7 @@ export const animeTable = sqliteTable('anime', {
 export const insertAnimeSchema = createInsertSchema(animeTable, {
     // 注意这里修改为函数形式
     updateWeekday: (schema) => schema.refine((val) => isTUpdateWeekday(val)),
-    updateTimeHHmm: (schema) => schema.regex(/^([01]?[0-9]|2[0-3]):[0-5][0-9]$/),
+    updateTimeHHmm: (schema) => schema.regex(/(0[0-9]|1[0-9]|2[0-3]):[0-5][0-9]/),
     isFinished: (shema) => shema,
     createdAt: (schema) => schema.int().gte(1735689600),
     firstEpisodeDateTime: (schema) => schema.int().gte(1735689600),

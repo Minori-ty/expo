@@ -49,13 +49,13 @@ const Notification: React.FC = () => {
     // const [list, setList] = useState<Awaited<ReturnType<typeof useSelectAnime>>>([])
     async function insert() {
         const data = {
-            name: 'a',
-            updateWeekday: 1,
+            name: 'Notification添加',
+            updateWeekday: 2,
             updateTimeHHmm: '12:00',
-            currentEpisode: 0,
-            totalEpisode: 1,
+            currentEpisode: 3,
+            totalEpisode: 13,
             isOver: false,
-            cover: 'https://sfaf',
+            cover: 'https://cdn.sm.cn/static/25/01/14/b8e93c8d92fc345d8e717bbd6333324c.png?x-oss-process=image/format,avif',
         }
         return await addAnime(data)
     }
