@@ -1,6 +1,6 @@
 import { db } from '@/db'
 import { animeTable, insertAnimeSchema, schduleTable } from '@/db/schema'
-import { TFormData, generateAnimeData, useSelectAnime } from '@/hooks/useAnime'
+import { TFormData, generateAnimeData } from '@/hooks/useAnime'
 import dayjs from 'dayjs'
 import { eq, inArray } from 'drizzle-orm'
 
@@ -20,6 +20,7 @@ export async function addAnime(formData: TFormData) {
                     animeId: animeData.id,
                 })
             }
+            return animeData
         } else {
             console.log('插入数据验证失败:', result.error)
             new Error(result.error.message)
@@ -27,32 +28,31 @@ export async function addAnime(formData: TFormData) {
     })
 }
 
-export async function getSchedule(): Promise<ReturnType<typeof useSelectAnime>> {
-    return new Promise(async (resolve, reject) => {
-        await db.transaction(async (tx) => {
-            const scheduleList = await tx.select().from(schduleTable)
-            const animeIdList = scheduleList.map((item) => item.animeId)
-            const animeList = tx.select().from(animeTable).where(inArray(animeTable.id, animeIdList)).all()
-            const parseAnimeList = animeList.map((item) => {
-                return {
-                    ...item,
-                    firstEpisodeDateTime: dayjs.unix(item.firstEpisodeDateTime).format('YYYY-MM-DD HH:mm'),
-                    lastEpisodeDateTime: dayjs.unix(item.lastEpisodeDateTime).format('YYYY-MM-DD HH:mm'),
-                    createdAt: dayjs.unix(item.createdAt).format('YYYY-MM-DD HH:mm'),
-                }
-            })
-            resolve(parseAnimeList)
+export async function getSchedule() {
+    return await db.transaction(async (tx) => {
+        const scheduleList = await tx.select().from(schduleTable)
+        const animeIdList = scheduleList.map((item) => item.animeId)
+        const animeList = tx.select().from(animeTable).where(inArray(animeTable.id, animeIdList)).all()
+        const parseAnimeList = animeList.map((item) => {
+            return {
+                ...item,
+                firstEpisodeDateTime: dayjs.unix(item.firstEpisodeDateTime).format('YYYY-MM-DD HH:mm'),
+                lastEpisodeDateTime: dayjs.unix(item.lastEpisodeDateTime).format('YYYY-MM-DD HH:mm'),
+                createdAt: dayjs.unix(item.createdAt).format('YYYY-MM-DD HH:mm'),
+            }
         })
+        return parseAnimeList
     })
 }
 
 export async function deleteAnime(id: number) {
     return db.transaction(async (tx) => {
-        await tx.delete(animeTable).where(eq(animeTable.id, id))
+        const anime = await tx.delete(animeTable).where(eq(animeTable.id, id)).returning()
         const returning = await tx.select().from(schduleTable).where(eq(schduleTable.animeId, id))
         if (returning.length) {
             const schedule = returning[0]
             tx.delete(schduleTable).where(eq(schduleTable.id, schedule.id))
         }
+        return anime
     })
 }
