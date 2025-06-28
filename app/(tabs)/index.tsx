@@ -1,6 +1,6 @@
 import { getSchedule } from '@/api/anime'
 import Empty from '@/components/lottie/Empty'
-import { useSelectAnime } from '@/hooks/useAnime'
+import { selectAnime } from '@/hooks/useAnime'
 import { useQuery } from '@tanstack/react-query'
 import dayjs from 'dayjs'
 import customParseFormat from 'dayjs/plugin/customParseFormat'
@@ -17,7 +17,7 @@ dayjs.extend(isSameOrBefore)
 dayjs.extend(isoWeek)
 
 interface IScheduleContext {
-    list: Awaited<ReturnType<typeof useSelectAnime>>
+    list: Awaited<ReturnType<typeof selectAnime>>
 }
 
 const scheduleContext = createContext<IScheduleContext | undefined>(undefined)
@@ -34,7 +34,7 @@ function Schedule({ updateWeekday }: { updateWeekday: number }) {
     if (!animeList.length) {
         return <Empty />
     }
-    const mapSchedule: Record<string, Awaited<ReturnType<typeof useSelectAnime>>> = {}
+    const mapSchedule: Record<string, Awaited<ReturnType<typeof selectAnime>>> = {}
     animeList.forEach((item) => {
         if (mapSchedule[item.updateTimeHHmm]) {
             mapSchedule[item.updateTimeHHmm].push(item)
@@ -62,7 +62,7 @@ function Schedule({ updateWeekday }: { updateWeekday: number }) {
 
 interface IScheduleItemProps {
     time: string
-    animeList: Awaited<ReturnType<typeof useSelectAnime>>
+    animeList: Awaited<ReturnType<typeof selectAnime>>
 }
 const blurhash =
     '|rF?hV%2WCj[ayj[a|j[az_NaeWBj@ayfRayfQfQM{M|azj[azf6fQfQfQIpWXofj[ayj[j[fQayWCoeoeaya}j[ayfQa{oLj?j[WVj[ayayj[fQoff7azayj[ayj[j[ayofayayayj[fQj[ayayj[ayfjj[j[ayjuayj['
@@ -125,7 +125,9 @@ export default function MyTabs() {
     ])
 
     useEffect(() => {
-        setIndex(dayjs().isoWeekday())
+        console.log(dayjs().isoWeekday())
+
+        // setIndex(dayjs().isoWeekday())
     }, [])
     async function search() {
         const data = await getSchedule()
@@ -166,6 +168,8 @@ export default function MyTabs() {
                             style={styles.tabBar}
                             renderTabBarItem={({ route, navigationState, defaultTabWidth, onPress }) => {
                                 const focused = navigationState.routes[navigationState.index].key === route.key
+                                console.log(focused)
+
                                 return (
                                     <TouchableWithoutFeedback onPress={onPress}>
                                         <View
