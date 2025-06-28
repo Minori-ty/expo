@@ -264,13 +264,13 @@ const styles = StyleSheet.create({
         paddingLeft: 10,
         alignItems: 'center',
         fontSize: 16,
-        height: 40, // 固定高度
+        height: 50, // 固定高度
     },
     picker: {
         borderWidth: 1,
         borderColor: '#ccc',
         borderRadius: 4,
-        height: 40,
+        height: 60,
     },
     errorInput: {
         borderColor: 'red',
