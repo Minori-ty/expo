@@ -1,4 +1,5 @@
 import { deleteAnime } from '@/api/anime'
+import CustomModal from '@/components/CustomModal'
 import PageHeader from '@/components/PageHeader'
 import { IconSymbol } from '@/components/ui/IconSymbol'
 import { useSelectAnime } from '@/hooks/useAnime'
@@ -7,17 +8,7 @@ import { useMutation, useQuery } from '@tanstack/react-query'
 import { Image } from 'expo-image'
 import { useRouter } from 'expo-router'
 import React, { createContext, useContext, useState } from 'react'
-import {
-    Dimensions,
-    FlatList,
-    Modal,
-    Pressable,
-    StyleSheet,
-    Text,
-    TouchableOpacity,
-    TouchableWithoutFeedback,
-    View,
-} from 'react-native'
+import { Dimensions, FlatList, Pressable, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 
 const blurhash =
@@ -93,18 +84,16 @@ function Schedual() {
                     ]}
                 />
                 {list.length > 0 ? <AnimeContainer list={list} /> : <Empty />}
-                <Modal
+                {/* <Modal
                     visible={modalVisible}
                     transparent
                     animationType="fade"
                     onRequestClose={() => setModalVisible(false)}
                 >
                     <View style={styles.modalBackground}>
-                        {/* 背景点击关闭 */}
                         <TouchableWithoutFeedback onPress={() => setModalVisible(false)}>
                             <View style={StyleSheet.absoluteFill} />
                         </TouchableWithoutFeedback>
-                        {/* 内容区域，点击不会关闭 */}
                         <View style={styles.modalPanel} pointerEvents="box-none">
                             <View style={styles.modalContent}>
                                 <Text style={styles.modalHeader}>确认删除</Text>
@@ -124,7 +113,27 @@ function Schedual() {
                             </View>
                         </View>
                     </View>
-                </Modal>
+                </Modal> */}
+                <CustomModal visible={modalVisible} onClose={() => setModalVisible(false)}>
+                    <View style={styles.modalPanel} pointerEvents="box-none">
+                        <View style={styles.modalContent}>
+                            <Text style={styles.modalHeader}>确认删除</Text>
+                            <Text style={{ fontSize: 14 }}>你确定要删除 "{animeData.name}" 吗？</Text>
+                        </View>
+                        <View style={styles.modalFooter}>
+                            <View style={styles.modalButtonWrapper}>
+                                <Pressable onPress={() => setModalVisible(false)}>
+                                    <Text style={styles.modalButton}>取消</Text>
+                                </Pressable>
+                            </View>
+                            <View style={styles.modalButtonWrapper}>
+                                <Pressable onPress={() => deleteItem()}>
+                                    <Text style={styles.modalButton}>删除</Text>
+                                </Pressable>
+                            </View>
+                        </View>
+                    </View>
+                </CustomModal>
             </SafeAreaView>
         </ModalContext.Provider>
     )
@@ -150,6 +159,8 @@ function AnimeContainer({ list }: IAnimeContainerProps) {
             keyExtractor={(item) => item.id.toString()}
             numColumns={3}
             columnWrapperStyle={{ gap: GAP }}
+            showsHorizontalScrollIndicator={false}
+            showsVerticalScrollIndicator={false}
             contentContainerStyle={{ gap: GAP, paddingHorizontal: GAP }}
             renderItem={({ item }) => <AnimeContainerItem data={item} />}
         />

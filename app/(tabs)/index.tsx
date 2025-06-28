@@ -8,7 +8,7 @@ import customParseFormat from 'dayjs/plugin/customParseFormat'
 import isSameOrBefore from 'dayjs/plugin/isSameOrBefore'
 import { Image } from 'expo-image'
 import React, { createContext, useContext, useState } from 'react'
-import { Dimensions, StyleSheet, Text, View } from 'react-native'
+import { Dimensions, ScrollView, StyleSheet, Text, View } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { SceneMap, TabBar, TabView } from 'react-native-tab-view'
 
@@ -51,11 +51,11 @@ function Schedule({ updateWeekday }: { updateWeekday: number }) {
         return timeA - timeB
     })
     return (
-        <View style={styles.schedule}>
+        <ScrollView style={styles.schedule} showsVerticalScrollIndicator={false} showsHorizontalScrollIndicator={false}>
             {sortedTimes.map((time, index) => {
                 return <ScheduleItem time={time} animeList={mapSchedule[time]} key={index} />
             })}
-        </View>
+        </ScrollView>
     )
 }
 
@@ -160,19 +160,29 @@ export default function MyTabs() {
                             activeColor="#fb7299"
                             inactiveColor="#9E9E9E"
                             style={styles.tabBar}
-                            renderTabBarItem={({ route, navigationState }) => {
+                            renderTabBarItem={({ route, navigationState, defaultTabWidth }) => {
                                 const focused = navigationState.routes[navigationState.index].key === route.key
                                 return (
-                                    <Text
+                                    <View
                                         style={{
-                                            color: focused ? '#fb7299' : '#9E9E9E',
-                                            fontWeight: focused ? '900' : '800',
-                                            fontSize: focused ? 18 : 16,
-                                            textAlign: 'center',
+                                            width: defaultTabWidth,
+                                            height: 50,
+                                            justifyContent: 'center',
+                                            alignItems: 'center',
+                                            backgroundColor: '#fff',
                                         }}
                                     >
-                                        {route.title}
-                                    </Text>
+                                        <Text
+                                            style={{
+                                                color: focused ? '#fb7299' : '#9E9E9E',
+                                                fontWeight: focused ? '900' : '800',
+                                                fontSize: focused ? 24 : 18,
+                                                textAlign: 'center',
+                                            }}
+                                        >
+                                            {route.title}
+                                        </Text>
+                                    </View>
                                 )
                             }}
                         />

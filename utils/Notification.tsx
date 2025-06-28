@@ -86,7 +86,7 @@ const Notification: React.FC = () => {
         getCalendarPermission()
     }, [])
     return (
-        <ScrollView>
+        <ScrollView showsVerticalScrollIndicator={false} showsHorizontalScrollIndicator={false}>
             <Text>Notification</Text>
             <Button
                 title="发送通知"
