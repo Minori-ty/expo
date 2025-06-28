@@ -7,7 +7,7 @@ import customParseFormat from 'dayjs/plugin/customParseFormat'
 import isSameOrBefore from 'dayjs/plugin/isSameOrBefore'
 import isoWeek from 'dayjs/plugin/isoWeek'
 import { Image } from 'expo-image'
-import React, { createContext, useContext, useEffect, useState } from 'react'
+import React, { createContext, useContext, useState } from 'react'
 import { Dimensions, ScrollView, StyleSheet, Text, TouchableWithoutFeedback, View } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { SceneMap, TabBar, TabView } from 'react-native-tab-view'
@@ -113,7 +113,7 @@ function EpisodeTip({ updateTimeHHmm, currentEpisode, updateWeekday }: IEpisodeT
 }
 
 export default function MyTabs() {
-    const [index, setIndex] = useState(0)
+    const [index, setIndex] = useState(dayjs().isoWeekday())
     const [routes] = useState([
         { key: 'monday', title: '周一' },
         { key: 'tuesday', title: '周二' },
@@ -124,11 +124,6 @@ export default function MyTabs() {
         { key: 'sunday', title: '周日' },
     ])
 
-    useEffect(() => {
-        console.log(dayjs().isoWeekday())
-
-        // setIndex(dayjs().isoWeekday())
-    }, [])
     async function search() {
         const data = await getSchedule()
         return data
@@ -168,7 +163,6 @@ export default function MyTabs() {
                             style={styles.tabBar}
                             renderTabBarItem={({ route, navigationState, defaultTabWidth, onPress }) => {
                                 const focused = navigationState.routes[navigationState.index].key === route.key
-                                console.log(focused)
 
                                 return (
                                     <TouchableWithoutFeedback onPress={onPress}>

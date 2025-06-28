@@ -5,6 +5,7 @@ const expoConfig = require('eslint-config-expo/flat')
 module.exports = defineConfig([
     expoConfig,
     {
+        files: ['**/*.{ts,tsx}'], // 明确要检查的文件类型
         ignores: ['dist/*'],
         languageOptions: {
             parserOptions: {
@@ -12,9 +13,6 @@ module.exports = defineConfig([
                 sourceType: 'module', // 启用 ES 模块
             },
         },
-    },
-    {
-        files: ['**/*.{js,jsx,ts,tsx}'], // 明确要检查的文件类型
         // 插件配置
         plugins: {
             'react-native': require('eslint-plugin-react-native'),
@@ -29,13 +27,16 @@ module.exports = defineConfig([
             'react-native/no-unused-styles': 'warn', // 检测未使用的样式
             'react-native/no-inline-styles': 'warn', // 不推荐内联样式
             'react-native/split-platform-components': 'error', // 规范平台特定组件
+            'react/jsx-key': 'error',
         },
-
         // 设置React版本（帮助eslint-plugin-react正确工作）
         settings: {
             react: {
                 version: 'detect', // 自动检测React版本
             },
         },
+    },
+    {
+        ignores: ['app.config.js'],
     },
 ])
