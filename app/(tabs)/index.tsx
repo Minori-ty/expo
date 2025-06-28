@@ -8,7 +8,7 @@ import customParseFormat from 'dayjs/plugin/customParseFormat'
 import isSameOrBefore from 'dayjs/plugin/isSameOrBefore'
 import isoWeek from 'dayjs/plugin/isoWeek'
 import { Image } from 'expo-image'
-import React, { createContext, useContext, useEffect, useState } from 'react'
+import React, { createContext, useContext, useEffect, useLayoutEffect, useState } from 'react'
 import { Dimensions, ScrollView, StyleSheet, Text, TouchableWithoutFeedback, View } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { SceneMap, TabBar, TabView } from 'react-native-tab-view'
@@ -127,6 +127,10 @@ export default function MyTabs() {
 
     useEffect(() => {
         sendNotifications(dayjs().isoWeekday() + '', dayjs().isoWeekday() + '')
+    }, [])
+
+    useLayoutEffect(() => {
+        setIndex(7)
     }, [])
 
     async function search() {
