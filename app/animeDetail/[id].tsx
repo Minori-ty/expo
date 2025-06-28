@@ -59,9 +59,6 @@ const AnimeDetail = () => {
     }, [])
 
     const getUpdateInfo = () => {
-        if (anime.isFinished) {
-            return '已完结'
-        }
         const weekday = weekdayMap[anime.updateWeekday - 1]
         return `每周${weekday} ${anime.updateTimeHHmm}更新`
     }
@@ -78,18 +75,15 @@ const AnimeDetail = () => {
                 <View style={styles.infoContainer}>
                     <Text style={styles.title}>{anime.name}</Text>
 
-                    <View style={styles.episodeInfo}>
-                        <Text style={styles.episodeText}>
-                            {anime.isFinished
-                                ? `全${anime.totalEpisode}话`
-                                : `第${anime.currentEpisode}/${anime.totalEpisode}话`}
-                        </Text>
-                        <Text style={styles.updateInfo}>{getUpdateInfo()}</Text>
+                    <View>
+                        <Text>当前更新第 {anime.currentEpisode} 集</Text>
+                        <Text>总集数 {anime.totalEpisode} 话</Text>
+                        <Text>{getUpdateInfo()}</Text>
                     </View>
 
                     <View style={styles.dateInfo}>
-                        <Text style={styles.dateText}>首播: {anime.lastEpisodeDateTime}</Text>
-                        {anime.isFinished && <Text style={styles.dateText}>完结: {anime.lastEpisodeDateTime}</Text>}
+                        <Text style={styles.dateText}>首播时间: {anime.firstEpisodeDateTime}</Text>
+                        <Text style={styles.dateText}>完结时间: {anime.lastEpisodeDateTime}</Text>
                     </View>
                 </View>
             </ScrollView>

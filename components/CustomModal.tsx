@@ -11,9 +11,7 @@ function CustomModal({ visible, children, onClose }: PropsWithChildren<ICustomMo
         <Modal transparent visible={visible} animationType="fade" onRequestClose={onClose}>
             <Pressable style={styles.overlay} onPress={onClose}>
                 {/* 下面这个View包裹内容，阻止事件冒泡 */}
-                <Pressable style={styles.content} onPress={() => {}}>
-                    {children}
-                </Pressable>
+                <Pressable onPress={() => {}}>{children}</Pressable>
             </Pressable>
         </Modal>
     )

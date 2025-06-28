@@ -116,7 +116,7 @@ function Schedual() {
                 </Modal> */}
                 <CustomModal visible={modalVisible} onClose={() => setModalVisible(false)}>
                     <View style={styles.modalPanel} pointerEvents="box-none">
-                        <View style={styles.modalContent}>
+                        <View>
                             <Text style={styles.modalHeader}>确认删除</Text>
                             <Text style={{ fontSize: 14 }}>你确定要删除 "{animeData.name}" 吗？</Text>
                         </View>
@@ -192,7 +192,7 @@ function AnimeContainerItem({ data }: IAnimeContainerItemProps) {
             <View style={styles.imageContainer}>
                 <Image
                     style={styles.image}
-                    source="https://picsum.photos/seed/696/3000/2000"
+                    source={data.cover}
                     placeholder={{ blurhash }}
                     contentFit="cover"
                     transition={1000}

@@ -77,13 +77,13 @@ function ScheduleItem({ time, animeList }: IScheduleItemProps) {
                         <View key={item.id} style={styles.animeCard}>
                             <Image
                                 style={styles.image}
-                                source="https://picsum.photos/seed/696/3000/2000"
+                                source={item.cover}
                                 placeholder={{ blurhash }}
                                 contentFit="cover"
                                 transition={1000}
                                 cachePolicy={'memory-disk'}
                             />
-                            <View>
+                            <View style={{ flex: 1 }}>
                                 <Text style={{ fontWeight: '900' }}>{item.name}</Text>
                                 <EpisodeTip
                                     updateTimeHHmm={item.updateTimeHHmm}
@@ -221,6 +221,7 @@ const styles = StyleSheet.create({
         height: coverWidth * (3 / 2),
         flexDirection: 'row',
         marginBottom: 10,
+        flex: 1,
     },
     tabBar: {
         elevation: 0, // 移除 Android 阴影
