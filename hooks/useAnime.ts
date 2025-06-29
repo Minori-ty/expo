@@ -1,13 +1,10 @@
+import type { TFormData } from '@/app/addAnime'
 import { db } from '@/db'
 import { animeTable, insertAnimeSchema } from '@/db/schema'
+import { getFirstEpisodeDateTime, getlastEpisodeDateTime } from '@/utils/timeCalculation'
 import dayjs from 'dayjs'
 import { eq, inArray } from 'drizzle-orm'
 import { z } from 'zod/v4'
-
-const insertAnimeData = insertAnimeSchema
-    .omit({ id: true, createdAt: true, isFinished: true, firstEpisodeDateTime: true, lastEpisodeDateTime: true })
-    .extend({})
-export type TFormData = z.infer<typeof insertAnimeData>
 
 export function useInsertAnime(formData: TFormData) {
     return new Promise(async (resolve, reject) => {
@@ -25,29 +22,11 @@ export function useInsertAnime(formData: TFormData) {
 }
 
 export function generateAnimeData(formData: TFormData) {
-    // 获取当前日期
+    const { updateTimeHHmm, updateWeekday, currentEpisode, totalEpisode } = formData
     const now = dayjs()
-
-    // 判断是否已过本周更新时间
-    const isUpdated = hasEpisodeUpdated(formData.updateWeekday, formData.updateTimeHHmm)
-    // 解析更新时间（时和分）
-    const [hours, minutes] = formData.updateTimeHHmm.split(':').map(Number)
-
-    // 构建本周更新时间点
-    let updateDateTime = now.day(formData.updateWeekday).hour(hours).minute(minutes).second(0).millisecond(0)
-
-    // 根据是否已更新调整集数和日期
-    let effectiveEpisode = formData.currentEpisode
-    if (!isUpdated) {
-        // 还没到本周更新时间，使用上周的集数
-        effectiveEpisode = formData.currentEpisode - 1
-        // 将更新时间调整到上周
-        updateDateTime = updateDateTime.subtract(1, 'week')
-    }
-
     // 计算第一集的日期时间
-    const firstEpisodeDateTime = updateDateTime.subtract((effectiveEpisode - 1) * 7, 'day')
-    const lastEpisodeDateTime = firstEpisodeDateTime.add((formData.totalEpisode - 1) * 7, 'day')
+    const firstEpisodeDateTime = getFirstEpisodeDateTime(updateTimeHHmm, updateWeekday, currentEpisode)
+    const lastEpisodeDateTime = getlastEpisodeDateTime(updateTimeHHmm, updateWeekday, currentEpisode, totalEpisode)
     // 判断是否完结：当前时间是否晚于最后一集更新时间
     const isFinished = now.isAfter(lastEpisodeDateTime)
 

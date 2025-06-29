@@ -1,11 +1,12 @@
 import { getSchedule } from '@/api/anime'
 import Empty from '@/components/lottie/Empty'
 import { selectAnime } from '@/hooks/useAnime'
+import { isCurrentWeekdayUpdateTimePassed } from '@/utils/timeCalculation'
 import { useQuery } from '@tanstack/react-query'
 import dayjs from 'dayjs'
 import customParseFormat from 'dayjs/plugin/customParseFormat'
-import isSameOrBefore from 'dayjs/plugin/isSameOrBefore'
 import isoWeek from 'dayjs/plugin/isoWeek'
+import isSameOrBefore from 'dayjs/plugin/isSameOrBefore'
 import { Image } from 'expo-image'
 import React, { createContext, useContext, useLayoutEffect, useState } from 'react'
 import { Dimensions, ScrollView, StyleSheet, Text, TouchableWithoutFeedback, View } from 'react-native'
@@ -103,7 +104,7 @@ interface IEpisodeTipProps {
     updateWeekday: number
 }
 function EpisodeTip({ updateTimeHHmm, currentEpisode, updateWeekday }: IEpisodeTipProps) {
-    if (isTimePassed(updateTimeHHmm, updateWeekday)) {
+    if (isCurrentWeekdayUpdateTimePassed(updateTimeHHmm, updateWeekday)) {
         return <Text style={styles.episodeTipPassed}>更新到 第{currentEpisode}集</Text>
     }
     return <Text style={styles.episodeTipSoon}>即将更新 第{currentEpisode} 集</Text>
@@ -276,24 +277,3 @@ const styles = StyleSheet.create({
         fontSize: 24,
     },
 })
-
-/**
- * 判断当前时间是否超过了给定的时间
- * @param updateTimeHHmm
- * @param currentEpisode
- * @returns
- */
-function isTimePassed(updateTimeHHmm: string, updateWeekday: number) {
-    // 获取当前时间
-    const now = dayjs()
-
-    // 解析输入的时间字符串
-    const [hours, minutes] = updateTimeHHmm.split(':').map(Number)
-
-    // 计算目标时间：本周指定星期的指定时间
-    const target = now.day(updateWeekday).hour(hours).minute(minutes).second(0).millisecond(0)
-
-    // 如果计算出的目标时间在当前时间之前，返回 true
-    // 如果目标时间是未来的时间，则返回 false
-    return now.isAfter(target)
-}
