@@ -6,7 +6,7 @@ interface IProps {
     actions?: React.ReactNode[]
 }
 
-const PageHeader: React.FC<IProps> = ({ title, actions }) => {
+function PageHeader({ title, actions }: IProps) {
     return (
         <View style={styles.header}>
             <Text style={styles.headerTitle}>{title}</Text>

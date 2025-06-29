@@ -6,21 +6,12 @@ import dayjs from 'dayjs'
 import { eq, inArray } from 'drizzle-orm'
 import { z } from 'zod/v4'
 
-export function useInsertAnime(formData: TFormData) {
-    return new Promise(async (resolve, reject) => {
-        const data = generateAnimeData(formData)
-        const result = insertAnimeSchema.safeParse(data)
-        type TData = typeof animeTable.$inferInsert
-        if (result.success) {
-            const data = await db.insert(animeTable).values(result.data as TData)
-            resolve(data.lastInsertRowId)
-        } else {
-            reject(result.error)
-            console.log('插入数据验证失败:', result.error)
-        }
-    })
-}
-
+export const formDataSchema = insertAnimeSchema.omit({ id: true })
+/**
+ * 生成表数据
+ * @param formData 表单数据
+ * @returns
+ */
 export function generateAnimeData(formData: TFormData) {
     const { updateTimeHHmm, updateWeekday, currentEpisode, totalEpisode } = formData
     const now = dayjs()
@@ -29,8 +20,7 @@ export function generateAnimeData(formData: TFormData) {
     const lastEpisodeDateTime = getlastEpisodeDateTime(updateTimeHHmm, updateWeekday, currentEpisode, totalEpisode)
     // 判断是否完结：当前时间是否晚于最后一集更新时间
     const isFinished = now.isAfter(lastEpisodeDateTime)
-
-    const data: z.infer<typeof insertAnimeSchema> = {
+    const data: z.infer<typeof formDataSchema> = {
         ...formData,
         createdAt: dayjs().unix(),
         firstEpisodeDateTime: firstEpisodeDateTime.unix(),
@@ -91,29 +81,6 @@ export async function selectAnimeByIdList(idList: number[]) {
     })
 }
 
-/**
- * 判断当前时间是否已过本周的更新时间点
- * @param  updateDay - 更新星期几（1-7，1表示周一）
- * @param  updateTime - 更新时间，格式为HH:mm
- * @returns  - 已过返回true，未过返回false
- */
-function hasEpisodeUpdated(updateDay: number, updateTime: string): boolean {
-    // 解析更新时间（时和分）
-    const [hours, minutes] = updateTime.split(':').map(Number)
-    if (isNaN(hours) || isNaN(minutes) || hours < 0 || hours > 23 || minutes < 0 || minutes > 59) {
-        throw new Error('更新时间格式无效，应为HH:mm')
-    }
-
-    // 获取当前时间
-    const now = dayjs()
-
-    // 构建本周更新时间点
-    const updateDateTime = now.day(updateDay).hour(hours).minute(minutes).second(0).millisecond(0)
-
-    // 判断当前时间是否已过更新时间点
-    return now.isAfter(updateDateTime)
-}
-
-export async function useDeleteAnime(id: number) {
+export async function deleteAnime(id: number) {
     return await db.delete(animeTable).where(eq(animeTable.id, id))
 }

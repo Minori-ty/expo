@@ -1,5 +1,4 @@
 import { addAnime } from '@/api/anime'
-import { animeTable } from '@/db/schema'
 import { selectAnime } from '@/hooks/useAnime'
 import { getCalendarPermission } from '@/permissions'
 import { sendNotifications } from '@/permissions/notifications'
@@ -10,7 +9,6 @@ import React, { useEffect } from 'react'
 import { Button, ScrollView, StyleSheet, Text, View } from 'react-native'
 import { queryClient } from './react-query'
 
-type TData = typeof animeTable.$inferInsert
 const blurhash =
     '|rF?hV%2WCj[ayj[a|j[az_NaeWBj@ayfRayfQfQM{M|azj[azf6fQfQfQIpWXofj[ayj[j[fQayWCoeoeaya}j[ayfQa{oLj?j[WVj[ayayj[fQoff7azayj[ayj[j[ayofayayayj[fQj[ayayj[ayfjj[j[ayjuayj['
 
@@ -44,8 +42,7 @@ async function addEventWithReminder() {
     return eventId
 }
 
-const Notification: React.FC = () => {
-    type TAnime = typeof animeTable.$inferSelect
+function Notification() {
     // const [list, setList] = useState<Awaited<ReturnType<typeof selectAnime>>>([])
     async function insert() {
         const data = {
