@@ -7,7 +7,7 @@ import customParseFormat from 'dayjs/plugin/customParseFormat'
 import isSameOrBefore from 'dayjs/plugin/isSameOrBefore'
 import isoWeek from 'dayjs/plugin/isoWeek'
 import { Image } from 'expo-image'
-import React, { createContext, useContext, useState } from 'react'
+import React, { createContext, useContext, useLayoutEffect, useState } from 'react'
 import { Dimensions, ScrollView, StyleSheet, Text, TouchableWithoutFeedback, View } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { SceneMap, TabBar, TabView } from 'react-native-tab-view'
@@ -133,6 +133,10 @@ export default function MyTabs() {
         queryKey: ['schedule'],
         queryFn: search,
     })
+
+    useLayoutEffect(() => {
+        setIndex(dayjs().isoWeekday() - 1)
+    }, [])
 
     const renderScene = SceneMap({
         monday: () => <Schedule updateWeekday={1} />,

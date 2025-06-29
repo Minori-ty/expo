@@ -66,7 +66,7 @@ export function generateAnimeData(formData: TFormData) {
  * 查询全部
  * @returns
  */
-export async function useSelectAnime() {
+export async function selectAnime() {
     const row = await db.select().from(animeTable)
     return row.map((item) => {
         return {
@@ -83,7 +83,7 @@ export async function useSelectAnime() {
  * @param idList 动漫的id列表
  * @returns
  */
-export async function useSelectAnimeById(id: number) {
+export async function selectAnimeById(id: number) {
     const result = await db.select().from(animeTable).where(eq(animeTable.id, id))
     const data = result.map((item) => {
         return {
@@ -100,7 +100,7 @@ export async function useSelectAnimeById(id: number) {
  * @param idList 动漫的id列表
  * @returns
  */
-export async function useSelectAnimeByIdList(idList: number[]) {
+export async function selectAnimeByIdList(idList: number[]) {
     const row = db.select().from(animeTable).where(inArray(animeTable.id, idList)).all()
     return row.map((item) => {
         return {

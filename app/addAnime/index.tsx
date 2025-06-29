@@ -125,6 +125,7 @@ const AnimeForm = () => {
             <ScrollView
                 contentContainerStyle={{ flexGrow: 1 }} // 动态调整底部间距
                 keyboardShouldPersistTaps="handled"
+                style={styles.scrollView}
             >
                 <View style={styles.formGroup}>
                     <Text style={styles.label}>番剧名称</Text>
@@ -144,7 +145,12 @@ const AnimeForm = () => {
                     {errors.name && <Text style={styles.errorText}>{errors.name.message}</Text>}
                 </View>
                 <Text style={styles.label}>更新状态</Text>
-                <RadioGroup options={options} value={selected} onChange={setSelected} style={{ marginBottom: 10 }} />
+                <RadioGroup
+                    options={options}
+                    value={selected}
+                    onChange={setSelected}
+                    style={{ marginBottom: 10, justifyContent: 'center' }}
+                />
                 <View style={styles.formGroup}>
                     <Text style={styles.label}>更新周</Text>
                     <Controller
@@ -155,6 +161,7 @@ const AnimeForm = () => {
                                 {...field}
                                 selectedValue={field.value}
                                 style={[styles.picker, errors.updateWeekday && styles.errorInput]}
+                                onValueChange={field.onChange}
                             >
                                 {weekdays.map((day) => (
                                     <Picker.Item label={day.label} value={day.value} key={day.value} />

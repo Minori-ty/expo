@@ -1,6 +1,6 @@
 import { addAnime } from '@/api/anime'
 import { animeTable } from '@/db/schema'
-import { useSelectAnime } from '@/hooks/useAnime'
+import { selectAnime } from '@/hooks/useAnime'
 import { getCalendarPermission } from '@/permissions'
 import { sendNotifications } from '@/permissions/notifications'
 import { useMutation, useQuery } from '@tanstack/react-query'
@@ -46,7 +46,7 @@ async function addEventWithReminder() {
 
 const Notification: React.FC = () => {
     type TAnime = typeof animeTable.$inferSelect
-    // const [list, setList] = useState<Awaited<ReturnType<typeof useSelectAnime>>>([])
+    // const [list, setList] = useState<Awaited<ReturnType<typeof selectAnime>>>([])
     async function insert() {
         const data = {
             name: 'Notification添加',
@@ -61,7 +61,7 @@ const Notification: React.FC = () => {
     }
 
     async function search() {
-        const data = await useSelectAnime()
+        const data = await selectAnime()
         // setList(data)
         return data
     }

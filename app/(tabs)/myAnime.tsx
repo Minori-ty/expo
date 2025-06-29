@@ -2,7 +2,7 @@ import { deleteAnime } from '@/api/anime'
 import CustomModal from '@/components/CustomModal'
 import PageHeader from '@/components/PageHeader'
 import { IconSymbol } from '@/components/ui/IconSymbol'
-import { useSelectAnime } from '@/hooks/useAnime'
+import { selectAnime } from '@/hooks/useAnime'
 import { queryClient } from '@/utils/react-query'
 import { useMutation, useQuery } from '@tanstack/react-query'
 import { Image } from 'expo-image'
@@ -42,7 +42,7 @@ function Schedual() {
     })
     const router = useRouter()
     async function search() {
-        const data = await useSelectAnime()
+        const data = await selectAnime()
         return data
     }
 
@@ -150,7 +150,7 @@ function Empty() {
 }
 const GAP = 10
 interface IAnimeContainerProps {
-    list: Awaited<ReturnType<typeof useSelectAnime>>
+    list: Awaited<ReturnType<typeof selectAnime>>
 }
 function AnimeContainer({ list }: IAnimeContainerProps) {
     return (
@@ -168,7 +168,7 @@ function AnimeContainer({ list }: IAnimeContainerProps) {
 }
 
 interface IAnimeContainerItemProps {
-    data: Awaited<ReturnType<typeof useSelectAnime>>[number]
+    data: Awaited<ReturnType<typeof selectAnime>>[number]
 }
 function AnimeContainerItem({ data }: IAnimeContainerItemProps) {
     const { setModalVisible, setAnimeData } = useModal()
@@ -247,19 +247,8 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'center',
     },
-    row: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        marginBottom: 8,
-    },
     text: {
         fontSize: 12,
-    },
-    modalBackground: {
-        flex: 1,
-        backgroundColor: 'rgba(0,0,0,0.3)',
-        justifyContent: 'center',
-        alignItems: 'center',
     },
     modalPanel: {
         backgroundColor: '#fff',
@@ -269,17 +258,10 @@ const styles = StyleSheet.create({
         borderRadius: 25,
         width: 300,
     },
-    closeButton: {
-        marginTop: 20,
-        padding: 10,
-        backgroundColor: '#eee',
-        borderRadius: 8,
-    },
     modalHeader: {
         fontSize: 20,
         marginBottom: 15,
     },
-    modalContent: {},
     modalFooter: {
         justifyContent: 'flex-end',
         flexDirection: 'row',

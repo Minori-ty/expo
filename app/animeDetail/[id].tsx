@@ -1,4 +1,4 @@
-import { useSelectAnimeById } from '@/hooks/useAnime'
+import { selectAnimeById } from '@/hooks/useAnime'
 import dayjs from 'dayjs'
 import 'dayjs/locale/zh-cn'
 import { Image as ExpoImage } from 'expo-image'
@@ -50,7 +50,7 @@ const AnimeDetail = () => {
 
     async function getAnimeDetail() {
         if (typeof id === 'string') {
-            const data = await useSelectAnimeById(Number(id))
+            const data = await selectAnimeById(Number(id))
             setAnime(data)
         }
     }
@@ -110,9 +110,7 @@ const styles = StyleSheet.create({
         width: '100%',
         height: '100%',
     },
-    placeholder: {
-        backgroundColor: '#e0e0e0',
-    },
+
     infoContainer: {
         marginBottom: 20,
     },
@@ -121,20 +119,7 @@ const styles = StyleSheet.create({
         fontWeight: 'bold',
         marginBottom: 8,
     },
-    episodeInfo: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        marginBottom: 8,
-    },
-    episodeText: {
-        fontSize: 16,
-        marginRight: 12,
-        color: '#333',
-    },
-    updateInfo: {
-        fontSize: 16,
-        color: '#007AFF',
-    },
+
     dateInfo: {
         flexDirection: 'column',
     },
@@ -142,21 +127,6 @@ const styles = StyleSheet.create({
         fontSize: 14,
         color: '#666',
         marginBottom: 4,
-    },
-    summaryContainer: {
-        backgroundColor: '#f9f9f9',
-        borderRadius: 10,
-        padding: 16,
-    },
-    sectionTitle: {
-        fontSize: 18,
-        fontWeight: 'bold',
-        marginBottom: 8,
-    },
-    summaryText: {
-        fontSize: 16,
-        lineHeight: 24,
-        color: '#333',
     },
 })
 
