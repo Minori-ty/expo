@@ -84,36 +84,6 @@ function Schedual() {
                     ]}
                 />
                 {list.length > 0 ? <AnimeContainer list={list} /> : <Empty />}
-                {/* <Modal
-                    visible={modalVisible}
-                    transparent
-                    animationType="fade"
-                    onRequestClose={() => setModalVisible(false)}
-                >
-                    <View style={styles.modalBackground}>
-                        <TouchableWithoutFeedback onPress={() => setModalVisible(false)}>
-                            <View style={StyleSheet.absoluteFill} />
-                        </TouchableWithoutFeedback>
-                        <View style={styles.modalPanel} pointerEvents="box-none">
-                            <View style={styles.modalContent}>
-                                <Text style={styles.modalHeader}>确认删除</Text>
-                                <Text style={{ fontSize: 14 }}>你确定要删除 "{animeData.name}" 吗？</Text>
-                            </View>
-                            <View style={styles.modalFooter}>
-                                <View style={styles.modalButtonWrapper}>
-                                    <Pressable onPress={() => setModalVisible(false)}>
-                                        <Text style={styles.modalButton}>取消</Text>
-                                    </Pressable>
-                                </View>
-                                <View style={styles.modalButtonWrapper}>
-                                    <Pressable onPress={() => deleteItem()}>
-                                        <Text style={styles.modalButton}>删除</Text>
-                                    </Pressable>
-                                </View>
-                            </View>
-                        </View>
-                    </View>
-                </Modal> */}
                 <CustomModal visible={modalVisible} onClose={() => setModalVisible(false)}>
                     <View style={styles.modalPanel} pointerEvents="box-none">
                         <View>

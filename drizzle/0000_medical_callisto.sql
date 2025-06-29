@@ -16,5 +16,11 @@ CREATE TABLE `schdule` (
 	`id` integer PRIMARY KEY AUTOINCREMENT NOT NULL,
 	`anime_id` integer NOT NULL,
 	`is_notification` integer DEFAULT 0 NOT NULL,
-	FOREIGN KEY (`anime_id`) REFERENCES `anime`(`id`) ON UPDATE no action ON DELETE no action
+	FOREIGN KEY (`anime_id`) REFERENCES `anime`(`id`) ON UPDATE no action ON DELETE cascade
+);
+--> statement-breakpoint
+CREATE TABLE `upcoming` (
+	`id` integer PRIMARY KEY AUTOINCREMENT NOT NULL,
+	`anime_id` integer NOT NULL,
+	FOREIGN KEY (`anime_id`) REFERENCES `anime`(`id`) ON UPDATE no action ON DELETE cascade
 );

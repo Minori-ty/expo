@@ -1,6 +1,7 @@
+import type { TFormData } from '@/app/addAnime'
 import { db } from '@/db'
 import { animeTable, insertAnimeSchema, schduleTable } from '@/db/schema'
-import { TFormData, generateAnimeData } from '@/hooks/useAnime'
+import { generateAnimeData } from '@/hooks/useAnime'
 import dayjs from 'dayjs'
 import { eq, inArray } from 'drizzle-orm'
 
@@ -47,13 +48,5 @@ export async function getSchedule() {
 }
 
 export async function deleteAnime(id: number) {
-    return db.transaction(async (tx) => {
-        const anime = await tx.delete(animeTable).where(eq(animeTable.id, id)).returning()
-        const returning = await tx.select().from(schduleTable).where(eq(schduleTable.animeId, id))
-        if (returning.length) {
-            const schedule = returning[0]
-            tx.delete(schduleTable).where(eq(schduleTable.id, schedule.id))
-        }
-        return anime
-    })
+    return await db.delete(animeTable).where(eq(animeTable.id, id)).returning()
 }

@@ -22,7 +22,7 @@ import {
 import { z, ZodIssueCode } from 'zod'
 import { z as zv4 } from 'zod/v4'
 
-const insertAnimeData = insertAnimeSchema
+export const insertAnimeData = insertAnimeSchema
     .omit({ id: true, createdAt: true, isFinished: true, firstEpisodeDateTime: true, lastEpisodeDateTime: true })
     .extend({})
 export type TFormData = zv4.infer<typeof insertAnimeData>
