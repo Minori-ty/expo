@@ -3,7 +3,7 @@ import { db } from '@/db'
 import { animeTable, insertAnimeSchema } from '@/db/schema'
 import { getFirstEpisodeDateTime, getlastEpisodeDateTime } from '@/utils/timeCalculation'
 import dayjs from 'dayjs'
-import { eq, inArray } from 'drizzle-orm'
+import { eq } from 'drizzle-orm'
 import { z } from 'zod/v4'
 
 export const formDataSchema = insertAnimeSchema.omit({ id: true })
@@ -63,24 +63,4 @@ export async function selectAnimeById(id: number) {
         }
     })
     return data[0]
-}
-/**
- *
- * @param idList 动漫的id列表
- * @returns
- */
-export async function selectAnimeByIdList(idList: number[]) {
-    const row = db.select().from(animeTable).where(inArray(animeTable.id, idList)).all()
-    return row.map((item) => {
-        return {
-            ...item,
-            firstEpisodeDateTime: dayjs.unix(item.firstEpisodeDateTime).format('YYYY-MM-DD HH:mm'),
-            lastEpisodeDateTime: dayjs.unix(item.lastEpisodeDateTime).format('YYYY-MM-DD HH:mm'),
-            createdAt: dayjs.unix(item.createdAt).format('YYYY-MM-DD HH:mm'),
-        }
-    })
-}
-
-export async function deleteAnime(id: number) {
-    return await db.delete(animeTable).where(eq(animeTable.id, id))
 }

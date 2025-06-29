@@ -1,4 +1,4 @@
-import { getSchedule } from '@/api/anime'
+import { getSchedule } from '@/api'
 import Empty from '@/components/lottie/Empty'
 import { selectAnime } from '@/hooks/useAnime'
 import { isCurrentWeekdayUpdateTimePassed } from '@/utils/timeCalculation'

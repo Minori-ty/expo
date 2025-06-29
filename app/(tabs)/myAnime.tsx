@@ -1,4 +1,4 @@
-import { deleteAnime } from '@/api/anime'
+import { deleteAnime } from '@/api'
 import CustomModal from '@/components/CustomModal'
 import PageHeader from '@/components/PageHeader'
 import { IconSymbol } from '@/components/ui/IconSymbol'

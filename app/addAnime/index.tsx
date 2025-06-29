@@ -1,4 +1,4 @@
-import { addAnime } from '@/api/anime'
+import { addAnime } from '@/api'
 import { RadioGroup } from '@/components/RadioGroup'
 import { insertAnimeSchema } from '@/db/schema'
 import { queryClient } from '@/utils/react-query'

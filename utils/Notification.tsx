@@ -1,4 +1,4 @@
-import { addAnime } from '@/api/anime'
+import { addAnime } from '@/api'
 import { selectAnime } from '@/hooks/useAnime'
 import { getCalendarPermission } from '@/permissions'
 import { sendNotifications } from '@/permissions/notifications'
