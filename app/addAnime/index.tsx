@@ -47,8 +47,6 @@ const animeSchema = z
         }
     })
 
-type AnimeFormData = z.infer<typeof animeSchema>
-
 function AnimeForm() {
     const navigation = useNavigation()
     useEffect(() => {
@@ -62,7 +60,7 @@ function AnimeForm() {
         handleSubmit,
         formState: { errors },
         reset,
-    } = useForm<AnimeFormData>({
+    } = useForm<TFormData>({
         resolver: zodResolver(animeSchema),
         defaultValues: {
             name: '',
@@ -91,7 +89,7 @@ function AnimeForm() {
         },
     })
 
-    const onSubmit: SubmitHandler<AnimeFormData> = async (data) => {
+    const onSubmit: SubmitHandler<TFormData> = async (data) => {
         console.log('提交表单数据:', data)
         addAnimeMution(data)
     }
@@ -153,7 +151,7 @@ function AnimeForm() {
                         options={options}
                         value={selected}
                         onChange={setSelected}
-                        style={{ justifyContent: 'center' }}
+                        style={styles.horizontalCenter}
                     />
                 </View>
                 {selected !== 2 && (
@@ -305,6 +303,8 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         fontSize: 16,
         height: 40, // 固定高度
+        lineHeight: 40,
+        textAlignVertical: 'center',
         justifyContent: 'center',
     },
     picker: {
@@ -320,6 +320,9 @@ const styles = StyleSheet.create({
         color: 'red',
         fontSize: 14,
         marginTop: 4,
+    },
+    horizontalCenter: {
+        justifyContent: 'center',
     },
 })
 
