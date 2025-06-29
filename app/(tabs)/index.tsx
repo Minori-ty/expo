@@ -119,7 +119,7 @@ function EpisodeTip({ updateTimeHHmm, currentEpisode, updateWeekday }: IEpisodeT
     if (isCurrentWeekdayUpdateTimePassed(updateTimeHHmm, updateWeekday)) {
         return <Text style={styles.episodeTipPassed}>更新到 第{currentEpisode}集</Text>
     }
-    return <Text style={styles.episodeTipSoon}>即将更新 第{currentEpisode} 集</Text>
+    return <Text style={styles.episodeTipSoon}>即将更新 第{currentEpisode + 1} 集</Text>
 }
 
 export default function MyTabs() {
