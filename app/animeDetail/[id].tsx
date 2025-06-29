@@ -24,7 +24,7 @@ interface Anime {
 
 const weekdayMap = ['一', '二', '三', '四', '五', '六', '日']
 
-const AnimeDetail = () => {
+function AnimeDetail() {
     const [anime, setAnime] = useState<Anime>({
         firstEpisodeDateTime: '-',
         lastEpisodeDateTime: '-',

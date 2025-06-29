@@ -16,6 +16,7 @@ module.exports = defineConfig([
         // 插件配置
         plugins: {
             'react-native': require('eslint-plugin-react-native'),
+            'react-hooks': require('eslint-plugin-react-hooks'),
         },
 
         // 规则配置
@@ -28,11 +29,25 @@ module.exports = defineConfig([
             'react-native/no-inline-styles': 'warn', // 不推荐内联样式
             'react-native/split-platform-components': 'error', // 规范平台特定组件
             'react/jsx-key': 'error',
+
+            // React Hook 规则
+            'react-hooks/rules-of-hooks': 'error', // 强制 Hook 使用规则
+            'react-hooks/exhaustive-deps': 'warn', // 检查依赖数组
+
+            // 允许普通函数作为组件
+            'react/function-component-definition': [
+                'error',
+                {
+                    namedComponents: 'function-declaration', // 命名组件使用 function 关键字
+                    unnamedComponents: 'arrow-function', // 未命名组件使用箭头函数
+                },
+            ],
         },
         // 设置React版本（帮助eslint-plugin-react正确工作）
         settings: {
             react: {
                 version: 'detect', // 自动检测React版本
+                componentWrapperFunctions: ['React.memo', 'React.forwardRef'],
             },
         },
     },

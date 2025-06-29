@@ -44,11 +44,8 @@ function Schedule({ updateWeekday }: { updateWeekday: number }) {
     })
     const updateTimeHHmmList = Object.keys(mapSchedule)
     const sortedTimes = updateTimeHHmmList.sort((a, b) => {
-        // 将时间字符串解析为 Day.js 对象，并提取时间戳
         const timeA = dayjs(`2000-01-01T${a}`).valueOf()
         const timeB = dayjs(`2000-01-01T${b}`).valueOf()
-
-        // 比较时间戳
         return timeA - timeB
     })
     return (
@@ -69,10 +66,10 @@ const blurhash =
 function ScheduleItem({ time, animeList }: IScheduleItemProps) {
     return (
         <View style={styles.scheduleItem}>
-            <View style={{ width: 60, justifyContent: 'flex-start', alignItems: 'center' }}>
+            <View style={styles.timeBlock}>
                 <Text>{time}</Text>
             </View>
-            <View style={{ flex: 1 }}>
+            <View style={styles.animeListBlock}>
                 {animeList.map((item) => {
                     return (
                         <View key={item.id} style={styles.animeCard}>
@@ -84,8 +81,8 @@ function ScheduleItem({ time, animeList }: IScheduleItemProps) {
                                 transition={1000}
                                 cachePolicy={'memory-disk'}
                             />
-                            <View style={{ flex: 1 }}>
-                                <Text style={{ fontWeight: '900' }}>{item.name}</Text>
+                            <View style={styles.animeInfo}>
+                                <Text style={styles.animeTitle}>{item.name}</Text>
                                 <EpisodeTip
                                     updateTimeHHmm={item.updateTimeHHmm}
                                     currentEpisode={item.currentEpisode}
@@ -107,9 +104,9 @@ interface IEpisodeTipProps {
 }
 function EpisodeTip({ updateTimeHHmm, currentEpisode, updateWeekday }: IEpisodeTipProps) {
     if (isTimePassed(updateTimeHHmm, updateWeekday)) {
-        return <Text style={{ marginTop: 5, color: '#fb7299', fontSize: 12 }}>更新到 第{currentEpisode}集</Text>
+        return <Text style={styles.episodeTipPassed}>更新到 第{currentEpisode}集</Text>
     }
-    return <Text style={{ marginTop: 5, color: '#9E9E9E', fontSize: 12 }}>即将更新 第{currentEpisode} 集</Text>
+    return <Text style={styles.episodeTipSoon}>即将更新 第{currentEpisode} 集</Text>
 }
 
 export default function MyTabs() {
@@ -149,19 +146,19 @@ export default function MyTabs() {
     })
 
     return (
-        <SafeAreaView style={{ flex: 1 }} edges={['top']}>
+        <SafeAreaView style={styles.safeArea} edges={['top']}>
             <scheduleContext.Provider value={{ list }}>
                 <TabView
                     navigationState={{ index, routes }}
                     renderScene={renderScene}
                     onIndexChange={setIndex}
                     initialLayout={{ width: Dimensions.get('window').width }}
-                    style={{ backgroundColor: '#fff' }}
+                    style={styles.tabViewBg}
                     renderTabBar={(props) => (
                         <TabBar
                             {...props}
                             scrollEnabled
-                            tabStyle={{ width: 80, backgroundColor: '#fff' }}
+                            tabStyle={styles.tabBarTab}
                             activeColor="#fb7299"
                             inactiveColor="#9E9E9E"
                             style={styles.tabBar}
@@ -171,21 +168,17 @@ export default function MyTabs() {
                                 return (
                                     <TouchableWithoutFeedback onPress={onPress}>
                                         <View
-                                            style={{
-                                                width: defaultTabWidth,
-                                                height: 50,
-                                                justifyContent: 'center',
-                                                alignItems: 'center',
-                                                backgroundColor: '#fff',
-                                            }}
+                                            style={[
+                                                styles.tabBarItem,
+                                                { width: defaultTabWidth },
+                                                focused && styles.tabBarItemFocused,
+                                            ]}
                                         >
                                             <Text
-                                                style={{
-                                                    color: focused ? '#fb7299' : '#9E9E9E',
-                                                    fontWeight: focused ? '800' : '400',
-                                                    fontSize: focused ? 24 : 18,
-                                                    textAlign: 'center',
-                                                }}
+                                                style={[
+                                                    styles.tabBarItemTitle,
+                                                    focused && styles.tabBarItemTitleFocused,
+                                                ]}
                                             >
                                                 {route.title}
                                             </Text>
@@ -203,6 +196,12 @@ export default function MyTabs() {
 
 const coverWidth = 60
 const styles = StyleSheet.create({
+    safeArea: {
+        flex: 1,
+    },
+    tabViewBg: {
+        backgroundColor: '#fff',
+    },
     schedule: {
         padding: 10,
     },
@@ -210,10 +209,19 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         marginVertical: 5,
     },
+    timeBlock: {
+        width: 60,
+        justifyContent: 'flex-start',
+        alignItems: 'center',
+    },
+    animeListBlock: {
+        flex: 1,
+    },
     image: {
         width: coverWidth,
         borderRadius: 5,
         marginRight: 10,
+        height: coverWidth * 1.5,
     },
     animeCard: {
         height: coverWidth * (3 / 2),
@@ -221,12 +229,51 @@ const styles = StyleSheet.create({
         marginBottom: 10,
         flex: 1,
     },
+    animeInfo: {
+        flex: 1,
+    },
+    animeTitle: {
+        fontWeight: '900',
+    },
+    episodeTipPassed: {
+        marginTop: 5,
+        color: '#fb7299',
+        fontSize: 12,
+    },
+    episodeTipSoon: {
+        marginTop: 5,
+        color: '#9E9E9E',
+        fontSize: 12,
+    },
     tabBar: {
         elevation: 0, // 移除 Android 阴影
         shadowOpacity: 0, // 移除 iOS 阴影
         shadowRadius: 0, // 移除 iOS 阴影
         shadowOffset: { height: 0, width: 0 }, // 移除 iOS 阴影
         borderBottomWidth: 0, // 移除可能的底部边框
+        backgroundColor: '#fff',
+    },
+    tabBarTab: {
+        width: 80,
+        backgroundColor: '#fff',
+    },
+    tabBarItem: {
+        height: 50,
+        justifyContent: 'center',
+        alignItems: 'center',
+        backgroundColor: '#fff',
+    },
+    tabBarItemFocused: {},
+    tabBarItemTitle: {
+        color: '#9E9E9E',
+        fontWeight: '400',
+        fontSize: 18,
+        textAlign: 'center',
+    },
+    tabBarItemTitleFocused: {
+        color: '#fb7299',
+        fontWeight: '800',
+        fontSize: 24,
     },
 })
 

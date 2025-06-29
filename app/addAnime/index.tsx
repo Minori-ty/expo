@@ -42,7 +42,7 @@ const animeSchema = z
 
 type AnimeFormData = z.infer<typeof animeSchema>
 
-const AnimeForm = () => {
+function AnimeForm() {
     const navigation = useNavigation()
     useEffect(() => {
         navigation.setOptions({
@@ -103,7 +103,7 @@ const AnimeForm = () => {
 
     useEffect(() => {
         const keyboardDidShowListener = Keyboard.addListener('keyboardDidShow', (e) => {
-            setKeyboardHeight(e.endCoordinates.height)
+            setKeyboardHeight(e.endCoordinates.height - 150)
         })
         const keyboardDidHideListener = Keyboard.addListener('keyboardDidHide', () => {
             setKeyboardHeight(0)
@@ -121,12 +121,8 @@ const AnimeForm = () => {
         { label: '即将更新', value: 3 },
     ]
     return (
-        <KeyboardAvoidingView style={styles.container} behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
-            <ScrollView
-                contentContainerStyle={{ flexGrow: 1 }} // 动态调整底部间距
-                keyboardShouldPersistTaps="handled"
-                style={styles.scrollView}
-            >
+        <KeyboardAvoidingView style={[styles.container]} behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
+            <ScrollView keyboardShouldPersistTaps="handled" style={[styles.scrollView]}>
                 <View style={styles.formGroup}>
                     <Text style={styles.label}>番剧名称</Text>
                     <Controller
@@ -144,33 +140,57 @@ const AnimeForm = () => {
                     />
                     {errors.name && <Text style={styles.errorText}>{errors.name.message}</Text>}
                 </View>
-                <Text style={styles.label}>更新状态</Text>
-                <RadioGroup
-                    options={options}
-                    value={selected}
-                    onChange={setSelected}
-                    style={{ marginBottom: 10, justifyContent: 'center' }}
-                />
                 <View style={styles.formGroup}>
-                    <Text style={styles.label}>更新周</Text>
-                    <Controller
-                        control={control}
-                        name="updateWeekday"
-                        render={({ field }) => (
-                            <Picker
-                                {...field}
-                                selectedValue={field.value}
-                                style={[styles.picker, errors.updateWeekday && styles.errorInput]}
-                                onValueChange={field.onChange}
-                            >
-                                {weekdays.map((day) => (
-                                    <Picker.Item label={day.label} value={day.value} key={day.value} />
-                                ))}
-                            </Picker>
-                        )}
+                    <Text style={styles.label}>更新状态</Text>
+                    <RadioGroup
+                        options={options}
+                        value={selected}
+                        onChange={setSelected}
+                        style={{ justifyContent: 'center' }}
                     />
-                    {errors.updateWeekday && <Text style={styles.errorText}>{errors.updateWeekday.message}</Text>}
                 </View>
+                {selected !== 2 && (
+                    <View style={styles.formGroup}>
+                        <Text style={styles.label}>首播时间</Text>
+                        <Controller
+                            control={control}
+                            name="updateTimeHHmm"
+                            render={({ field }) => (
+                                <TextInput
+                                    {...field}
+                                    style={[styles.input, errors.updateTimeHHmm && styles.errorInput]}
+                                    placeholder="例如: 2024-05-15"
+                                    keyboardType="numeric"
+                                    onChangeText={field.onChange}
+                                    value={field.value}
+                                />
+                            )}
+                        />
+                        {errors.updateTimeHHmm && <Text style={styles.errorText}>{errors.updateTimeHHmm.message}</Text>}
+                    </View>
+                )}
+                {selected === 2 && (
+                    <View style={styles.formGroup}>
+                        <Text style={styles.label}>更新周</Text>
+                        <Controller
+                            control={control}
+                            name="updateWeekday"
+                            render={({ field }) => (
+                                <Picker
+                                    {...field}
+                                    selectedValue={field.value}
+                                    style={[styles.picker, errors.updateWeekday && styles.errorInput]}
+                                    onValueChange={field.onChange}
+                                >
+                                    {weekdays.map((day) => (
+                                        <Picker.Item label={day.label} value={day.value} key={day.value} />
+                                    ))}
+                                </Picker>
+                            )}
+                        />
+                        {errors.updateWeekday && <Text style={styles.errorText}>{errors.updateWeekday.message}</Text>}
+                    </View>
+                )}
                 <View style={styles.formGroup}>
                     <Text style={styles.label}>更新时间(HH:mm)</Text>
                     <Controller
@@ -189,24 +209,26 @@ const AnimeForm = () => {
                     />
                     {errors.updateTimeHHmm && <Text style={styles.errorText}>{errors.updateTimeHHmm.message}</Text>}
                 </View>
-                <View style={styles.formGroup}>
-                    <Text style={styles.label}>当前更新集数</Text>
-                    <Controller
-                        control={control}
-                        name="currentEpisode"
-                        render={({ field }) => (
-                            <TextInput
-                                {...field}
-                                style={[styles.input, errors.currentEpisode && styles.errorInput]}
-                                placeholder="请输入当前更新集数"
-                                keyboardType="numeric"
-                                onChangeText={(text) => field.onChange(parseInt(text) || 0)}
-                                value={field.value?.toString() || ''}
-                            />
-                        )}
-                    />
-                    {errors.currentEpisode && <Text style={styles.errorText}>{errors.currentEpisode.message}</Text>}
-                </View>
+                {selected === 2 && (
+                    <View style={styles.formGroup}>
+                        <Text style={styles.label}>当前更新集数</Text>
+                        <Controller
+                            control={control}
+                            name="currentEpisode"
+                            render={({ field }) => (
+                                <TextInput
+                                    {...field}
+                                    style={[styles.input, errors.currentEpisode && styles.errorInput]}
+                                    placeholder="请输入当前更新集数"
+                                    keyboardType="numeric"
+                                    onChangeText={(text) => field.onChange(parseInt(text) || 0)}
+                                    value={field.value?.toString() || ''}
+                                />
+                            )}
+                        />
+                        {errors.currentEpisode && <Text style={styles.errorText}>{errors.currentEpisode.message}</Text>}
+                    </View>
+                )}
                 <View style={styles.formGroup}>
                     <Text style={styles.label}>总集数</Text>
                     <Controller
@@ -243,6 +265,7 @@ const AnimeForm = () => {
                     {errors.cover && <Text style={styles.errorText}>{errors.cover.message}</Text>}
                 </View>
                 <Button title="提交" onPress={handleSubmit(onSubmit)} />
+                <View style={{ height: keyboardHeight }}></View>
             </ScrollView>
         </KeyboardAvoidingView>
     )
@@ -254,7 +277,9 @@ const styles = StyleSheet.create({
         backgroundColor: '#fff',
     },
     scrollView: {
+        flex: 1,
         padding: 16,
+        paddingBottom: 50,
     },
     formGroup: {
         marginBottom: 16,

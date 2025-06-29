@@ -67,6 +67,7 @@
         "drizzle-kit": "^0.31.2",
         "eslint": "^9.25.0",
         "eslint-config-expo": "~9.2.0",
+        "eslint-plugin-react-hooks": "^5.2.0",
         "eslint-plugin-react-native": "^5.0.0",
         "typescript": "~5.8.3"
     },
