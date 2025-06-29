@@ -8,8 +8,17 @@ import customParseFormat from 'dayjs/plugin/customParseFormat'
 import isoWeek from 'dayjs/plugin/isoWeek'
 import isSameOrBefore from 'dayjs/plugin/isSameOrBefore'
 import { Image } from 'expo-image'
+import { useRouter } from 'expo-router'
 import React, { createContext, useContext, useLayoutEffect, useState } from 'react'
-import { Dimensions, ScrollView, StyleSheet, Text, TouchableWithoutFeedback, View } from 'react-native'
+import {
+    Dimensions,
+    ScrollView,
+    StyleSheet,
+    Text,
+    TouchableOpacity,
+    TouchableWithoutFeedback,
+    View,
+} from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { SceneMap, TabBar, TabView } from 'react-native-tab-view'
 
@@ -65,6 +74,7 @@ interface IScheduleItemProps {
 const blurhash =
     '|rF?hV%2WCj[ayj[a|j[az_NaeWBj@ayfRayfQfQM{M|azj[azf6fQfQfQIpWXofj[ayj[j[fQayWCoeoeaya}j[ayfQa{oLj?j[WVj[ayayj[fQoff7azayj[ayj[j[ayofayayayj[fQj[ayayj[ayfjj[j[ayjuayj['
 function ScheduleItem({ time, animeList }: IScheduleItemProps) {
+    const router = useRouter()
     return (
         <View style={styles.scheduleItem}>
             <View style={styles.timeBlock}>
@@ -73,24 +83,26 @@ function ScheduleItem({ time, animeList }: IScheduleItemProps) {
             <View style={styles.animeListBlock}>
                 {animeList.map((item) => {
                     return (
-                        <View key={item.id} style={styles.animeCard}>
-                            <Image
-                                style={styles.image}
-                                source={item.cover}
-                                placeholder={{ blurhash }}
-                                contentFit="cover"
-                                transition={1000}
-                                cachePolicy={'memory-disk'}
-                            />
-                            <View style={styles.animeInfo}>
-                                <Text style={styles.animeTitle}>{item.name}</Text>
-                                <EpisodeTip
-                                    updateTimeHHmm={item.updateTimeHHmm}
-                                    currentEpisode={item.currentEpisode}
-                                    updateWeekday={item.updateWeekday}
+                        <TouchableOpacity key={item.id} onPress={() => router.push(`/animeDetail/${item.id}`)}>
+                            <View style={styles.animeCard}>
+                                <Image
+                                    style={styles.image}
+                                    source={item.cover}
+                                    placeholder={{ blurhash }}
+                                    contentFit="cover"
+                                    transition={1000}
+                                    cachePolicy={'memory-disk'}
                                 />
+                                <View style={styles.animeInfo}>
+                                    <Text style={styles.animeTitle}>{item.name}</Text>
+                                    <EpisodeTip
+                                        updateTimeHHmm={item.updateTimeHHmm}
+                                        currentEpisode={item.currentEpisode}
+                                        updateWeekday={item.updateWeekday}
+                                    />
+                                </View>
                             </View>
-                        </View>
+                        </TouchableOpacity>
                     )
                 })}
             </View>

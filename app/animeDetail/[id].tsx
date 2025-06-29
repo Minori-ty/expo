@@ -1,10 +1,11 @@
+import { IconSymbol } from '@/components/ui/IconSymbol'
 import { selectAnimeById } from '@/hooks/useAnime'
 import dayjs from 'dayjs'
 import 'dayjs/locale/zh-cn'
-import { Image as ExpoImage } from 'expo-image'
-import { useLocalSearchParams, useNavigation } from 'expo-router'
-import React, { useEffect, useState } from 'react'
-import { SafeAreaView, ScrollView, StyleSheet, Text, View } from 'react-native'
+import { Image } from 'expo-image'
+import { useLocalSearchParams, useNavigation, useRouter } from 'expo-router'
+import React, { useCallback, useEffect, useLayoutEffect, useState } from 'react'
+import { SafeAreaView, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 
 dayjs.locale('zh-cn')
 
@@ -40,35 +41,50 @@ function AnimeDetail() {
     })
 
     const navigation = useNavigation()
-    useEffect(() => {
+    const router = useRouter()
+    useLayoutEffect(() => {
         navigation.setOptions({
             headerTitle: '动漫详情',
             headerTitleAlign: 'center',
+            headerRight: () => {
+                return (
+                    <TouchableOpacity onPress={() => router.push(`/editAnime/${anime.id}`)}>
+                        <IconSymbol size={28} name="text.append" color={'black'} />
+                    </TouchableOpacity>
+                )
+            },
         })
-    }, [navigation])
+    }, [navigation, anime.id, router])
     const { id } = useLocalSearchParams()
 
-    async function getAnimeDetail() {
+    const getAnimeDetail = useCallback(async () => {
         if (typeof id === 'string') {
             const data = await selectAnimeById(Number(id))
             setAnime(data)
         }
-    }
+    }, [id])
     useEffect(() => {
         getAnimeDetail()
-    }, [])
+    }, [getAnimeDetail])
 
     const getUpdateInfo = () => {
         const weekday = weekdayMap[anime.updateWeekday - 1]
         return `每周${weekday} ${anime.updateTimeHHmm}更新`
     }
+    const blurhash =
+        '|rF?hV%2WCj[ayj[a|j[az_NaeWBj@ayfRayfQfQM{M|azj[azf6fQfQfQIpWXofj[ayj[j[fQayWCoeoeaya}j[ayfQa{oLj?j[WVj[ayayj[fQoff7azayj[ayj[j[ayofayayayj[fQj[ayayj[ayfjj[j[ayjuayj['
 
     return (
         <SafeAreaView style={styles.container}>
             <ScrollView contentContainerStyle={styles.scrollView}>
                 {/* 封面图 */}
                 <View style={styles.coverContainer}>
-                    <ExpoImage source={{ uri: anime.cover }} style={styles.coverImage} contentFit="cover" />
+                    <Image
+                        source={{ uri: anime.cover }}
+                        style={styles.coverImage}
+                        contentFit="cover"
+                        placeholder={{ blurhash }}
+                    />
                 </View>
 
                 {/* 基本信息 */}

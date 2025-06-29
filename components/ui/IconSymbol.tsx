@@ -20,6 +20,7 @@ const MAPPING = {
     'chevron.right': 'chevron-right',
     'bookmark.fill': 'bookmark',
     'plus.app.fill': 'add',
+    'text.append': 'edit-note',
 } as IconMapping
 
 /**
