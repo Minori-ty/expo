@@ -1,7 +1,6 @@
 import { db } from '@/db'
-import { animeTable, calendarTable, schduleTable, upcomingTable } from '@/db/schema'
-import { createCalendarEvent } from '@/utils/calendar'
-import { getCurrentEpisode, isCurrentWeekdayUpdateTimePassed } from '@/utils/timeCalculation'
+import { animeTable, schduleTable, upcomingTable } from '@/db/schema'
+import { getCurrentEpisode } from '@/utils/timeCalculation'
 import dayjs from 'dayjs'
 import { eq } from 'drizzle-orm'
 import * as BackgroundTask from 'expo-background-task'
@@ -57,13 +56,13 @@ export async function refreshScheduleAndCalendar() {
         deleteScheduleList.forEach(async (item) => {
             await tx.delete(schduleTable).where(eq(schduleTable.id, item.schdule.id))
         })
-        /** 更新totalEpisode */
+        /** 更新currentEpisode */
         const remainingSchedules = allSchedule.filter((schedule) => !deleteScheduleList.includes(schedule))
         remainingSchedules.forEach(async (item) => {
             if (!item.anime) return
             await tx
                 .update(animeTable)
-                .set({ totalEpisode: getCurrentEpisode(item.anime.firstEpisodeDateTime, item.anime.totalEpisode) })
+                .set({ currentEpisode: getCurrentEpisode(item.anime.firstEpisodeDateTime, item.anime.totalEpisode) })
                 .where(eq(animeTable.id, item.anime.id))
         })
 
@@ -83,38 +82,38 @@ export async function refreshScheduleAndCalendar() {
             }
         })
 
-        const calendarList = await tx
-            .select()
-            .from(calendarTable)
-            .leftJoin(animeTable, eq(calendarTable.animeId, animeTable.id))
-            .where(eq(calendarTable.animeId, animeTable.id))
+        // const calendarList = await tx
+        //     .select()
+        //     .from(calendarTable)
+        //     .leftJoin(animeTable, eq(calendarTable.animeId, animeTable.id))
+        //     .where(eq(calendarTable.animeId, animeTable.id))
 
-        const calendarMapScheduleId = calendarList.map((item) => item.calendar.scheduleId)
+        // const calendarMapScheduleId = calendarList.map((item) => item.calendar.scheduleId)
 
-        // 找出没有注册日历事件的动漫更新记录，注册日历事件
-        allSchedule.forEach(async (item) => {
-            if (!item.anime) return
-            if (!calendarMapScheduleId.includes(item.schdule.id)) {
-                const calendarId = await createCalendarEvent({
-                    name: item.anime.name,
-                    currentEpisode: item.anime.currentEpisode,
-                    updateTimeHHmm: item.anime.updateTimeHHmm,
-                    updateWeekday: item.anime.updateWeekday,
-                })
-                if (calendarId) {
-                    await tx
-                        .insert(calendarTable)
-                        .values({ calendarId, scheduleId: item.schdule.id, animeId: item.anime.id })
-                }
-            }
-        })
+        // // 找出没有注册日历事件的动漫更新记录，注册日历事件
+        // allSchedule.forEach(async (item) => {
+        //     if (!item.anime) return
+        //     if (!calendarMapScheduleId.includes(item.schdule.id)) {
+        //         const calendarId = await createCalendarEvent({
+        //             name: item.anime.name,
+        //             currentEpisode: item.anime.currentEpisode,
+        //             updateTimeHHmm: item.anime.updateTimeHHmm,
+        //             updateWeekday: item.anime.updateWeekday,
+        //         })
+        //         if (calendarId) {
+        //             await tx
+        //                 .insert(calendarTable)
+        //                 .values({ calendarId, scheduleId: item.schdule.id, animeId: item.anime.id })
+        //         }
+        //     }
+        // })
 
-        /** 删除已经通知的日历事件 */
-        calendarList.forEach(async (item) => {
-            if (!item.anime) return
-            if (isCurrentWeekdayUpdateTimePassed(item.anime.updateTimeHHmm, item.anime.updateWeekday)) {
-                await tx.delete(calendarTable).where(eq(calendarTable.id, item.calendar.id))
-            }
-        })
+        // /** 删除已经通知的日历事件 */
+        // calendarList.forEach(async (item) => {
+        //     if (!item.anime) return
+        //     if (isCurrentWeekdayUpdateTimePassed(item.anime.updateTimeHHmm, item.anime.updateWeekday)) {
+        //         await tx.delete(calendarTable).where(eq(calendarTable.id, item.calendar.id))
+        //     }
+        // })
     })
 }

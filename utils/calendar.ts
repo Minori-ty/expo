@@ -39,6 +39,9 @@ export async function createCalendarEvent({
         alarms: [
             { relativeOffset: -5 }, // 提前10分钟通知
         ],
+        recurrenceRule: {
+            frequency: Calendar.Frequency.WEEKLY,
+        },
     })
     return eventId
 }
