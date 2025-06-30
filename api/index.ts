@@ -67,7 +67,7 @@ export async function addAnime(
                 .returning()
             /** 插入后返回的数据 */
             const animeData = returning[0]
-            const { id, name, currentEpisode, lastEpisodeDateTime, firstEpisodeDateTime } = animeData
+            const { id, name, currentEpisode, lastEpisodeDateTime, firstEpisodeDateTime, totalEpisode } = animeData
             const dayStartTimestamp = dayjs().hour(0).minute(0).second(0).millisecond(0).unix()
             if (status === EStatus.ONGOING) {
                 const schedule = await tx
@@ -82,6 +82,7 @@ export async function addAnime(
                     currentEpisode,
                     firstEpisodeDateTime,
                     lastEpisodeDateTime,
+                    totalEpisode,
                 })
                 if (calendarId) {
                     await tx
@@ -102,6 +103,7 @@ export async function addAnime(
                     currentEpisode,
                     firstEpisodeDateTime,
                     lastEpisodeDateTime,
+                    totalEpisode,
                 })
                 if (calendarId) {
                     await tx

@@ -4,14 +4,15 @@ import * as Calendar from 'expo-calendar'
 
 export async function createCalendarEvent({
     name,
-    currentEpisode,
     firstEpisodeDateTime,
-    lastEpisodeDateTime,
+    totalEpisode,
+    currentEpisode,
 }: {
     name: string
     currentEpisode: number
     firstEpisodeDateTime: number
     lastEpisodeDateTime: number
+    totalEpisode: number
 }) {
     // 先获取日历权限
     const granted = await getCalendarPermission()
@@ -31,16 +32,18 @@ export async function createCalendarEvent({
     const minutes = day.minute()
     // 解析输入的时间字符串
     const eventId = await Calendar.createEventAsync(defaultCalendar.id, {
-        title: `${name} 第${currentEpisode + 1}集 即将更新!`,
+        title: `${name} 即将更新!`,
         startDate: dayjs().isoWeekday(weekday).hour(hours).minute(minutes).toDate(),
         endDate: dayjs().isoWeekday(weekday).hour(hours).minute(minutes).toDate(),
         timeZone: 'Asia/Shanghai',
         alarms: [
             { relativeOffset: -5 }, // 提前10分钟通知
         ],
-        // recurrenceRule: {
-        //     // frequency: Calendar.Frequency.WEEKLY,
-        // },
+        recurrenceRule: {
+            frequency: Calendar.Frequency.WEEKLY,
+            interval: 1,
+            occurrence: totalEpisode - currentEpisode,
+        },
     })
     return eventId
 }
@@ -49,7 +52,7 @@ export async function createCalendarEvent({
 export async function deleteCalendarEvent(eventId: string) {
     // 先获取日历权限
     const granted = await getCalendarPermission()
-    if (!granted) return
+    if (!granted) return false
 
     // 获得默认日历ID
     const calendars = await Calendar.getCalendarsAsync()
@@ -57,11 +60,14 @@ export async function deleteCalendarEvent(eventId: string) {
 
     if (!defaultCalendar) {
         console.log('没有找到可修改的默认日历')
-        return
+        return false
     }
 
-    // 删除事件
-    const success = await Calendar.deleteEventAsync(eventId)
-
-    return success
+    try {
+        await Calendar.deleteEventAsync(eventId)
+        return true
+    } catch (error) {
+        alert(error)
+        return false
+    }
 }
