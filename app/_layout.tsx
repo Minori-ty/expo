@@ -7,7 +7,7 @@ import 'react-native-reanimated'
 import { db } from '@/db'
 import migrations from '@/drizzle/migrations'
 import { useColorScheme } from '@/hooks/useColorScheme'
-import { getNotificationPermission } from '@/permissions'
+import { getCalendarPermission, getNotificationPermission } from '@/permissions'
 import { queryClient } from '@/utils/react-query'
 import { QueryClientProvider } from '@tanstack/react-query'
 import { useMigrations } from 'drizzle-orm/expo-sqlite/migrator'
@@ -33,11 +33,8 @@ export default function RootLayout() {
     })
 
     useEffect(() => {
-        // 只会在组件挂载时调用一次
-        async function askPermission() {
-            await getNotificationPermission()
-        }
-        askPermission()
+        getNotificationPermission()
+        getCalendarPermission()
         SplashScreen.hideAsync()
     }, [])
 

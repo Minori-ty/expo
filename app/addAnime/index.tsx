@@ -1,10 +1,11 @@
 import { addAnime } from '@/api'
 import { RadioGroup } from '@/components/RadioGroup'
-import { insertAnimeSchema } from '@/db/schema'
+import { EStatus, EUpdateWeekday, insertAnimeSchema } from '@/db/schema'
 import { queryClient } from '@/utils/react-query'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Picker } from '@react-native-picker/picker'
 import { useMutation } from '@tanstack/react-query'
+import dayjs from 'dayjs'
 import { router, useNavigation } from 'expo-router'
 import React, { useEffect, useState } from 'react'
 import { Controller, SubmitHandler, useForm } from 'react-hook-form'
@@ -20,22 +21,22 @@ import {
     View,
 } from 'react-native'
 import { z, ZodIssueCode } from 'zod'
-import { z as zv4 } from 'zod/v4'
+import { z as v4 } from 'zod/v4'
 
 export const insertAnimeData = insertAnimeSchema
-    .omit({ id: true, createdAt: true, isFinished: true, firstEpisodeDateTime: true, lastEpisodeDateTime: true })
-    .extend({})
-export type TFormData = zv4.infer<typeof insertAnimeData>
+    .omit({ id: true, createdAt: true, lastEpisodeDateTime: true, firstEpisodeDateTime: true })
+    .extend({ firstEpisodeDateTime: z.string() })
 
 // 表单验证规则
 const animeSchema = z
     .object({
         name: z.string().min(1, '请输入番剧名称'),
-        updateWeekday: z.coerce.number().min(1, '请选择更新周').max(7, '更新周必须在1-7之间'),
+        updateWeekday: z.coerce.number().int().min(1, '请选择更新周').max(7, '更新周必须在1-7之间'),
         updateTimeHHmm: z.string().regex(/(0[0-9]|1[0-9]|2[0-3]):[0-5][0-9]/, '请输入正确的时间格式HH:mm'),
         currentEpisode: z.coerce.number().min(1, '当前集数至少为1'),
         totalEpisode: z.coerce.number().min(1, '总集数至少为1'),
         cover: z.string().url('请输入有效的URL'),
+        status: z.number().int().min(1).max(3),
     })
     .superRefine((values, ctx) => {
         if (values.totalEpisode < values.currentEpisode) {
@@ -47,6 +48,69 @@ const animeSchema = z
         }
     })
 
+const baseScheme = z.object({
+    name: z.string().min(1, '请输入番剧名称').max(20, '番剧名称长度不能超过20个字符'),
+    status: z.union([z.literal(EStatus.COMING_SOON), z.literal(EStatus.COMPLETED), z.literal(EStatus.ONGOING)]),
+    updateTimeHHmm: z.string().regex(/(0[0-9]|1[0-9]|2[0-3]):[0-5][0-9]/, '请输入正确的时间格式HH:mm'),
+    totalEpisode: z.coerce.number().min(1, '总集数至少为1'),
+    cover: z.string().url('请输入有效的URL'),
+})
+
+function createSchema(status: EStatus) {
+    let dynamicFields: z.ZodRawShape = {}
+    if (status === EStatus.ONGOING) {
+        dynamicFields = {
+            updateWeekday: z.coerce.number().int().min(1, '请选择更新周').max(7, '更新周必须在1-7之间'),
+            currentEpisode: z.coerce.number().min(1, '当前集数至少为1'),
+        }
+        return baseScheme.extend(dynamicFields).superRefine((val, ctx) => {
+            if (val.currentEpisode > val.totalEpisode) {
+                ctx.addIssue({
+                    code: ZodIssueCode.custom,
+                    path: ['currentEpisode'],
+                    message: '当前集数不能大于总集数',
+                })
+            }
+        })
+    } else if (status === EStatus.COMPLETED) {
+        dynamicFields = {
+            firstEpisodeDateTime: z.string(),
+        }
+        return baseScheme.extend(dynamicFields).superRefine((val, ctx) => {
+            const { updateTimeHHmm, totalEpisode, firstEpisodeDateTime } = val
+            const lastEpisodeDateTimeTimestamp = dayjs(`${firstEpisodeDateTime} ${updateTimeHHmm}`)
+                .add((totalEpisode - 1) * 7, 'day')
+                .unix()
+
+            if (lastEpisodeDateTimeTimestamp > dayjs().unix()) {
+                ctx.addIssue({
+                    code: ZodIssueCode.custom,
+                    path: ['firstEpisodeDateTime'],
+                    message: '当前番剧还未完结，请设置正确的日期',
+                })
+            }
+        })
+    } else if (status === EStatus.COMING_SOON) {
+        dynamicFields = {
+            firstEpisodeDateTime: z.string(),
+        }
+        return baseScheme.extend(dynamicFields).superRefine((val, ctx) => {
+            const { firstEpisodeDateTime, updateTimeHHmm } = val
+            const firstEpisodeDateTimeTimestamp = dayjs(`${firstEpisodeDateTime} ${updateTimeHHmm}`).unix()
+
+            if (firstEpisodeDateTimeTimestamp < dayjs().unix()) {
+                ctx.addIssue({
+                    code: ZodIssueCode.custom,
+                    path: ['firstEpisodeDateTime'],
+                    message: '当前番剧已开播，请设置正确的日期',
+                })
+            }
+        })
+    }
+    return baseScheme
+}
+
+export type TFormData = z.infer<ReturnType<typeof createSchema>>
 function AnimeForm() {
     const navigation = useNavigation()
     useEffect(() => {
@@ -55,23 +119,27 @@ function AnimeForm() {
             headerTitleAlign: 'center',
         })
     }, [navigation])
+    const [status, setStatus] = useState(EStatus.ONGOING)
+    const formSchema = createSchema(status)
     const {
         control,
         handleSubmit,
         formState: { errors },
         reset,
-    } = useForm<TFormData>({
-        resolver: zodResolver(animeSchema),
+    } = useForm<v4.infer<typeof insertAnimeData>>({
+        resolver: zodResolver(formSchema),
         defaultValues: {
-            name: '',
-            updateWeekday: 1,
-            updateTimeHHmm: '',
+            name: '完结',
+            updateWeekday: EUpdateWeekday.MONDAY,
+            updateTimeHHmm: '09:00',
             currentEpisode: 1,
             totalEpisode: 13,
-            cover: '',
+            cover: 'https://saf',
+            status: EStatus.ONGOING,
+            firstEpisodeDateTime: '',
         },
     })
-    const [selected, setSelected] = useState(2)
+
     const { mutate: addAnimeMution } = useMutation({
         mutationFn: addAnime,
         onSuccess: () => {
@@ -89,9 +157,32 @@ function AnimeForm() {
         },
     })
 
-    const onSubmit: SubmitHandler<TFormData> = async (data) => {
-        console.log('提交表单数据:', data)
-        addAnimeMution(data)
+    const onSubmit: SubmitHandler<v4.infer<typeof insertAnimeData>> = async (data) => {
+        const {
+            cover,
+            currentEpisode,
+            name,
+            status,
+            totalEpisode,
+            updateTimeHHmm,
+            updateWeekday,
+            firstEpisodeDateTime,
+        } = data
+        console.log(data)
+
+        if (status === EStatus.ONGOING) {
+            addAnimeMution({ cover, currentEpisode, name, status, totalEpisode, updateTimeHHmm, updateWeekday })
+        } else {
+            const firstEpisodeDateTimeTimestamp = dayjs(`${firstEpisodeDateTime} ${updateTimeHHmm}`).unix()
+            addAnimeMution({
+                cover,
+                name,
+                status,
+                totalEpisode,
+                updateTimeHHmm,
+                firstEpisodeDateTime: firstEpisodeDateTimeTimestamp,
+            })
+        }
     }
     const weekdays = [
         { label: '周一', value: 1 },
@@ -108,7 +199,7 @@ function AnimeForm() {
 
     useEffect(() => {
         const keyboardDidShowListener = Keyboard.addListener('keyboardDidShow', (e) => {
-            setKeyboardHeight(e.endCoordinates.height - 150)
+            setKeyboardHeight(Math.max(e.endCoordinates.height - 150, 0))
         })
         const keyboardDidHideListener = Keyboard.addListener('keyboardDidHide', () => {
             setKeyboardHeight(0)
@@ -143,38 +234,47 @@ function AnimeForm() {
                             />
                         )}
                     />
-                    {errors.name && <Text style={styles.errorText}>{errors.name.message}</Text>}
+                    {errors.name && <ErrorMessage error={errors.name} />}
                 </View>
                 <View style={styles.formGroup}>
                     <Text style={styles.label}>更新状态</Text>
-                    <RadioGroup
-                        options={options}
-                        value={selected}
-                        onChange={setSelected}
-                        style={styles.horizontalCenter}
+                    <Controller
+                        control={control}
+                        name="status"
+                        render={({ field }) => (
+                            <RadioGroup
+                                {...field}
+                                options={options}
+                                value={field.value}
+                                onChange={(val: EStatus) => {
+                                    field.onChange(val)
+                                    setStatus(val)
+                                }}
+                                style={styles.horizontalCenter}
+                            />
+                        )}
                     />
                 </View>
-                {selected !== 2 && (
+                {status !== 2 && (
                     <View style={styles.formGroup}>
                         <Text style={styles.label}>首播时间</Text>
                         <Controller
                             control={control}
-                            name="updateTimeHHmm"
+                            name="firstEpisodeDateTime"
                             render={({ field }) => (
                                 <TextInput
                                     {...field}
-                                    style={[styles.input, errors.updateTimeHHmm && styles.errorInput]}
+                                    style={[styles.input, errors.firstEpisodeDateTime && styles.errorInput]}
                                     placeholder="例如: 2024-05-15"
-                                    keyboardType="numeric"
                                     onChangeText={field.onChange}
                                     value={field.value}
                                 />
                             )}
                         />
-                        {errors.updateTimeHHmm && <Text style={styles.errorText}>{errors.updateTimeHHmm.message}</Text>}
+                        {errors.firstEpisodeDateTime && <ErrorMessage error={errors.firstEpisodeDateTime} />}
                     </View>
                 )}
-                {selected === 2 && (
+                {status === 2 && (
                     <View style={styles.formGroup}>
                         <Text style={styles.label}>更新周</Text>
                         <Controller
@@ -193,7 +293,7 @@ function AnimeForm() {
                                 </Picker>
                             )}
                         />
-                        {errors.updateWeekday && <Text style={styles.errorText}>{errors.updateWeekday.message}</Text>}
+                        {errors.updateWeekday && <ErrorMessage error={errors.updateWeekday} />}
                     </View>
                 )}
                 <View style={styles.formGroup}>
@@ -212,9 +312,9 @@ function AnimeForm() {
                             />
                         )}
                     />
-                    {errors.updateTimeHHmm && <Text style={styles.errorText}>{errors.updateTimeHHmm.message}</Text>}
+                    {errors.updateTimeHHmm && <ErrorMessage error={errors.updateTimeHHmm} />}
                 </View>
-                {selected === 2 && (
+                {status === EStatus.ONGOING && (
                     <View style={styles.formGroup}>
                         <Text style={styles.label}>当前更新集数</Text>
                         <Controller
@@ -231,7 +331,7 @@ function AnimeForm() {
                                 />
                             )}
                         />
-                        {errors.currentEpisode && <Text style={styles.errorText}>{errors.currentEpisode.message}</Text>}
+                        {errors.currentEpisode && <ErrorMessage error={errors.currentEpisode} />}
                     </View>
                 )}
                 <View style={styles.formGroup}>
@@ -250,7 +350,7 @@ function AnimeForm() {
                             />
                         )}
                     />
-                    {errors.totalEpisode && <Text style={styles.errorText}>{errors.totalEpisode.message}</Text>}
+                    {errors.totalEpisode && <ErrorMessage error={errors.totalEpisode} />}
                 </View>
                 <View style={styles.formGroup}>
                     <Text style={styles.label}>封面URL</Text>
@@ -267,7 +367,7 @@ function AnimeForm() {
                             />
                         )}
                     />
-                    {errors.cover && <Text style={styles.errorText}>{errors.cover.message}</Text>}
+                    {errors.cover && <ErrorMessage error={errors.cover} />}
                 </View>
                 <Button title="提交" onPress={handleSubmit(onSubmit)} />
                 <View style={{ height: keyboardHeight }}></View>
@@ -327,3 +427,20 @@ const styles = StyleSheet.create({
 })
 
 export default AnimeForm
+
+function getErrorMessage(error: any): string | null {
+    if (!error) return null
+    if (typeof error === 'string') return error
+    if (error.message) return error.message
+    if (typeof error === 'object') {
+        // 尝试从嵌套的错误对象中提取消息
+        return getErrorMessage(Object.values(error)[0])
+    }
+    return null
+}
+
+// 改进 ErrorMessage 组件
+function ErrorMessage({ error }: { error?: any }) {
+    const message = getErrorMessage(error)
+    return message ? <Text style={styles.errorText}>{message}</Text> : <></>
+}

@@ -2,6 +2,7 @@ import { deleteAnime } from '@/api'
 import CustomModal from '@/components/CustomModal'
 import PageHeader from '@/components/PageHeader'
 import { IconSymbol } from '@/components/ui/IconSymbol'
+import { EStatus } from '@/db/schema'
 import { selectAnime } from '@/hooks/useAnime'
 import { queryClient } from '@/utils/react-query'
 import { useMutation, useQuery } from '@tanstack/react-query'
@@ -168,7 +169,7 @@ function AnimeContainerItem({ data }: IAnimeContainerItemProps) {
                     transition={1000}
                     cachePolicy={'memory-disk'}
                 />
-                <UpdateLabel isOver={data.isFinished} />
+                <UpdateLabel status={data.status} />
             </View>
             <Text style={styles.text}>{data.name}</Text>
             <Text style={styles.text}>更新 第{data.currentEpisode}集</Text>
@@ -177,12 +178,23 @@ function AnimeContainerItem({ data }: IAnimeContainerItemProps) {
 }
 
 interface IUpdateLabelProps {
-    isOver: boolean
+    status: EStatus
 }
-function UpdateLabel({ isOver }: IUpdateLabelProps) {
+function UpdateLabel({ status }: IUpdateLabelProps) {
+    const mapColor = {
+        [EStatus.COMING_SOON]: '#FFD547',
+        [EStatus.ONGOING]: '#409eff',
+        [EStatus.COMPLETED]: '#f56c6c',
+    }
+
+    const mapText = {
+        [EStatus.COMING_SOON]: '即将更新',
+        [EStatus.ONGOING]: '连载中',
+        [EStatus.COMPLETED]: '已完结',
+    }
     return (
-        <View style={[styles.updateLabel, { backgroundColor: isOver ? '#f56c6c' : '#409eff' }]}>
-            <Text style={{ color: '#fff' }}>{isOver ? '已完结' : '连载中'}</Text>
+        <View style={[styles.updateLabel, { backgroundColor: mapColor[status] }]}>
+            <Text style={{ color: '#fff' }}>{mapText[status]}</Text>
         </View>
     )
 }
@@ -197,7 +209,7 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
     },
     animeContainerItem: {
-        height: 205,
+        height: 215,
         width: (Dimensions.get('window').width - GAP * 4) / 3,
     },
     imageContainer: {
@@ -219,6 +231,7 @@ const styles = StyleSheet.create({
     },
     text: {
         fontSize: 12,
+        marginTop: 5,
     },
     modalPanel: {
         backgroundColor: '#fff',

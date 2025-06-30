@@ -10,7 +10,7 @@
         "web": "expo start --web",
         "lint": "expo lint",
         "build": "eas build --platform android --local",
-        "genetate:db": "npx drizzle-kit generate"
+        "db": "npx drizzle-kit generate"
     },
     "dependencies": {
         "@expo/vector-icons": "^14.1.0",
@@ -27,6 +27,7 @@
         "dayjs": "^1.11.13",
         "drizzle-orm": "^0.44.2",
         "drizzle-zod": "^0.8.2",
+        "enum-plus": "^2.3.3",
         "expo": "~53.0.13",
         "expo-background-task": "~0.2.7",
         "expo-blur": "~14.1.5",

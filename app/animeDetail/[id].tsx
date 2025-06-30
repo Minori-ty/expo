@@ -1,4 +1,5 @@
 import { IconSymbol } from '@/components/ui/IconSymbol'
+import { EStatus, EUpdateWeekday } from '@/db/schema'
 import { selectAnimeById } from '@/hooks/useAnime'
 import dayjs from 'dayjs'
 import 'dayjs/locale/zh-cn'
@@ -15,11 +16,11 @@ interface Anime {
     createdAt: string
     id: number
     name: string
-    updateWeekday: 1 | 2 | 3 | 4 | 5 | 6 | 7
+    updateWeekday: EUpdateWeekday
     updateTimeHHmm: string
     currentEpisode: number
     totalEpisode: number
-    isFinished: boolean
+    status: EStatus
     cover: string
 }
 
@@ -36,7 +37,7 @@ function AnimeDetail() {
         updateTimeHHmm: '-',
         currentEpisode: 0,
         totalEpisode: 0,
-        isFinished: false,
+        status: EStatus.ONGOING,
         cover: '-',
     })
 
