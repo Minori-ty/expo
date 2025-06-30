@@ -4,7 +4,7 @@ import { Stack } from 'expo-router'
 import { StatusBar } from 'expo-status-bar'
 import 'react-native-reanimated'
 
-import { db } from '@/db'
+import { db, expo } from '@/db'
 import migrations from '@/drizzle/migrations'
 import { useColorScheme } from '@/hooks/useColorScheme'
 import { getCalendarPermission, getNotificationPermission } from '@/permissions'
@@ -12,6 +12,7 @@ import { refreshScheduleAndCalendar, registerBackgroundTask, taskDefined } from 
 import { queryClient } from '@/utils/react-query'
 import { QueryClientProvider } from '@tanstack/react-query'
 import { useMigrations } from 'drizzle-orm/expo-sqlite/migrator'
+import { useDrizzleStudio } from 'expo-drizzle-studio-plugin'
 import * as Notifications from 'expo-notifications'
 import * as SplashScreen from 'expo-splash-screen'
 import { useEffect } from 'react'
@@ -33,7 +34,7 @@ export default function RootLayout() {
     const [loaded] = useFonts({
         SpaceMono: require('../assets/fonts/SpaceMono-Regular.ttf'),
     })
-
+    useDrizzleStudio(expo)
     useEffect(() => {
         getNotificationPermission()
         getCalendarPermission()

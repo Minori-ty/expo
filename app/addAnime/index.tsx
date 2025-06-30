@@ -129,12 +129,12 @@ function AnimeForm() {
     } = useForm<v4.infer<typeof insertAnimeData>>({
         resolver: zodResolver(formSchema),
         defaultValues: {
-            name: '完结',
+            name: '章鱼哔的原罪',
             updateWeekday: EUpdateWeekday.MONDAY,
             updateTimeHHmm: '09:00',
             currentEpisode: 1,
             totalEpisode: 13,
-            cover: 'https://saf',
+            cover: 'http://lz.sinaimg.cn/large/8a65eec0gy1i295k5s0evj207i0al424.jpg',
             status: EStatus.ONGOING,
             firstEpisodeDateTime: '',
         },
@@ -265,7 +265,7 @@ function AnimeForm() {
                                 <TextInput
                                     {...field}
                                     style={[styles.input, errors.firstEpisodeDateTime && styles.errorInput]}
-                                    placeholder="例如: 2024-05-15"
+                                    placeholder="例如: 2025-05-15"
                                     onChangeText={field.onChange}
                                     value={field.value}
                                 />
