@@ -5,13 +5,13 @@ import * as Calendar from 'expo-calendar'
 export async function createCalendarEvent({
     name,
     currentEpisode,
-    updateTimeHHmm,
-    updateWeekday,
+    firstEpisodeDateTime,
+    lastEpisodeDateTime,
 }: {
     name: string
     currentEpisode: number
-    updateTimeHHmm: string
-    updateWeekday: number
+    firstEpisodeDateTime: number
+    lastEpisodeDateTime: number
 }) {
     // 先获取日历权限
     const granted = await getCalendarPermission()
@@ -26,21 +26,17 @@ export async function createCalendarEvent({
         return
     }
     // 解析输入的时间字符串
-    const [hours, minutes] = updateTimeHHmm.split(':').map(Number)
     const eventId = await Calendar.createEventAsync(defaultCalendar.id, {
         title: `${name} 第${currentEpisode + 1}集 即将更新!`,
-        startDate: dayjs().isoWeekday(updateWeekday).hour(hours).minute(minutes).toDate(),
-        endDate: dayjs()
-            .isoWeekday(updateWeekday)
-            .hour(hours)
-            .minute(minutes + 24)
-            .toDate(),
+        startDate: dayjs.unix(firstEpisodeDateTime).toDate(),
+        endDate: dayjs.unix(lastEpisodeDateTime).toDate(),
         timeZone: 'Asia/Shanghai',
         alarms: [
             { relativeOffset: -5 }, // 提前10分钟通知
         ],
         recurrenceRule: {
             frequency: Calendar.Frequency.WEEKLY,
+            interval: 1,
         },
     })
     return eventId

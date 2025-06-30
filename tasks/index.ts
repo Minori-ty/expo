@@ -1,5 +1,6 @@
 import { db } from '@/db'
-import { animeTable, schduleTable, upcomingTable } from '@/db/schema'
+import { animeTable, calendarTable, EStatus, schduleTable, upcomingTable } from '@/db/schema'
+import { deleteCalendarEvent } from '@/utils/calendar'
 import { getCurrentEpisode } from '@/utils/timeCalculation'
 import dayjs from 'dayjs'
 import { eq } from 'drizzle-orm'
@@ -42,78 +43,76 @@ export async function registerBackgroundTask() {
  */
 export async function refreshScheduleAndCalendar() {
     db.transaction(async (tx) => {
-        const allSchedule = await tx
+        const selectSchedule = await tx
             .select()
             .from(schduleTable)
             .leftJoin(animeTable, eq(schduleTable.animeId, animeTable.id))
             .where(eq(schduleTable.animeId, animeTable.id))
-        /** 需要删除的动漫更新记录 */
-        const deleteScheduleList = allSchedule.filter((schedule) => {
-            if (!schedule.anime) return true
-            const nowTimestamp = dayjs().unix()
-            if (schedule.anime.lastEpisodeDateTime < nowTimestamp) return true
-        })
-        deleteScheduleList.forEach(async (item) => {
-            await tx.delete(schduleTable).where(eq(schduleTable.id, item.schdule.id))
-        })
-        /** 更新currentEpisode */
-        const remainingSchedules = allSchedule.filter((schedule) => !deleteScheduleList.includes(schedule))
-        remainingSchedules.forEach(async (item) => {
+
+        // 1.先更新表数据
+        selectSchedule.forEach(async (item) => {
             if (!item.anime) return
-            await tx
-                .update(animeTable)
-                .set({ currentEpisode: getCurrentEpisode(item.anime.firstEpisodeDateTime, item.anime.totalEpisode) })
-                .where(eq(animeTable.id, item.anime.id))
+            const { firstEpisodeDateTime, totalEpisode, currentEpisode, id } = item.anime
+            if (getCurrentEpisode(firstEpisodeDateTime, totalEpisode) > currentEpisode) {
+                const updateEpisode = currentEpisode + 1
+                await tx.update(animeTable).set({ currentEpisode: updateEpisode }).where(eq(animeTable.id, id))
+                if (updateEpisode === totalEpisode) {
+                    await tx.update(animeTable).set({ status: EStatus.COMPLETED }).where(eq(animeTable.id, id))
+                }
+            }
+        })
+
+        // 2.删除已完结和过期的动漫数据
+
+        // 更新完数据后，重新获取最新的数据
+        const newSelectSchedule = await tx
+            .select()
+            .from(schduleTable)
+            .leftJoin(animeTable, eq(schduleTable.animeId, animeTable.id))
+            .where(eq(schduleTable.animeId, animeTable.id))
+
+        newSelectSchedule.forEach((item) => {
+            if (!item.anime) return
+            const { status, lastEpisodeDateTime } = item.anime
+            if (status === EStatus.COMPLETED && lastEpisodeDateTime < dayjs().isoWeekday(1).unix()) {
+                tx.delete(schduleTable).where(eq(schduleTable.id, item.schdule.id))
+            }
         })
 
         /** 把达到更新时间的动漫插入到更新表中 */
-        const upcomingList = await tx
+        const selectUpcoming = await tx
             .select()
             .from(upcomingTable)
             .leftJoin(animeTable, eq(upcomingTable.animeId, animeTable.id))
             .where(eq(upcomingTable.animeId, animeTable.id))
 
-        upcomingList.forEach(async (item) => {
+        selectUpcoming.forEach(async (item) => {
             if (!item.anime) return
-            if (item.anime.firstEpisodeDateTime < dayjs().unix()) {
+            const { firstEpisodeDateTime, id } = item.anime
+            if (firstEpisodeDateTime < dayjs().unix()) {
+                await tx.update(animeTable).set({
+                    status: EStatus.ONGOING,
+                    currentEpisode: 1,
+                })
                 await tx.insert(schduleTable).values({
-                    animeId: item.anime.id,
+                    animeId: id,
                 })
             }
         })
 
-        // const calendarList = await tx
-        //     .select()
-        //     .from(calendarTable)
-        //     .leftJoin(animeTable, eq(calendarTable.animeId, animeTable.id))
-        //     .where(eq(calendarTable.animeId, animeTable.id))
+        // 3.删除已过期的日历事件
 
-        // const calendarMapScheduleId = calendarList.map((item) => item.calendar.scheduleId)
+        const selectCalendar = await tx
+            .select()
+            .from(calendarTable)
+            .leftJoin(animeTable, eq(calendarTable.animeId, animeTable.id))
 
-        // // 找出没有注册日历事件的动漫更新记录，注册日历事件
-        // allSchedule.forEach(async (item) => {
-        //     if (!item.anime) return
-        //     if (!calendarMapScheduleId.includes(item.schdule.id)) {
-        //         const calendarId = await createCalendarEvent({
-        //             name: item.anime.name,
-        //             currentEpisode: item.anime.currentEpisode,
-        //             updateTimeHHmm: item.anime.updateTimeHHmm,
-        //             updateWeekday: item.anime.updateWeekday,
-        //         })
-        //         if (calendarId) {
-        //             await tx
-        //                 .insert(calendarTable)
-        //                 .values({ calendarId, scheduleId: item.schdule.id, animeId: item.anime.id })
-        //         }
-        //     }
-        // })
-
-        // /** 删除已经通知的日历事件 */
-        // calendarList.forEach(async (item) => {
-        //     if (!item.anime) return
-        //     if (isCurrentWeekdayUpdateTimePassed(item.anime.updateTimeHHmm, item.anime.updateWeekday)) {
-        //         await tx.delete(calendarTable).where(eq(calendarTable.id, item.calendar.id))
-        //     }
-        // })
+        selectCalendar.forEach(async (item) => {
+            if (!item.anime) return
+            const { lastEpisodeDateTime } = item.anime
+            if (lastEpisodeDateTime < dayjs().unix()) {
+                await deleteCalendarEvent(item.calendar.calendarId)
+            }
+        })
     })
 }

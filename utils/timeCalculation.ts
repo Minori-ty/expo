@@ -27,7 +27,7 @@ export function isCurrentWeekdayUpdateTimePassed(updateTimeHHmm: string, updateW
         return currentHours > hours
     }
     if (minutes !== currentMinutes) {
-        return currentHours > minutes
+        return currentMinutes > minutes
     }
     return true
 }
@@ -76,6 +76,8 @@ export function getCurrentEpisode(firstEpisodeDateTime: number, totalEpisode: nu
     const updateCycle = 60 * 24 * 7 //一周更新周期的分钟数
     // 计算已过分钟数并转换为集数
     const minutesPassed = now.diff(dayjs.unix(firstEpisodeDateTime), 'minutes')
+    if (minutesPassed < 0) return 0
+
     const episodeNum = Math.floor(minutesPassed / updateCycle) + 1
     return Math.min(episodeNum, totalEpisode)
 }

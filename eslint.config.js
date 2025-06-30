@@ -52,6 +52,6 @@ module.exports = defineConfig([
         },
     },
     {
-        ignores: ['app.config.js'],
+        ignores: ['app.config.js', '.expo'],
     },
 ])

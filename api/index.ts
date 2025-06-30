@@ -56,43 +56,58 @@ export async function addAnime(
                 updateWeekday,
             }
         }
-        const data = generateAnimeData(params)
-        const result = insertAnimeSchema.safeParse(data)
+        const insertData = generateAnimeData(params)
+        const { status } = insertData
+        const result = insertAnimeSchema.safeParse(insertData)
         type TData = typeof animeTable.$inferInsert
         if (result.success) {
             const returning = await tx
                 .insert(animeTable)
                 .values(result.data as TData)
                 .returning()
+            /** 插入后返回的数据 */
             const animeData = returning[0]
-            const dayStart = dayjs().hour(0).minute(0).second(0).millisecond(0).unix()
-            if (data.status === EStatus.ONGOING) {
+            const { id, name, currentEpisode, lastEpisodeDateTime, firstEpisodeDateTime } = animeData
+            const dayStartTimestamp = dayjs().hour(0).minute(0).second(0).millisecond(0).unix()
+            if (status === EStatus.ONGOING) {
                 const schedule = await tx
                     .insert(schduleTable)
                     .values({
-                        animeId: animeData.id,
+                        animeId: id,
                     })
                     .returning()
 
                 const calendarId = await createCalendarEvent({
-                    name: animeData.name,
-                    currentEpisode: animeData.currentEpisode,
-                    updateTimeHHmm: animeData.updateTimeHHmm,
-                    updateWeekday: animeData.updateWeekday,
+                    name,
+                    currentEpisode,
+                    firstEpisodeDateTime,
+                    lastEpisodeDateTime,
                 })
                 if (calendarId) {
                     await tx
                         .insert(calendarTable)
                         .values({ calendarId, scheduleId: schedule[0].id, animeId: animeData.id })
                 }
-            } else if (data.status === EStatus.COMPLETED && data.lastEpisodeDateTime > dayStart) {
+            } else if (status === EStatus.COMPLETED && lastEpisodeDateTime > dayStartTimestamp) {
                 await tx.insert(schduleTable).values({
-                    animeId: animeData.id,
+                    animeId: id,
                 })
-            } else if (data.status === EStatus.COMING_SOON) {
+            } else if (status === EStatus.COMING_SOON) {
                 await tx.insert(upcomingTable).values({
-                    animeId: animeData.id,
+                    animeId: id,
                 })
+                const returning = await tx.select().from(schduleTable).where(eq(animeTable.id, id))
+                const calendarId = await createCalendarEvent({
+                    name,
+                    currentEpisode,
+                    firstEpisodeDateTime,
+                    lastEpisodeDateTime,
+                })
+                if (calendarId) {
+                    await tx
+                        .insert(calendarTable)
+                        .values({ calendarId, scheduleId: returning[0].id, animeId: animeData.id })
+                }
             }
             return animeData
         } else {
