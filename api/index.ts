@@ -73,21 +73,17 @@ export async function addAnime(
                         animeId: animeData.id,
                     })
                     .returning()
-                // 解析输入的时间字符串
-                const [hours, minutes] = animeData.updateTimeHHmm.split(':').map(Number)
-                const calendarId = await createCalendarEvent(
-                    `${animeData.name} 第${animeData.currentEpisode + 1}集 更新了`,
-                    dayjs().isoWeekday(animeData.updateWeekday).hour(hours).minute(minutes).toDate(),
-                    dayjs()
-                        .isoWeekday(animeData.updateWeekday)
-                        .hour(hours)
-                        .minute(minutes + 24)
-                        .toDate()
-                )
+
+                const calendarId = await createCalendarEvent({
+                    name: animeData.name,
+                    currentEpisode: animeData.currentEpisode,
+                    updateTimeHHmm: animeData.updateTimeHHmm,
+                    updateWeekday: animeData.updateWeekday,
+                })
                 if (calendarId) {
                     await tx
                         .insert(calendarTable)
-                        .values({ calendarId, schduleId: schedule[0].id, animeId: animeData.id })
+                        .values({ calendarId, scheduleId: schedule[0].id, animeId: animeData.id })
                 }
             } else if (data.status === EStatus.COMPLETED && data.lastEpisodeDateTime > dayStart) {
                 await tx.insert(schduleTable).values({

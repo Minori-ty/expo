@@ -77,7 +77,7 @@ export const insertSchduleSchema = createInsertSchema(schduleTable, {
 
 export const selectSchduleSchema = createSelectSchema(schduleTable)
 
-/** 动漫更新表数据表 */
+/** 动漫即将更新表数据表 */
 export const upcomingTable = sqliteTable('upcoming', {
     id: integer('id').primaryKey({ autoIncrement: true }).notNull(),
     animeId: integer('anime_id')
@@ -87,7 +87,7 @@ export const upcomingTable = sqliteTable('upcoming', {
 
 export const calendarTable = sqliteTable('calendar', {
     id: integer('id').primaryKey({ autoIncrement: true }).notNull(),
-    schduleId: integer('schdule_id')
+    scheduleId: integer('schdule_id')
         .notNull()
         .references(() => schduleTable.id, { onDelete: 'cascade' }),
     animeId: integer('anime_id')

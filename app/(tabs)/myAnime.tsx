@@ -225,9 +225,9 @@ const styles = StyleSheet.create({
         bottom: 0,
         left: 0,
         height: 25,
-        width: 60,
         alignItems: 'center',
         justifyContent: 'center',
+        paddingHorizontal: 10,
     },
     text: {
         fontSize: 12,

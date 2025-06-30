@@ -8,6 +8,7 @@ import { db } from '@/db'
 import migrations from '@/drizzle/migrations'
 import { useColorScheme } from '@/hooks/useColorScheme'
 import { getCalendarPermission, getNotificationPermission } from '@/permissions'
+import { refreshScheduleAndCalendar, registerBackgroundTask, taskDefined } from '@/tasks'
 import { queryClient } from '@/utils/react-query'
 import { QueryClientProvider } from '@tanstack/react-query'
 import { useMigrations } from 'drizzle-orm/expo-sqlite/migrator'
@@ -25,6 +26,7 @@ Notifications.setNotificationHandler({
     }),
 })
 
+taskDefined()
 export default function RootLayout() {
     const colorScheme = useColorScheme()
     const { success, error } = useMigrations(db, migrations)
@@ -36,6 +38,8 @@ export default function RootLayout() {
         getNotificationPermission()
         getCalendarPermission()
         SplashScreen.hideAsync()
+        registerBackgroundTask()
+        refreshScheduleAndCalendar()
     }, [])
 
     if (!loaded) {

@@ -64,3 +64,18 @@ export function getlastEpisodeDateTime(
 
     return lastEpisodeDateTime
 }
+
+/**
+ * 获取当前时间更新了多少集
+ * @param firstEpisodeDateTime 第一集的日期unix时间戳
+ * @param totalEpisode 总集数
+ * @returns
+ */
+export function getCurrentEpisode(firstEpisodeDateTime: number, totalEpisode: number) {
+    const now = dayjs()
+    const updateCycle = 60 * 24 * 7 //一周更新周期的分钟数
+    // 计算已过分钟数并转换为集数
+    const minutesPassed = now.diff(dayjs.unix(firstEpisodeDateTime), 'minutes')
+    const episodeNum = Math.floor(minutesPassed / updateCycle) + 1
+    return Math.min(episodeNum, totalEpisode)
+}

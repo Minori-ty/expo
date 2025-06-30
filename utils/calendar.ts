@@ -1,7 +1,18 @@
 import { getCalendarPermission } from '@/permissions'
+import dayjs from 'dayjs'
 import * as Calendar from 'expo-calendar'
 
-export async function createCalendarEvent(title: string, startDate: Date, endDate: Date) {
+export async function createCalendarEvent({
+    name,
+    currentEpisode,
+    updateTimeHHmm,
+    updateWeekday,
+}: {
+    name: string
+    currentEpisode: number
+    updateTimeHHmm: string
+    updateWeekday: number
+}) {
     // 先获取日历权限
     const granted = await getCalendarPermission()
     if (!granted) return
@@ -14,11 +25,16 @@ export async function createCalendarEvent(title: string, startDate: Date, endDat
         console.log('没有找到可修改的默认日历')
         return
     }
-
+    // 解析输入的时间字符串
+    const [hours, minutes] = updateTimeHHmm.split(':').map(Number)
     const eventId = await Calendar.createEventAsync(defaultCalendar.id, {
-        title,
-        startDate,
-        endDate,
+        title: `${name} 第${currentEpisode + 1}集 即将更新!`,
+        startDate: dayjs().isoWeekday(updateWeekday).hour(hours).minute(minutes).toDate(),
+        endDate: dayjs()
+            .isoWeekday(updateWeekday)
+            .hour(hours)
+            .minute(minutes + 24)
+            .toDate(),
         timeZone: 'Asia/Shanghai',
         alarms: [
             { relativeOffset: -5 }, // 提前10分钟通知

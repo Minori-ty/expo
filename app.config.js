@@ -108,16 +108,16 @@ const config = {
                 projectId: '5df2f02e-5af9-4191-8ad2-bbf3c5e8d468',
             },
         },
-        // backgroundTasks: [
-        //     {
-        //         taskName: 'background-task',
-        //         allowsNetworking: true,
-        //         minInterval: 60, // 1分钟（单位：秒）
-        //         android: {
-        //             permission: ['RECEIVE_BOOT_COMPLETED'],
-        //         },
-        //     },
-        // ],
+        backgroundTasks: [
+            {
+                taskName: 'REFRESH_SCHEDULE_AND_CALENDAR',
+                allowsNetworking: true,
+                minInterval: 60 * 15, // 1分钟（单位：秒）
+                android: {
+                    permission: ['RECEIVE_BOOT_COMPLETED'],
+                },
+            },
+        ],
     },
 }
 
