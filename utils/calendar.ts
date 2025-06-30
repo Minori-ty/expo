@@ -31,21 +31,26 @@ export async function createCalendarEvent({
     const hours = day.hour()
     const minutes = day.minute()
     // 解析输入的时间字符串
-    const eventId = await Calendar.createEventAsync(defaultCalendar.id, {
-        title: `${name} 即将更新!`,
-        startDate: dayjs().isoWeekday(weekday).hour(hours).minute(minutes).toDate(),
-        endDate: dayjs().isoWeekday(weekday).hour(hours).minute(minutes).toDate(),
-        timeZone: 'Asia/Shanghai',
-        alarms: [
-            { relativeOffset: -5 }, // 提前10分钟通知
-        ],
-        recurrenceRule: {
-            frequency: Calendar.Frequency.WEEKLY,
-            interval: 1,
-            occurrence: totalEpisode - currentEpisode,
-        },
-    })
-    return eventId
+    try {
+        const eventId = await Calendar.createEventAsync(defaultCalendar.id, {
+            title: `${name} 即将更新!`,
+            startDate: dayjs().isoWeekday(weekday).hour(hours).minute(minutes).toDate(),
+            endDate: dayjs().isoWeekday(weekday).hour(hours).minute(minutes).toDate(),
+            timeZone: 'Asia/Shanghai',
+            alarms: [
+                { relativeOffset: -5 }, // 提前10分钟通知
+            ],
+            recurrenceRule: {
+                frequency: Calendar.Frequency.WEEKLY,
+                interval: 1,
+                occurrence: totalEpisode - currentEpisode,
+            },
+        })
+        return eventId
+    } catch (error) {
+        alert(error)
+        return ''
+    }
 }
 
 // 删除日历事件
@@ -66,8 +71,7 @@ export async function deleteCalendarEvent(eventId: string) {
     try {
         await Calendar.deleteEventAsync(eventId)
         return true
-    } catch (error) {
-        alert(error)
+    } catch {
         return false
     }
 }
