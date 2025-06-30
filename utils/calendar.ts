@@ -29,7 +29,7 @@ export async function createCalendarEvent({
     const eventId = await Calendar.createEventAsync(defaultCalendar.id, {
         title: `${name} 第${currentEpisode + 1}集 即将更新!`,
         startDate: dayjs.unix(firstEpisodeDateTime).toDate(),
-        endDate: dayjs.unix(lastEpisodeDateTime).toDate(),
+        endDate: dayjs.unix(firstEpisodeDateTime).toDate(),
         timeZone: 'Asia/Shanghai',
         alarms: [
             { relativeOffset: -5 }, // 提前10分钟通知
