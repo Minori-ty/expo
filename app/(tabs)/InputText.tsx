@@ -18,7 +18,13 @@ function TextInput(props: TextInputProps) {
 
 export default function AwareScrollView() {
     return (
-        <KeyboardAwareScrollView bottomOffset={50} style={styles.container} contentContainerStyle={styles.content}>
+        <KeyboardAwareScrollView
+            bottomOffset={0}
+            style={styles.container}
+            contentContainerStyle={styles.content}
+            showsVerticalScrollIndicator={false}
+            keyboardShouldPersistTaps="handled"
+        >
             {new Array(20).fill(0).map((_, i) => (
                 <TextInput key={i} placeholder={`TextInput#${i}`} keyboardType={i % 2 === 0 ? 'numeric' : 'default'} />
             ))}
