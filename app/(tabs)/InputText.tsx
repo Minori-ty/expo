@@ -1,49 +1,48 @@
 import React from 'react'
-import { Animated, StyleSheet, TextInput, View } from 'react-native'
-import { useKeyboardAnimation } from 'react-native-keyboard-controller'
+import { StyleSheet, TextInputProps, TextInput as TextInputRN } from 'react-native'
+import { KeyboardAwareScrollView } from 'react-native-keyboard-controller'
+
+function TextInput(props: TextInputProps) {
+    return (
+        <TextInputRN
+            placeholderTextColor="#6c6c6c"
+            style={styles.textInput}
+            multiline
+            numberOfLines={2}
+            testID={props.placeholder}
+            {...props}
+            placeholder={`${props.placeholder} (${props.keyboardType === 'default' ? 'text' : 'numeric'})`}
+        />
+    )
+}
+
+export default function AwareScrollView() {
+    return (
+        <KeyboardAwareScrollView bottomOffset={50} style={styles.container} contentContainerStyle={styles.content}>
+            {new Array(20).fill(0).map((_, i) => (
+                <TextInput key={i} placeholder={`TextInput#${i}`} keyboardType={i % 2 === 0 ? 'numeric' : 'default'} />
+            ))}
+        </KeyboardAwareScrollView>
+    )
+}
 
 const styles = StyleSheet.create({
     container: {
-        flex: 1,
-        alignItems: 'center',
-        justifyContent: 'flex-end',
+        paddingHorizontal: 16,
     },
-    row: {
-        flexDirection: 'row',
+    content: {
+        paddingTop: 50,
+    },
+    textInput: {
+        width: '100%',
+        minHeight: 50,
+        maxHeight: 200,
+        // marginBottom: 50,
+        borderColor: 'black',
+        borderWidth: 2,
+        marginRight: 160,
+        borderRadius: 10,
+        color: 'black',
+        paddingHorizontal: 12,
     },
 })
-
-export default function KeyboardAnimation() {
-    // 1. we need to use hook to get an access to animated values
-    const { height, progress } = useKeyboardAnimation()
-
-    const scale = progress.interpolate({
-        inputRange: [0, 1],
-        outputRange: [1, 2],
-    })
-
-    return (
-        <View style={styles.container}>
-            <View style={styles.row}>
-                <Animated.View
-                    style={{
-                        width: 50,
-                        height: 50,
-                        backgroundColor: '#17fc03',
-                        borderRadius: 15,
-                        // 2. we can apply any transformations we want
-                        transform: [{ translateY: height }, { scale }],
-                    }}
-                />
-            </View>
-            <TextInput
-                style={{
-                    width: '100%',
-                    marginTop: 50,
-                    height: 50,
-                    backgroundColor: 'yellow',
-                }}
-            />
-        </View>
-    )
-}
