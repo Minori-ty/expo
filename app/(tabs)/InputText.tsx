@@ -1,5 +1,7 @@
-import React, { useEffect, useState } from 'react'
-import { Dimensions, Keyboard, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native'
+import { useFocusEffect } from 'expo-router'
+import React, { useCallback, useEffect, useState } from 'react'
+import { Keyboard, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native'
+import { AvoidSoftInput } from 'react-native-avoid-softinput'
 
 export default function InputText() {
     const [keyboardHeight, setKeyboardHeight] = useState(0)
@@ -18,11 +20,17 @@ export default function InputText() {
         }
     }, [])
 
-    const screenWidth = Dimensions.get('window').width
-    const screenHeight = Dimensions.get('window').height
+    const onFocusEffect = useCallback(() => {
+        AvoidSoftInput.setEnabled(true)
+        return () => {
+            // This should be run when screen loses focus - disable the module where it's not needed, to make a cleanup
+            AvoidSoftInput.setEnabled(false)
+        }
+    }, [])
 
+    useFocusEffect(onFocusEffect)
     return (
-        <ScrollView style={{ width: screenWidth, height: screenHeight - keyboardHeight }}>
+        <ScrollView>
             <Text>InputText</Text>
             <View style={{ height: 500 }}></View>
             <TextInput style={[styles.input]} placeholder="请输入当前更新集数" keyboardType="numeric" />

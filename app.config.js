@@ -98,6 +98,15 @@ const config = {
                     calendarPermission: '申请获取日历权限，以便添加动漫更新事件',
                 },
             ],
+            [
+                'react-native-edge-to-edge',
+                {
+                    android: {
+                        parentTheme: 'Default',
+                        enforceNavigationBarContrast: false,
+                    },
+                },
+            ],
         ],
         experiments: {
             typedRoutes: true,
