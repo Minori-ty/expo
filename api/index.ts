@@ -87,6 +87,7 @@ export async function addAnime(
                 firstEpisodeDateTime,
                 lastEpisodeDateTime,
                 totalEpisode,
+                status,
             })
             if (calendarId) {
                 await tx.insert(calendarTable).values({ calendarId, animeId: animeData.id })
@@ -107,6 +108,7 @@ export async function addAnime(
                 firstEpisodeDateTime,
                 lastEpisodeDateTime,
                 totalEpisode,
+                status,
             })
             console.log('创建日历事件', calendarId)
 

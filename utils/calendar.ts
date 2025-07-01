@@ -1,3 +1,4 @@
+import { EStatus } from '@/db/schema'
 import { getCalendarPermission } from '@/permissions'
 import dayjs from 'dayjs'
 import * as Calendar from 'expo-calendar'
@@ -7,12 +8,14 @@ export async function createCalendarEvent({
     firstEpisodeDateTime,
     totalEpisode,
     currentEpisode,
+    status,
 }: {
     name: string
     currentEpisode: number
     firstEpisodeDateTime: number
     lastEpisodeDateTime: number
     totalEpisode: number
+    status: EStatus
 }) {
     // 先获取日历权限
     const granted = await getCalendarPermission()
@@ -30,12 +33,21 @@ export async function createCalendarEvent({
     const weekday = day.isoWeekday()
     const hours = day.hour()
     const minutes = day.minute()
+    const startDate =
+        status === EStatus.ONGOING
+            ? dayjs().isoWeekday(weekday).hour(hours).minute(minutes).toDate()
+            : dayjs.unix(firstEpisodeDateTime).toDate()
+    const endDate =
+        status === EStatus.ONGOING
+            ? dayjs().isoWeekday(weekday).hour(hours).minute(minutes).add(24, 'minute').toDate()
+            : dayjs.unix(firstEpisodeDateTime).add(24, 'minute').toDate()
+
     // 解析输入的时间字符串
     try {
         const eventId = await Calendar.createEventAsync(defaultCalendar.id, {
             title: `${name} 即将更新!`,
-            startDate: dayjs().isoWeekday(weekday).hour(hours).minute(minutes).toDate(),
-            endDate: dayjs().isoWeekday(weekday).hour(hours).minute(minutes).toDate(),
+            startDate,
+            endDate,
             timeZone: 'Asia/Shanghai',
             alarms: [
                 { relativeOffset: -5 }, // 提前10分钟通知
