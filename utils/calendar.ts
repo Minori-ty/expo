@@ -34,13 +34,11 @@ export async function createCalendarEvent({
     const hours = day.hour()
     const minutes = day.minute()
     const startDate =
-        status === EStatus.ONGOING
-            ? dayjs().isoWeekday(weekday).hour(hours).minute(minutes).toDate()
-            : dayjs.unix(firstEpisodeDateTime).toDate()
+        status === EStatus.ONGOING ? dayjs().isoWeekday(weekday).hour(hours).minute(minutes).toDate() : day.toDate()
     const endDate =
         status === EStatus.ONGOING
             ? dayjs().isoWeekday(weekday).hour(hours).minute(minutes).add(24, 'minute').toDate()
-            : dayjs.unix(firstEpisodeDateTime).add(24, 'minute').toDate()
+            : day.add(24, 'minute').toDate()
 
     // 解析输入的时间字符串
     try {
