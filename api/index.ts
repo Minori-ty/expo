@@ -71,9 +71,10 @@ export async function addAnime(
         /** 插入后返回的数据 */
         const animeData = returning[0]
         const { id, name, currentEpisode, lastEpisodeDateTime, firstEpisodeDateTime, totalEpisode } = animeData
+        /** 本周开始的时间 */
         const dayStartTimestamp = dayjs().hour(0).minute(0).second(0).millisecond(0).unix()
         if (status === EStatus.ONGOING) {
-            const schedule = await tx
+            await tx
                 .insert(schduleTable)
                 .values({
                     animeId: id,
@@ -88,8 +89,9 @@ export async function addAnime(
                 totalEpisode,
             })
             if (calendarId) {
-                await tx.insert(calendarTable).values({ calendarId, scheduleId: schedule[0].id, animeId: animeData.id })
+                await tx.insert(calendarTable).values({ calendarId, animeId: animeData.id })
             }
+            // 虽然完结了，但是是在本周内完结的，也要插入到更新表中
         } else if (status === EStatus.COMPLETED && lastEpisodeDateTime > dayStartTimestamp) {
             await tx.insert(schduleTable).values({
                 animeId: id,
@@ -98,24 +100,19 @@ export async function addAnime(
             await tx.insert(upcomingTable).values({
                 animeId: id,
             })
-            const returning = await tx.select().from(schduleTable).where(eq(schduleTable.animeId, id))
-            if (returning.length > 0) {
-                const calendarId = await createCalendarEvent({
-                    name,
-                    currentEpisode,
-                    firstEpisodeDateTime,
-                    lastEpisodeDateTime,
-                    totalEpisode,
-                })
-                if (calendarId) {
-                    try {
-                        await tx
-                            .insert(calendarTable)
-                            .values({ calendarId, scheduleId: returning[0].id, animeId: animeData.id })
-                    } catch {
-                        deleteCalendarEvent(calendarId)
-                    }
-                }
+
+            const calendarId = await createCalendarEvent({
+                name,
+                currentEpisode,
+                firstEpisodeDateTime,
+                lastEpisodeDateTime,
+                totalEpisode,
+            })
+            console.log('创建日历事件', calendarId)
+
+            if (calendarId) {
+                await tx.insert(calendarTable).values({ calendarId, animeId: animeData.id })
+                console.log('插入日历表')
             }
         }
         return animeData

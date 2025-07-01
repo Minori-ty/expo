@@ -87,11 +87,8 @@ export const upcomingTable = sqliteTable('upcoming', {
 
 export const calendarTable = sqliteTable('calendar', {
     id: integer('id').primaryKey({ autoIncrement: true }).notNull(),
-    scheduleId: integer('schdule_id')
-        .notNull()
-        .references(() => schduleTable.id, { onDelete: 'cascade' }),
     animeId: integer('anime_id')
         .notNull()
-        .references(() => animeTable.id),
+        .references(() => animeTable.id, { onDelete: 'cascade' }),
     calendarId: text('calendar_id').notNull(),
 })
