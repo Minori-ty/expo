@@ -98,18 +98,24 @@ export async function addAnime(
             await tx.insert(upcomingTable).values({
                 animeId: id,
             })
-            const returning = await tx.select().from(schduleTable).where(eq(schduleTable.id, id))
-            const calendarId = await createCalendarEvent({
-                name,
-                currentEpisode,
-                firstEpisodeDateTime,
-                lastEpisodeDateTime,
-                totalEpisode,
-            })
-            if (calendarId) {
-                await tx
-                    .insert(calendarTable)
-                    .values({ calendarId, scheduleId: returning[0].id, animeId: animeData.id })
+            const returning = await tx.select().from(schduleTable).where(eq(schduleTable.animeId, id))
+            if (returning.length > 0) {
+                const calendarId = await createCalendarEvent({
+                    name,
+                    currentEpisode,
+                    firstEpisodeDateTime,
+                    lastEpisodeDateTime,
+                    totalEpisode,
+                })
+                if (calendarId) {
+                    try {
+                        await tx
+                            .insert(calendarTable)
+                            .values({ calendarId, scheduleId: returning[0].id, animeId: animeData.id })
+                    } catch {
+                        deleteCalendarEvent(calendarId)
+                    }
+                }
             }
         }
         return animeData
