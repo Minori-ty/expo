@@ -136,7 +136,7 @@ function AnimeForm() {
             totalEpisode: 13,
             cover: 'http://lz.sinaimg.cn/large/8a65eec0gy1i295k5s0evj207i0al424.jpg',
             status: EStatus.ONGOING,
-            firstEpisodeDateTime: '',
+            firstEpisodeDateTime: '2025-07-08',
         },
     })
 
@@ -155,6 +155,9 @@ function AnimeForm() {
             reset()
             router.back()
         },
+        onError: (err) => {
+            alert(err)
+        },
     })
 
     const onSubmit: SubmitHandler<v4.infer<typeof insertAnimeData>> = async (data) => {
@@ -168,10 +171,13 @@ function AnimeForm() {
             updateWeekday,
             firstEpisodeDateTime,
         } = data
-        console.log(data)
 
         if (status === EStatus.ONGOING) {
-            addAnimeMution({ cover, currentEpisode, name, status, totalEpisode, updateTimeHHmm, updateWeekday })
+            try {
+                addAnimeMution({ cover, currentEpisode, name, status, totalEpisode, updateTimeHHmm, updateWeekday })
+            } catch (err) {
+                alert(err)
+            }
         } else {
             const firstEpisodeDateTimeTimestamp = dayjs(`${firstEpisodeDateTime} ${updateTimeHHmm}`).unix()
             addAnimeMution({

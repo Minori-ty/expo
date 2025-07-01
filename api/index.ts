@@ -98,7 +98,7 @@ export async function addAnime(
             await tx.insert(upcomingTable).values({
                 animeId: id,
             })
-            const returning = await tx.select().from(schduleTable).where(eq(animeTable.id, id))
+            const returning = await tx.select().from(schduleTable).where(eq(schduleTable.id, id))
             const calendarId = await createCalendarEvent({
                 name,
                 currentEpisode,
