@@ -17,6 +17,7 @@ import * as Notifications from 'expo-notifications'
 import * as SplashScreen from 'expo-splash-screen'
 import { useEffect } from 'react'
 import { Text } from 'react-native'
+import { KeyboardProvider } from 'react-native-keyboard-controller'
 
 Notifications.setNotificationHandler({
     handleNotification: async () => ({
@@ -56,14 +57,16 @@ export default function RootLayout() {
     }
 
     return (
-        <QueryClientProvider client={queryClient}>
-            <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-                <Stack>
-                    <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-                    <Stack.Screen name="+not-found" />
-                </Stack>
-                <StatusBar style="auto" />
-            </ThemeProvider>
-        </QueryClientProvider>
+        <KeyboardProvider>
+            <QueryClientProvider client={queryClient}>
+                <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
+                    <Stack>
+                        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+                        <Stack.Screen name="+not-found" />
+                    </Stack>
+                    <StatusBar style="auto" />
+                </ThemeProvider>
+            </QueryClientProvider>
+        </KeyboardProvider>
     )
 }
