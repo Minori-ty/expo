@@ -14,7 +14,6 @@ import { QueryClientProvider } from '@tanstack/react-query'
 import { useMigrations } from 'drizzle-orm/expo-sqlite/migrator'
 import { useDrizzleStudio } from 'expo-drizzle-studio-plugin'
 import * as Notifications from 'expo-notifications'
-import * as SplashScreen from 'expo-splash-screen'
 import { useEffect } from 'react'
 import { Text } from 'react-native'
 import { KeyboardProvider } from 'react-native-keyboard-controller'
@@ -39,7 +38,6 @@ export default function RootLayout() {
     useEffect(() => {
         getNotificationPermission()
         getCalendarPermission()
-        SplashScreen.hideAsync()
         registerBackgroundTask()
         refreshScheduleAndCalendar()
     }, [])

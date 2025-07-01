@@ -53,8 +53,6 @@
         "react-dom": "19.0.0",
         "react-hook-form": "^7.59.0",
         "react-native": "0.79.4",
-        "react-native-avoid-softinput": "^7.0.2",
-        "react-native-edge-to-edge": "^1.6.2",
         "react-native-gesture-handler": "2.26.0",
         "react-native-keyboard-controller": "^1.17.5",
         "react-native-pager-view": "6.8.1",
