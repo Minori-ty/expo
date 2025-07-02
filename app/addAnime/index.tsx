@@ -408,7 +408,7 @@ const styles = StyleSheet.create({
         paddingLeft: 10,
         fontSize: 16,
         height: 40, // 固定高度
-        lineHeight: 36,
+        lineHeight: 32,
         textAlignVertical: 'bottom',
         ...Platform.select({
             android: {
