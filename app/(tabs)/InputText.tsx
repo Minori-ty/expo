@@ -1,6 +1,7 @@
 import { BottomSheetModal, BottomSheetModalProvider, BottomSheetView } from '@gorhom/bottom-sheet'
+import dayjs from 'dayjs'
 import { useCallback, useRef, useState } from 'react'
-import { Button, StyleSheet, TouchableOpacity } from 'react-native'
+import { Button, StyleSheet, Text, TouchableOpacity } from 'react-native'
 import { GestureHandlerRootView } from 'react-native-gesture-handler'
 import DateTimePicker, { DateType, useDefaultStyles } from 'react-native-ui-datepicker'
 
@@ -28,6 +29,7 @@ export default function BottomSheetScreen() {
 
     return (
         <GestureHandlerRootView style={styles.container}>
+            <Text>{date && dayjs(date).format('YYYY-MM-DD HH:mm')}</Text>
             <BottomSheetModalProvider>
                 <Button onPress={handlePresentModalPress} title="Present Modal" />
                 <BottomSheetModal
