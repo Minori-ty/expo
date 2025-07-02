@@ -8,7 +8,7 @@ import { useMutation } from '@tanstack/react-query'
 import dayjs from 'dayjs'
 import { router, useNavigation } from 'expo-router'
 import React, { useEffect, useState } from 'react'
-import { Controller, SubmitHandler, useForm } from 'react-hook-form'
+import { Controller, FieldErrors, useForm } from 'react-hook-form'
 import {
     Button,
     Keyboard,
@@ -20,8 +20,7 @@ import {
     TextInput,
     View,
 } from 'react-native'
-import { z, ZodIssueCode } from 'zod'
-import { z as v4 } from 'zod/v4'
+import { z, ZodIssueCode, ZodTypeAny } from 'zod'
 
 export const insertAnimeData = insertAnimeSchema
     .omit({ id: true, createdAt: true, lastEpisodeDateTime: true, firstEpisodeDateTime: true })
@@ -56,7 +55,7 @@ const baseScheme = z.object({
     cover: z.string().url('请输入有效的URL'),
 })
 
-function createSchema(status: EStatus) {
+function createSchema(status: EStatus): ZodTypeAny {
     let dynamicFields: z.ZodRawShape = {}
     if (status === EStatus.ONGOING) {
         dynamicFields = {
@@ -110,6 +109,23 @@ function createSchema(status: EStatus) {
     return baseScheme
 }
 
+interface IBaseFormData {
+    name: string
+    status: EStatus
+    updateTimeHHmm: string
+    totalEpisode: number
+    cover: string
+}
+
+type TOngoingForm = IBaseFormData & {
+    updateWeekday: number
+    currentEpisode: number
+}
+
+type ICompleteForm = IBaseFormData & {
+    firstEpisodeDateTime: string
+}
+
 export type TFormData = z.infer<ReturnType<typeof createSchema>>
 function AnimeForm() {
     const navigation = useNavigation()
@@ -126,7 +142,7 @@ function AnimeForm() {
         handleSubmit,
         formState: { errors },
         reset,
-    } = useForm<v4.infer<typeof insertAnimeData>>({
+    } = useForm<TOngoingForm | ICompleteForm>({
         resolver: zodResolver(formSchema),
         defaultValues: {
             name: '章鱼哔的原罪',
@@ -160,25 +176,14 @@ function AnimeForm() {
         },
     })
 
-    const onSubmit: SubmitHandler<v4.infer<typeof insertAnimeData>> = async (data) => {
-        const {
-            cover,
-            currentEpisode,
-            name,
-            status,
-            totalEpisode,
-            updateTimeHHmm,
-            updateWeekday,
-            firstEpisodeDateTime,
-        } = data
+    function hasFirstEpisodeDateTime(data: TOngoingForm | ICompleteForm): data is ICompleteForm {
+        return 'firstEpisodeDateTime' in data
+    }
 
-        if (status === EStatus.ONGOING) {
-            try {
-                addAnimeMution({ cover, currentEpisode, name, status, totalEpisode, updateTimeHHmm, updateWeekday })
-            } catch (err) {
-                alert(err)
-            }
-        } else {
+    const onSubmit = async (data: TOngoingForm | ICompleteForm) => {
+        const { cover, name, status, totalEpisode, updateTimeHHmm } = data
+        if (hasFirstEpisodeDateTime(data)) {
+            const { firstEpisodeDateTime } = data
             const firstEpisodeDateTimeTimestamp = dayjs(`${firstEpisodeDateTime} ${updateTimeHHmm}`).unix()
             addAnimeMution({
                 cover,
@@ -188,6 +193,9 @@ function AnimeForm() {
                 updateTimeHHmm,
                 firstEpisodeDateTime: firstEpisodeDateTimeTimestamp,
             })
+        } else {
+            const { currentEpisode, updateWeekday } = data
+            addAnimeMution({ cover, currentEpisode, name, status, totalEpisode, updateTimeHHmm, updateWeekday })
         }
     }
     const weekdays = [
@@ -222,6 +230,14 @@ function AnimeForm() {
         { label: '连载中', value: 2 },
         { label: '即将更新', value: 3 },
     ]
+
+    function isOngoingErrors(errors: FieldErrors<TOngoingForm | ICompleteForm>): errors is FieldErrors<TOngoingForm> {
+        return 'updateWeekday' in errors || 'currentEpisode' in errors
+    }
+
+    function isCompleteErrors(errors: FieldErrors<TOngoingForm | ICompleteForm>): errors is FieldErrors<ICompleteForm> {
+        return 'firstEpisodeDateTime' in errors
+    }
     return (
         <KeyboardAvoidingView style={[styles.container]} behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
             <ScrollView keyboardShouldPersistTaps="handled" style={[styles.scrollView]}>
@@ -270,14 +286,19 @@ function AnimeForm() {
                             render={({ field }) => (
                                 <TextInput
                                     {...field}
-                                    style={[styles.input, errors.firstEpisodeDateTime && styles.errorInput]}
+                                    style={[
+                                        styles.input,
+                                        isCompleteErrors(errors) && errors.firstEpisodeDateTime && styles.errorInput,
+                                    ]}
                                     placeholder="例如: 2025-05-15"
                                     onChangeText={field.onChange}
                                     value={field.value}
                                 />
                             )}
                         />
-                        {errors.firstEpisodeDateTime && <ErrorMessage error={errors.firstEpisodeDateTime} />}
+                        {isCompleteErrors(errors) && errors.firstEpisodeDateTime && (
+                            <ErrorMessage error={errors.firstEpisodeDateTime} />
+                        )}
                     </View>
                 )}
                 {status === 2 && (
@@ -290,7 +311,10 @@ function AnimeForm() {
                                 <Picker
                                     {...field}
                                     selectedValue={field.value}
-                                    style={[styles.picker, errors.updateWeekday && styles.errorInput]}
+                                    style={[
+                                        styles.picker,
+                                        isOngoingErrors(errors) && errors.updateWeekday && styles.errorInput,
+                                    ]}
                                     onValueChange={field.onChange}
                                 >
                                     {weekdays.map((day) => (
@@ -299,7 +323,9 @@ function AnimeForm() {
                                 </Picker>
                             )}
                         />
-                        {errors.updateWeekday && <ErrorMessage error={errors.updateWeekday} />}
+                        {isOngoingErrors(errors) && errors.updateWeekday && (
+                            <ErrorMessage error={errors.updateWeekday} />
+                        )}
                     </View>
                 )}
                 <View style={styles.formGroup}>
@@ -329,7 +355,10 @@ function AnimeForm() {
                             render={({ field }) => (
                                 <TextInput
                                     {...field}
-                                    style={[styles.input, errors.currentEpisode && styles.errorInput]}
+                                    style={[
+                                        styles.input,
+                                        isOngoingErrors(errors) && errors.currentEpisode && styles.errorInput,
+                                    ]}
                                     placeholder="请输入当前更新集数"
                                     keyboardType="numeric"
                                     onChangeText={(text) => field.onChange(parseInt(text) || 0)}
@@ -337,7 +366,9 @@ function AnimeForm() {
                                 />
                             )}
                         />
-                        {errors.currentEpisode && <ErrorMessage error={errors.currentEpisode} />}
+                        {isOngoingErrors(errors) && errors.currentEpisode && (
+                            <ErrorMessage error={errors.currentEpisode} />
+                        )}
                     </View>
                 )}
                 <View style={styles.formGroup}>
@@ -408,8 +439,8 @@ const styles = StyleSheet.create({
         paddingLeft: 10,
         fontSize: 16,
         height: 40, // 固定高度
-        lineHeight: 32,
-        textAlignVertical: 'bottom',
+        textAlignVertical: 'center',
+        lineHeight: 26,
         ...Platform.select({
             android: {
                 paddingTop: 0,
