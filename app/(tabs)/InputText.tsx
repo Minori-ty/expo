@@ -1,74 +1,83 @@
-import CustomModal from '@/components/CustomModal'
-import React, { useState } from 'react'
-import { StyleSheet, TextInputProps, TextInput as TextInputRN, View } from 'react-native'
-import { KeyboardAwareScrollView } from 'react-native-keyboard-controller'
+import { BottomSheetModal, BottomSheetModalProvider, BottomSheetView } from '@gorhom/bottom-sheet'
+import { useCallback, useRef, useState } from 'react'
+import { Button, StyleSheet, TouchableOpacity } from 'react-native'
+import { GestureHandlerRootView } from 'react-native-gesture-handler'
 import DateTimePicker, { DateType, useDefaultStyles } from 'react-native-ui-datepicker'
 
-function TextInput(props: TextInputProps) {
-    return (
-        <TextInputRN
-            placeholderTextColor="#6c6c6c"
-            style={styles.textInput}
-            multiline
-            numberOfLines={2}
-            testID={props.placeholder}
-            {...props}
-            placeholder={`${props.placeholder} (${props.keyboardType === 'default' ? 'text' : 'numeric'})`}
-        />
-    )
-}
-
-export default function AwareScrollView() {
+export default function BottomSheetScreen() {
     const defaultStyles = useDefaultStyles()
-    const [selected, setSelected] = useState<DateType>()
+    const [date, setDate] = useState<DateType>()
+    const bottomSheetModalRef = useRef<BottomSheetModal>(null)
+    const [dates, setDates] = useState<DateType[]>()
+    const [range, setRange] = useState<{
+        startDate: DateType
+        endDate: DateType
+    }>({ startDate: undefined, endDate: undefined })
+
+    const handlePresentModalPress = useCallback(() => {
+        bottomSheetModalRef.current?.present()
+    }, [])
+
+    const handleClose = () => {
+        bottomSheetModalRef.current?.close()
+    }
+
+    // const handleSheetChanges = useCallback((index: number) => {
+    //   console.log('handleSheetChanges', index);
+    // }, []);
+
     return (
-        <KeyboardAwareScrollView
-            bottomOffset={0}
-            style={styles.container}
-            contentContainerStyle={styles.content}
-            showsVerticalScrollIndicator={false}
-            keyboardShouldPersistTaps="handled"
-        >
-            <CustomModal visible={true} onClose={() => {}}>
-                <View style={styles.panel}>
-                    <DateTimePicker
-                        mode="single"
-                        date={selected}
-                        onChange={({ date }) => setSelected(date)}
-                        styles={defaultStyles}
-                        timePicker={true}
-                    />
-                </View>
-            </CustomModal>
-        </KeyboardAwareScrollView>
+        <GestureHandlerRootView style={styles.container}>
+            <BottomSheetModalProvider>
+                <Button onPress={handlePresentModalPress} title="Present Modal" />
+                <BottomSheetModal
+                    ref={bottomSheetModalRef}
+                    enableContentPanningGesture={false}
+                    backdropComponent={() => (
+                        <TouchableOpacity
+                            activeOpacity={1}
+                            style={styles.backdrop}
+                            onPress={() => {
+                                handleClose()
+                            }}
+                        />
+                    )}
+                    //onChange={handleSheetChanges}
+                >
+                    <BottomSheetView style={styles.contentContainer}>
+                        <DateTimePicker
+                            styles={defaultStyles}
+                            mode="single"
+                            date={date}
+                            onChange={(params) => setDate(params.date)}
+                            firstDayOfWeek={6}
+                            multiRangeMode
+                            showOutsideDays
+                            timePicker
+                            //calendar="jalali"
+                            //locale="en"
+                            //numerals="arabext"
+                        />
+                    </BottomSheetView>
+                </BottomSheetModal>
+            </BottomSheetModalProvider>
+        </GestureHandlerRootView>
     )
 }
 
 const styles = StyleSheet.create({
     container: {
-        paddingHorizontal: 16,
+        flex: 1,
+        alignItems: 'center',
+        justifyContent: 'center',
     },
-    content: {
-        paddingTop: 50,
+    contentContainer: {
+        flex: 1,
+        paddingHorizontal: 30,
+        height: 400,
     },
-    textInput: {
-        width: '100%',
-        minHeight: 50,
-        maxHeight: 200,
-        // marginBottom: 50,
-        borderColor: 'black',
-        borderWidth: 2,
-        marginRight: 160,
-        borderRadius: 10,
-        color: 'black',
-        paddingHorizontal: 12,
-    },
-    panel: {
-        width: 300,
-        height: 350,
-        backgroundColor: 'white',
-        paddingTop: 10,
-        paddingHorizontal: 10,
-        borderRadius: 10,
+    backdrop: {
+        ...StyleSheet.absoluteFillObject,
+        backgroundColor: 'rgba(0, 0, 0, 0.5)',
     },
 })
