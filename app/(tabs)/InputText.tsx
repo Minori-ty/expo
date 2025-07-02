@@ -1,6 +1,8 @@
-import React from 'react'
-import { StyleSheet, TextInputProps, TextInput as TextInputRN } from 'react-native'
+import CustomModal from '@/components/CustomModal'
+import React, { useState } from 'react'
+import { StyleSheet, TextInputProps, TextInput as TextInputRN, View } from 'react-native'
 import { KeyboardAwareScrollView } from 'react-native-keyboard-controller'
+import DateTimePicker, { DateType, useDefaultStyles } from 'react-native-ui-datepicker'
 
 function TextInput(props: TextInputProps) {
     return (
@@ -17,6 +19,8 @@ function TextInput(props: TextInputProps) {
 }
 
 export default function AwareScrollView() {
+    const defaultStyles = useDefaultStyles()
+    const [selected, setSelected] = useState<DateType>()
     return (
         <KeyboardAwareScrollView
             bottomOffset={0}
@@ -25,9 +29,17 @@ export default function AwareScrollView() {
             showsVerticalScrollIndicator={false}
             keyboardShouldPersistTaps="handled"
         >
-            {new Array(20).fill(0).map((_, i) => (
-                <TextInput key={i} placeholder={`TextInput#${i}`} keyboardType={i % 2 === 0 ? 'numeric' : 'default'} />
-            ))}
+            <CustomModal visible={true} onClose={() => {}}>
+                <View style={styles.panel}>
+                    <DateTimePicker
+                        mode="single"
+                        date={selected}
+                        onChange={({ date }) => setSelected(date)}
+                        styles={defaultStyles}
+                        timePicker={true}
+                    />
+                </View>
+            </CustomModal>
         </KeyboardAwareScrollView>
     )
 }
@@ -50,5 +62,13 @@ const styles = StyleSheet.create({
         borderRadius: 10,
         color: 'black',
         paddingHorizontal: 12,
+    },
+    panel: {
+        width: 300,
+        height: 350,
+        backgroundColor: 'white',
+        paddingTop: 10,
+        paddingHorizontal: 10,
+        borderRadius: 10,
     },
 })

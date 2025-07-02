@@ -1,7 +1,7 @@
 {
     "name": "app",
     "main": "expo-router/entry",
-    "version": "0.0.8",
+    "version": "0.0.9",
     "scripts": {
         "start": "expo start",
         "reset-project": "node ./scripts/reset-project.js",
@@ -60,6 +60,7 @@
         "react-native-safe-area-context": "5.5.0",
         "react-native-screens": "^4.11.1",
         "react-native-tab-view": "^4.1.2",
+        "react-native-ui-datepicker": "^3.1.2",
         "zod": "^3.25.67"
     },
     "devDependencies": {
