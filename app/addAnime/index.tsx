@@ -406,11 +406,10 @@ const styles = StyleSheet.create({
         borderRadius: 4,
         padding: 0,
         paddingLeft: 10,
-        alignItems: 'center',
         fontSize: 16,
         height: 40, // 固定高度
-        lineHeight: 16,
-        textAlignVertical: 'bottom',
+        lineHeight: 24,
+        textAlignVertical: 'center',
         ...Platform.select({
             android: {
                 paddingTop: 0,
