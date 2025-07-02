@@ -277,7 +277,7 @@ function AnimeForm() {
                         )}
                     />
                 </View>
-                {isCompleteErrors(errors) && (
+                {status !== 2 && (
                     <View style={styles.formGroup}>
                         <Text style={styles.label}>首播时间</Text>
                         <Controller
@@ -286,17 +286,22 @@ function AnimeForm() {
                             render={({ field }) => (
                                 <TextInput
                                     {...field}
-                                    style={[styles.input, errors.firstEpisodeDateTime && styles.errorInput]}
+                                    style={[
+                                        styles.input,
+                                        isCompleteErrors(errors) && errors.firstEpisodeDateTime && styles.errorInput,
+                                    ]}
                                     placeholder="例如: 2025-05-15"
                                     onChangeText={field.onChange}
                                     value={field.value}
                                 />
                             )}
                         />
-                        {errors.firstEpisodeDateTime && <ErrorMessage error={errors.firstEpisodeDateTime} />}
+                        {isCompleteErrors(errors) && errors.firstEpisodeDateTime && (
+                            <ErrorMessage error={errors.firstEpisodeDateTime} />
+                        )}
                     </View>
                 )}
-                {isOngoingErrors(errors) && (
+                {status === 2 && (
                     <View style={styles.formGroup}>
                         <Text style={styles.label}>更新周</Text>
                         <Controller
@@ -306,7 +311,10 @@ function AnimeForm() {
                                 <Picker
                                     {...field}
                                     selectedValue={field.value}
-                                    style={[styles.picker, errors.updateWeekday && styles.errorInput]}
+                                    style={[
+                                        styles.picker,
+                                        isOngoingErrors(errors) && errors.updateWeekday && styles.errorInput,
+                                    ]}
                                     onValueChange={field.onChange}
                                 >
                                     {weekdays.map((day) => (
@@ -315,7 +323,9 @@ function AnimeForm() {
                                 </Picker>
                             )}
                         />
-                        {errors.updateWeekday && <ErrorMessage error={errors.updateWeekday} />}
+                        {isOngoingErrors(errors) && errors.updateWeekday && (
+                            <ErrorMessage error={errors.updateWeekday} />
+                        )}
                     </View>
                 )}
                 <View style={styles.formGroup}>
@@ -336,7 +346,7 @@ function AnimeForm() {
                     />
                     {errors.updateTimeHHmm && <ErrorMessage error={errors.updateTimeHHmm} />}
                 </View>
-                {isOngoingErrors(errors) && (
+                {status === EStatus.ONGOING && (
                     <View style={styles.formGroup}>
                         <Text style={styles.label}>当前更新集数</Text>
                         <Controller
@@ -345,7 +355,10 @@ function AnimeForm() {
                             render={({ field }) => (
                                 <TextInput
                                     {...field}
-                                    style={[styles.input, errors.currentEpisode && styles.errorInput]}
+                                    style={[
+                                        styles.input,
+                                        isOngoingErrors(errors) && errors.currentEpisode && styles.errorInput,
+                                    ]}
                                     placeholder="请输入当前更新集数"
                                     keyboardType="numeric"
                                     onChangeText={(text) => field.onChange(parseInt(text) || 0)}
@@ -353,7 +366,9 @@ function AnimeForm() {
                                 />
                             )}
                         />
-                        {errors.currentEpisode && <ErrorMessage error={errors.currentEpisode} />}
+                        {isOngoingErrors(errors) && errors.currentEpisode && (
+                            <ErrorMessage error={errors.currentEpisode} />
+                        )}
                     </View>
                 )}
                 <View style={styles.formGroup}>
