@@ -2,6 +2,20 @@ import { EStatus } from '@/db/schema'
 import { getCalendarPermission } from '@/permissions'
 import dayjs from 'dayjs'
 import * as Calendar from 'expo-calendar'
+import { isCurrentWeekdayUpdateTimePassed } from './timeCalculation'
+
+function getstartDate(firstEpisodeDateTime: number, status: EStatus) {
+    const day = dayjs.unix(firstEpisodeDateTime)
+    const weekday = day.isoWeekday()
+    const hours = day.hour()
+    const minutes = day.minute()
+
+    const firstDateTime = status === EStatus.ONGOING ? dayjs().isoWeekday(weekday).hour(hours).minute(minutes) : day
+    if (isCurrentWeekdayUpdateTimePassed(day.format('HH:mm'), weekday)) {
+        return firstDateTime.add(7, 'day').toDate()
+    }
+    return firstDateTime.toDate()
+}
 
 export async function createCalendarEvent({
     name,
@@ -33,8 +47,7 @@ export async function createCalendarEvent({
     const weekday = day.isoWeekday()
     const hours = day.hour()
     const minutes = day.minute()
-    const startDate =
-        status === EStatus.ONGOING ? dayjs().isoWeekday(weekday).hour(hours).minute(minutes).toDate() : day.toDate()
+    const startDate = getstartDate(firstEpisodeDateTime, status)
     const endDate =
         status === EStatus.ONGOING
             ? dayjs().isoWeekday(weekday).hour(hours).minute(minutes).add(24, 'minute').toDate()
