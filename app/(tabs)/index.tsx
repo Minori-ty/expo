@@ -9,7 +9,7 @@ import isoWeek from 'dayjs/plugin/isoWeek'
 import isSameOrBefore from 'dayjs/plugin/isSameOrBefore'
 import { Image } from 'expo-image'
 import { useRouter } from 'expo-router'
-import React, { createContext, useContext, useLayoutEffect, useState } from 'react'
+import React, { createContext, useContext, useEffect, useState } from 'react'
 import {
     Dimensions,
     ScrollView,
@@ -123,7 +123,7 @@ function EpisodeTip({ updateTimeHHmm, currentEpisode, updateWeekday }: IEpisodeT
 }
 
 export default function MyTabs() {
-    const [index, setIndex] = useState(dayjs().isoWeekday() - 1)
+    const [index, setIndex] = useState(0)
     const [routes] = useState([
         { key: 'monday', title: '周一' },
         { key: 'tuesday', title: '周二' },
@@ -144,7 +144,7 @@ export default function MyTabs() {
         queryFn: search,
     })
 
-    useLayoutEffect(() => {
+    useEffect(() => {
         setIndex(dayjs().isoWeekday() - 1)
     }, [])
 
