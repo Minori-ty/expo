@@ -9,43 +9,13 @@ import dayjs from 'dayjs'
 import { router, useNavigation } from 'expo-router'
 import React, { useEffect, useState } from 'react'
 import { Controller, FieldErrors, useForm } from 'react-hook-form'
-import {
-    Button,
-    Keyboard,
-    KeyboardAvoidingView,
-    Platform,
-    ScrollView,
-    StyleSheet,
-    Text,
-    TextInput,
-    View,
-} from 'react-native'
+import { Button, Platform, StyleSheet, Text, TextInput, View } from 'react-native'
+import { KeyboardAwareScrollView } from 'react-native-keyboard-controller'
 import { z, ZodIssueCode, ZodTypeAny } from 'zod'
 
 export const insertAnimeData = insertAnimeSchema
     .omit({ id: true, createdAt: true, lastEpisodeDateTime: true, firstEpisodeDateTime: true })
     .extend({ firstEpisodeDateTime: z.string() })
-
-// 表单验证规则
-const animeSchema = z
-    .object({
-        name: z.string().min(1, '请输入番剧名称'),
-        updateWeekday: z.coerce.number().int().min(1, '请选择更新周').max(7, '更新周必须在1-7之间'),
-        updateTimeHHmm: z.string().regex(/(0[0-9]|1[0-9]|2[0-3]):[0-5][0-9]/, '请输入正确的时间格式HH:mm'),
-        currentEpisode: z.coerce.number().min(1, '当前集数至少为1'),
-        totalEpisode: z.coerce.number().min(1, '总集数至少为1'),
-        cover: z.string().url('请输入有效的URL'),
-        status: z.number().int().min(1).max(3),
-    })
-    .superRefine((values, ctx) => {
-        if (values.totalEpisode < values.currentEpisode) {
-            ctx.addIssue({
-                code: ZodIssueCode.custom,
-                path: ['totalEpisode'],
-                message: '总集数不能小于当前集数',
-            })
-        }
-    })
 
 const baseScheme = z.object({
     name: z.string().min(1, '请输入番剧名称').max(20, '番剧名称长度不能超过20个字符'),
@@ -208,23 +178,6 @@ function AnimeForm() {
         { label: '周日', value: 7 },
     ]
 
-    // 处理键盘事件
-    const [keyboardHeight, setKeyboardHeight] = useState(0)
-
-    useEffect(() => {
-        const keyboardDidShowListener = Keyboard.addListener('keyboardDidShow', (e) => {
-            setKeyboardHeight(Math.max(e.endCoordinates.height - 150, 0))
-        })
-        const keyboardDidHideListener = Keyboard.addListener('keyboardDidHide', () => {
-            setKeyboardHeight(0)
-        })
-
-        return () => {
-            keyboardDidShowListener.remove()
-            keyboardDidHideListener.remove()
-        }
-    }, [])
-
     const options = [
         { label: '已完结', value: 1 },
         { label: '连载中', value: 2 },
@@ -239,177 +192,174 @@ function AnimeForm() {
         return 'firstEpisodeDateTime' in errors
     }
     return (
-        <KeyboardAvoidingView style={[styles.container]} behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
-            <ScrollView keyboardShouldPersistTaps="handled" style={[styles.scrollView]}>
+        // <KeyboardAvoidingView style={[styles.container]} behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
+        //     <ScrollView keyboardShouldPersistTaps="handled" style={[styles.scrollView]}>
+        <KeyboardAwareScrollView bottomOffset={50} style={styles.container} contentContainerStyle={styles.scrollView}>
+            <View style={styles.formGroup}>
+                <Text style={styles.label}>番剧名称</Text>
+                <Controller
+                    control={control}
+                    name="name"
+                    render={({ field }) => (
+                        <TextInput
+                            {...field}
+                            style={[styles.input, errors.name && styles.errorInput]}
+                            placeholder="请输入番剧名称"
+                            onChangeText={field.onChange}
+                            value={field.value}
+                        />
+                    )}
+                />
+                {errors.name && <ErrorMessage error={errors.name} />}
+            </View>
+            <View style={styles.formGroup}>
+                <Text style={styles.label}>更新状态</Text>
+                <Controller
+                    control={control}
+                    name="status"
+                    render={({ field }) => (
+                        <RadioGroup
+                            {...field}
+                            options={options}
+                            value={field.value}
+                            onChange={(val: EStatus) => {
+                                field.onChange(val)
+                                setStatus(val)
+                            }}
+                            style={styles.horizontalCenter}
+                        />
+                    )}
+                />
+            </View>
+            {status !== 2 && (
                 <View style={styles.formGroup}>
-                    <Text style={styles.label}>番剧名称</Text>
+                    <Text style={styles.label}>首播时间</Text>
                     <Controller
                         control={control}
-                        name="name"
+                        name="firstEpisodeDateTime"
                         render={({ field }) => (
                             <TextInput
                                 {...field}
-                                style={[styles.input, errors.name && styles.errorInput]}
-                                placeholder="请输入番剧名称"
+                                style={[
+                                    styles.input,
+                                    isCompleteErrors(errors) && errors.firstEpisodeDateTime && styles.errorInput,
+                                ]}
+                                placeholder="例如: 2025-05-15"
                                 onChangeText={field.onChange}
                                 value={field.value}
                             />
                         )}
                     />
-                    {errors.name && <ErrorMessage error={errors.name} />}
+                    {isCompleteErrors(errors) && errors.firstEpisodeDateTime && (
+                        <ErrorMessage error={errors.firstEpisodeDateTime} />
+                    )}
                 </View>
+            )}
+            {status === 2 && (
                 <View style={styles.formGroup}>
-                    <Text style={styles.label}>更新状态</Text>
+                    <Text style={styles.label}>更新周</Text>
                     <Controller
                         control={control}
-                        name="status"
+                        name="updateWeekday"
                         render={({ field }) => (
-                            <RadioGroup
+                            <Picker
                                 {...field}
-                                options={options}
-                                value={field.value}
-                                onChange={(val: EStatus) => {
-                                    field.onChange(val)
-                                    setStatus(val)
-                                }}
-                                style={styles.horizontalCenter}
-                            />
+                                selectedValue={field.value}
+                                style={[
+                                    styles.picker,
+                                    isOngoingErrors(errors) && errors.updateWeekday && styles.errorInput,
+                                ]}
+                                onValueChange={field.onChange}
+                            >
+                                {weekdays.map((day) => (
+                                    <Picker.Item label={day.label} value={day.value} key={day.value} />
+                                ))}
+                            </Picker>
                         )}
                     />
+                    {isOngoingErrors(errors) && errors.updateWeekday && <ErrorMessage error={errors.updateWeekday} />}
                 </View>
-                {status !== 2 && (
-                    <View style={styles.formGroup}>
-                        <Text style={styles.label}>首播时间</Text>
-                        <Controller
-                            control={control}
-                            name="firstEpisodeDateTime"
-                            render={({ field }) => (
-                                <TextInput
-                                    {...field}
-                                    style={[
-                                        styles.input,
-                                        isCompleteErrors(errors) && errors.firstEpisodeDateTime && styles.errorInput,
-                                    ]}
-                                    placeholder="例如: 2025-05-15"
-                                    onChangeText={field.onChange}
-                                    value={field.value}
-                                />
-                            )}
+            )}
+            <View style={styles.formGroup}>
+                <Text style={styles.label}>更新时间(HH:mm)</Text>
+                <Controller
+                    control={control}
+                    name="updateTimeHHmm"
+                    render={({ field }) => (
+                        <TextInput
+                            {...field}
+                            style={[styles.input, errors.updateTimeHHmm && styles.errorInput]}
+                            placeholder="例如: 12:00"
+                            keyboardType="numeric"
+                            onChangeText={field.onChange}
+                            value={field.value}
                         />
-                        {isCompleteErrors(errors) && errors.firstEpisodeDateTime && (
-                            <ErrorMessage error={errors.firstEpisodeDateTime} />
-                        )}
-                    </View>
-                )}
-                {status === 2 && (
-                    <View style={styles.formGroup}>
-                        <Text style={styles.label}>更新周</Text>
-                        <Controller
-                            control={control}
-                            name="updateWeekday"
-                            render={({ field }) => (
-                                <Picker
-                                    {...field}
-                                    selectedValue={field.value}
-                                    style={[
-                                        styles.picker,
-                                        isOngoingErrors(errors) && errors.updateWeekday && styles.errorInput,
-                                    ]}
-                                    onValueChange={field.onChange}
-                                >
-                                    {weekdays.map((day) => (
-                                        <Picker.Item label={day.label} value={day.value} key={day.value} />
-                                    ))}
-                                </Picker>
-                            )}
-                        />
-                        {isOngoingErrors(errors) && errors.updateWeekday && (
-                            <ErrorMessage error={errors.updateWeekday} />
-                        )}
-                    </View>
-                )}
+                    )}
+                />
+                {errors.updateTimeHHmm && <ErrorMessage error={errors.updateTimeHHmm} />}
+            </View>
+            {status === EStatus.ONGOING && (
                 <View style={styles.formGroup}>
-                    <Text style={styles.label}>更新时间(HH:mm)</Text>
+                    <Text style={styles.label}>当前更新集数</Text>
                     <Controller
                         control={control}
-                        name="updateTimeHHmm"
+                        name="currentEpisode"
                         render={({ field }) => (
                             <TextInput
                                 {...field}
-                                style={[styles.input, errors.updateTimeHHmm && styles.errorInput]}
-                                placeholder="例如: 12:00"
-                                keyboardType="numeric"
-                                onChangeText={field.onChange}
-                                value={field.value}
-                            />
-                        )}
-                    />
-                    {errors.updateTimeHHmm && <ErrorMessage error={errors.updateTimeHHmm} />}
-                </View>
-                {status === EStatus.ONGOING && (
-                    <View style={styles.formGroup}>
-                        <Text style={styles.label}>当前更新集数</Text>
-                        <Controller
-                            control={control}
-                            name="currentEpisode"
-                            render={({ field }) => (
-                                <TextInput
-                                    {...field}
-                                    style={[
-                                        styles.input,
-                                        isOngoingErrors(errors) && errors.currentEpisode && styles.errorInput,
-                                    ]}
-                                    placeholder="请输入当前更新集数"
-                                    keyboardType="numeric"
-                                    onChangeText={(text) => field.onChange(parseInt(text) || 0)}
-                                    value={field.value?.toString() || ''}
-                                />
-                            )}
-                        />
-                        {isOngoingErrors(errors) && errors.currentEpisode && (
-                            <ErrorMessage error={errors.currentEpisode} />
-                        )}
-                    </View>
-                )}
-                <View style={styles.formGroup}>
-                    <Text style={styles.label}>总集数</Text>
-                    <Controller
-                        control={control}
-                        name="totalEpisode"
-                        render={({ field }) => (
-                            <TextInput
-                                {...field}
-                                style={[styles.input, errors.totalEpisode && styles.errorInput]}
-                                placeholder="请输入总集数"
+                                style={[
+                                    styles.input,
+                                    isOngoingErrors(errors) && errors.currentEpisode && styles.errorInput,
+                                ]}
+                                placeholder="请输入当前更新集数"
                                 keyboardType="numeric"
                                 onChangeText={(text) => field.onChange(parseInt(text) || 0)}
                                 value={field.value?.toString() || ''}
                             />
                         )}
                     />
-                    {errors.totalEpisode && <ErrorMessage error={errors.totalEpisode} />}
+                    {isOngoingErrors(errors) && errors.currentEpisode && <ErrorMessage error={errors.currentEpisode} />}
                 </View>
-                <View style={styles.formGroup}>
-                    <Text style={styles.label}>封面URL</Text>
-                    <Controller
-                        control={control}
-                        name="cover"
-                        render={({ field }) => (
-                            <TextInput
-                                {...field}
-                                style={[styles.input, errors.cover && styles.errorInput]}
-                                placeholder="请输入封面图片URL"
-                                onChangeText={field.onChange}
-                                value={field.value}
-                            />
-                        )}
-                    />
-                    {errors.cover && <ErrorMessage error={errors.cover} />}
-                </View>
-                <Button title="提交" onPress={handleSubmit(onSubmit)} />
-                <View style={{ height: keyboardHeight }}></View>
-            </ScrollView>
-        </KeyboardAvoidingView>
+            )}
+            <View style={styles.formGroup}>
+                <Text style={styles.label}>总集数</Text>
+                <Controller
+                    control={control}
+                    name="totalEpisode"
+                    render={({ field }) => (
+                        <TextInput
+                            {...field}
+                            style={[styles.input, errors.totalEpisode && styles.errorInput]}
+                            placeholder="请输入总集数"
+                            keyboardType="numeric"
+                            onChangeText={(text) => field.onChange(parseInt(text) || 0)}
+                            value={field.value?.toString() || ''}
+                        />
+                    )}
+                />
+                {errors.totalEpisode && <ErrorMessage error={errors.totalEpisode} />}
+            </View>
+            <View style={styles.formGroup}>
+                <Text style={styles.label}>封面URL</Text>
+                <Controller
+                    control={control}
+                    name="cover"
+                    render={({ field }) => (
+                        <TextInput
+                            {...field}
+                            style={[styles.input, errors.cover && styles.errorInput]}
+                            placeholder="请输入封面图片URL"
+                            onChangeText={field.onChange}
+                            value={field.value}
+                        />
+                    )}
+                />
+                {errors.cover && <ErrorMessage error={errors.cover} />}
+            </View>
+            <Button title="提交" onPress={handleSubmit(onSubmit)} />
+        </KeyboardAwareScrollView>
+        //     </ScrollView>
+        // </KeyboardAvoidingView>
     )
 }
 

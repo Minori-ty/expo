@@ -211,6 +211,7 @@ const coverWidth = 70
 const styles = StyleSheet.create({
     safeArea: {
         flex: 1,
+        backgroundColor: '#fff',
     },
     tabViewBg: {
         backgroundColor: '#fff',

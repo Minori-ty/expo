@@ -85,27 +85,27 @@ function Schedual() {
                     ]}
                 />
                 {list.length > 0 ? <AnimeContainer list={list} /> : <Empty />}
-                <CustomModal visible={modalVisible} onClose={() => setModalVisible(false)}>
-                    <View style={styles.modalPanel} pointerEvents="box-none">
-                        <View>
-                            <Text style={styles.modalHeader}>确认删除</Text>
-                            <Text style={{ fontSize: 14 }}>你确定要删除 &quot;{animeData.name}&quot; 吗？</Text>
+            </SafeAreaView>
+            <CustomModal visible={modalVisible} onClose={() => setModalVisible(false)}>
+                <View style={styles.modalPanel} pointerEvents="box-none">
+                    <View>
+                        <Text style={styles.modalHeader}>确认删除</Text>
+                        <Text style={{ fontSize: 14 }}>你确定要删除 &quot;{animeData.name}&quot; 吗？</Text>
+                    </View>
+                    <View style={styles.modalFooter}>
+                        <View style={styles.modalButtonWrapper}>
+                            <Pressable onPress={() => setModalVisible(false)} style={styles.buttonWrapper}>
+                                <Text style={styles.modalButton}>取消</Text>
+                            </Pressable>
                         </View>
-                        <View style={styles.modalFooter}>
-                            <View style={styles.modalButtonWrapper}>
-                                <Pressable onPress={() => setModalVisible(false)}>
-                                    <Text style={styles.modalButton}>取消</Text>
-                                </Pressable>
-                            </View>
-                            <View style={styles.modalButtonWrapper}>
-                                <Pressable onPress={() => deleteItem()}>
-                                    <Text style={styles.modalButton}>删除</Text>
-                                </Pressable>
-                            </View>
+                        <View style={styles.modalButtonWrapper}>
+                            <Pressable onPress={() => deleteItem()} style={styles.buttonWrapper}>
+                                <Text style={styles.modalButton}>删除</Text>
+                            </Pressable>
                         </View>
                     </View>
-                </CustomModal>
-            </SafeAreaView>
+                </View>
+            </CustomModal>
         </ModalContext.Provider>
     )
 }
@@ -202,6 +202,7 @@ function UpdateLabel({ status }: IUpdateLabelProps) {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
+        backgroundColor: '#fff',
     },
     emptyContainer: {
         flex: 1,
@@ -255,6 +256,12 @@ const styles = StyleSheet.create({
         fontSize: 14,
     },
     modalButtonWrapper: {
-        marginHorizontal: 20,
+        // marginHorizontal: 20,
+    },
+    buttonWrapper: {
+        width: 60,
+        height: 30,
+        justifyContent: 'center',
+        alignItems: 'center',
     },
 })
