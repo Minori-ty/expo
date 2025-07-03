@@ -1,7 +1,6 @@
 import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native'
 import { useFonts } from 'expo-font'
 import { Stack } from 'expo-router'
-import { StatusBar } from 'expo-status-bar'
 import 'react-native-reanimated'
 
 import { db, expo } from '@/db'
@@ -16,6 +15,7 @@ import { useDrizzleStudio } from 'expo-drizzle-studio-plugin'
 import * as Notifications from 'expo-notifications'
 import { useEffect } from 'react'
 import { Text } from 'react-native'
+import { GestureHandlerRootView } from 'react-native-gesture-handler'
 import { KeyboardProvider } from 'react-native-keyboard-controller'
 
 Notifications.setNotificationHandler({
@@ -57,13 +57,15 @@ export default function RootLayout() {
     return (
         <KeyboardProvider>
             <QueryClientProvider client={queryClient}>
-                <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-                    <Stack>
-                        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-                        <Stack.Screen name="+not-found" />
-                    </Stack>
-                    <StatusBar style="auto" />
-                </ThemeProvider>
+                <GestureHandlerRootView>
+                    <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
+                        <Stack>
+                            <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+                            <Stack.Screen name="+not-found" />
+                        </Stack>
+                        {/* <StatusBar style="auto" /> */}
+                    </ThemeProvider>
+                </GestureHandlerRootView>
             </QueryClientProvider>
         </KeyboardProvider>
     )

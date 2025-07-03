@@ -1,4 +1,5 @@
 import { addAnime } from '@/api'
+import DatePicker, { type IDatePickerRef } from '@/components/Datepicker'
 import { RadioGroup } from '@/components/RadioGroup'
 import { EStatus, EUpdateWeekday, insertAnimeSchema } from '@/db/schema'
 import { queryClient } from '@/utils/react-query'
@@ -7,11 +8,11 @@ import { Picker } from '@react-native-picker/picker'
 import { useMutation } from '@tanstack/react-query'
 import dayjs from 'dayjs'
 import { router, useNavigation } from 'expo-router'
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import { Controller, FieldErrors, useForm } from 'react-hook-form'
-import { Button, Platform, StyleSheet, Text, TextInput, View } from 'react-native'
+import { Button, Platform, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native'
 import { KeyboardAwareScrollView } from 'react-native-keyboard-controller'
-import { z, ZodIssueCode, ZodTypeAny } from 'zod'
+import { z, ZodArray, ZodBoolean, ZodDate, ZodIssueCode, ZodNumber, ZodString, ZodTypeAny, ZodUnion } from 'zod'
 
 export const insertAnimeData = insertAnimeSchema
     .omit({ id: true, createdAt: true, lastEpisodeDateTime: true, firstEpisodeDateTime: true })
@@ -24,9 +25,30 @@ const baseScheme = z.object({
     totalEpisode: z.coerce.number().min(1, '总集数至少为1'),
     cover: z.string().url('请输入有效的URL'),
 })
+// 辅助类型：确保类型符合 ZodTypeAny 约束
+type EnsureZodType<T> = T extends ZodTypeAny ? T : never
 
-function createSchema(status: EStatus): ZodTypeAny {
-    let dynamicFields: z.ZodRawShape = {}
+// 核心类型工具：将普通对象类型转换为 Zod 模式类型
+type ToZodType<T> = {
+    [K in keyof T]: T[K] extends number
+        ? ZodNumber
+        : T[K] extends string
+        ? ZodString
+        : T[K] extends boolean
+        ? ZodBoolean
+        : T[K] extends Date
+        ? ZodDate
+        : T[K] extends (infer U)[]
+        ? ZodArray<EnsureZodType<ToZodType<U>>>
+        : T[K] extends object
+        ? ToZodType<T[K]>
+        : T[K] extends infer A | infer B
+        ? ZodUnion<[EnsureZodType<ToZodType<A>>, EnsureZodType<ToZodType<B>>]>
+        : ZodTypeAny
+}
+
+function createSchema(status: EStatus) {
+    let dynamicFields: ToZodType<ICompleteExtera> | ToZodType<IOngoingExtera>
     if (status === EStatus.ONGOING) {
         dynamicFields = {
             updateWeekday: z.coerce.number().int().min(1, '请选择更新周').max(7, '更新周必须在1-7之间'),
@@ -43,34 +65,42 @@ function createSchema(status: EStatus): ZodTypeAny {
         })
     } else if (status === EStatus.COMPLETED) {
         dynamicFields = {
-            firstEpisodeDateTime: z.string(),
+            firstEpisodeDateTimeYYYYMMDDHHmm: z.string(),
         }
         return baseScheme.extend(dynamicFields).superRefine((val, ctx) => {
-            const { updateTimeHHmm, totalEpisode, firstEpisodeDateTime } = val
-            const lastEpisodeDateTimeTimestamp = dayjs(`${firstEpisodeDateTime} ${updateTimeHHmm}`)
+            const { totalEpisode, firstEpisodeDateTimeYYYYMMDDHHmm } = val
+            const firstEpisodeDateTimeTimestamp = dayjs(`${firstEpisodeDateTimeYYYYMMDDHHmm}`).unix()
+            if (firstEpisodeDateTimeTimestamp > dayjs().unix()) {
+                ctx.addIssue({
+                    code: ZodIssueCode.custom,
+                    path: ['firstEpisodeDateTimeYYYYMMDDHHmm'],
+                    message: '当前番剧还未播出，请设置正确的日期',
+                })
+            }
+            const lastEpisodeDateTimeTimestamp = dayjs(`${firstEpisodeDateTimeYYYYMMDDHHmm}`)
                 .add((totalEpisode - 1) * 7, 'day')
                 .unix()
 
             if (lastEpisodeDateTimeTimestamp > dayjs().unix()) {
                 ctx.addIssue({
                     code: ZodIssueCode.custom,
-                    path: ['firstEpisodeDateTime'],
+                    path: ['firstEpisodeDateTimeYYYYMMDDHHmm'],
                     message: '当前番剧还未完结，请设置正确的日期',
                 })
             }
         })
     } else if (status === EStatus.COMING_SOON) {
         dynamicFields = {
-            firstEpisodeDateTime: z.string(),
+            firstEpisodeDateTimeYYYYMMDDHHmm: z.string(),
         }
         return baseScheme.extend(dynamicFields).superRefine((val, ctx) => {
-            const { firstEpisodeDateTime, updateTimeHHmm } = val
-            const firstEpisodeDateTimeTimestamp = dayjs(`${firstEpisodeDateTime} ${updateTimeHHmm}`).unix()
+            const { firstEpisodeDateTimeYYYYMMDDHHmm } = val
+            const firstEpisodeDateTimeTimestamp = dayjs(`${firstEpisodeDateTimeYYYYMMDDHHmm}`).unix()
 
             if (firstEpisodeDateTimeTimestamp < dayjs().unix()) {
                 ctx.addIssue({
                     code: ZodIssueCode.custom,
-                    path: ['firstEpisodeDateTime'],
+                    path: ['firstEpisodeDateTimeYYYYMMDDHHmm'],
                     message: '当前番剧已开播，请设置正确的日期',
                 })
             }
@@ -87,16 +117,19 @@ interface IBaseFormData {
     cover: string
 }
 
-type TOngoingForm = IBaseFormData & {
+interface IOngoingExtera {
     updateWeekday: number
     currentEpisode: number
 }
+type TOngoingForm = IBaseFormData & IOngoingExtera
 
-type ICompleteForm = IBaseFormData & {
-    firstEpisodeDateTime: string
+type ICompleteExtera = {
+    firstEpisodeDateTimeYYYYMMDDHHmm: string
 }
 
-export type TFormData = z.infer<ReturnType<typeof createSchema>>
+type ICompleteForm = IBaseFormData & ICompleteExtera
+
+export type TFormData = TOngoingForm | ICompleteForm
 function AnimeForm() {
     const navigation = useNavigation()
     useEffect(() => {
@@ -107,12 +140,13 @@ function AnimeForm() {
     }, [navigation])
     const [status, setStatus] = useState(EStatus.ONGOING)
     const formSchema = createSchema(status)
+    const datapickerRef = useRef<IDatePickerRef>(null)
     const {
         control,
         handleSubmit,
         formState: { errors },
         reset,
-    } = useForm<TOngoingForm | ICompleteForm>({
+    } = useForm<TFormData>({
         resolver: zodResolver(formSchema),
         defaultValues: {
             name: '章鱼哔的原罪',
@@ -122,7 +156,7 @@ function AnimeForm() {
             totalEpisode: 13,
             cover: 'http://lz.sinaimg.cn/large/8a65eec0gy1i295k5s0evj207i0al424.jpg',
             status: EStatus.ONGOING,
-            firstEpisodeDateTime: '2025-07-08',
+            firstEpisodeDateTimeYYYYMMDDHHmm: '2025-07-08 00:00',
         },
     })
 
@@ -146,15 +180,15 @@ function AnimeForm() {
         },
     })
 
-    function hasFirstEpisodeDateTime(data: TOngoingForm | ICompleteForm): data is ICompleteForm {
-        return 'firstEpisodeDateTime' in data
+    function hasFirstEpisodeDateTime(data: TFormData): data is ICompleteForm {
+        return 'firstEpisodeDateTimeYYYYMMDDHHmm' in data
     }
 
-    const onSubmit = async (data: TOngoingForm | ICompleteForm) => {
+    const onSubmit = async (data: TFormData) => {
         const { cover, name, status, totalEpisode, updateTimeHHmm } = data
         if (hasFirstEpisodeDateTime(data)) {
-            const { firstEpisodeDateTime } = data
-            const firstEpisodeDateTimeTimestamp = dayjs(`${firstEpisodeDateTime} ${updateTimeHHmm}`).unix()
+            const { firstEpisodeDateTimeYYYYMMDDHHmm } = data
+            const firstEpisodeDateTimeTimestamp = dayjs(`${firstEpisodeDateTimeYYYYMMDDHHmm}`).unix()
             addAnimeMution({
                 cover,
                 name,
@@ -167,6 +201,7 @@ function AnimeForm() {
             const { currentEpisode, updateWeekday } = data
             addAnimeMution({ cover, currentEpisode, name, status, totalEpisode, updateTimeHHmm, updateWeekday })
         }
+        return data
     }
     const weekdays = [
         { label: '周一', value: 1 },
@@ -184,16 +219,17 @@ function AnimeForm() {
         { label: '即将更新', value: 3 },
     ]
 
-    function isOngoingErrors(errors: FieldErrors<TOngoingForm | ICompleteForm>): errors is FieldErrors<TOngoingForm> {
+    function isOngoingErrors(errors: FieldErrors<TFormData>): errors is FieldErrors<TOngoingForm> {
         return 'updateWeekday' in errors || 'currentEpisode' in errors
     }
 
-    function isCompleteErrors(errors: FieldErrors<TOngoingForm | ICompleteForm>): errors is FieldErrors<ICompleteForm> {
-        return 'firstEpisodeDateTime' in errors
+    function isCompleteErrors(errors: FieldErrors<TFormData>): errors is FieldErrors<ICompleteForm> {
+        return 'firstEpisodeDateTimeYYYYMMDDHHmm' in errors
     }
     return (
         // <KeyboardAvoidingView style={[styles.container]} behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
         //     <ScrollView keyboardShouldPersistTaps="handled" style={[styles.scrollView]}>
+
         <KeyboardAwareScrollView bottomOffset={50} style={styles.container} contentContainerStyle={styles.scrollView}>
             <View style={styles.formGroup}>
                 <Text style={styles.label}>番剧名称</Text>
@@ -231,31 +267,32 @@ function AnimeForm() {
                     )}
                 />
             </View>
-            {status !== 2 && (
+            {status !== EStatus.ONGOING && (
                 <View style={styles.formGroup}>
                     <Text style={styles.label}>首播时间</Text>
                     <Controller
                         control={control}
-                        name="firstEpisodeDateTime"
+                        name="firstEpisodeDateTimeYYYYMMDDHHmm"
                         render={({ field }) => (
-                            <TextInput
-                                {...field}
+                            <TouchableOpacity
                                 style={[
-                                    styles.input,
-                                    isCompleteErrors(errors) && errors.firstEpisodeDateTime && styles.errorInput,
+                                    styles.datepickBox,
+                                    isCompleteErrors(errors) &&
+                                        errors.firstEpisodeDateTimeYYYYMMDDHHmm &&
+                                        styles.errorInput,
                                 ]}
-                                placeholder="例如: 2025-05-15"
-                                onChangeText={field.onChange}
-                                value={field.value}
-                            />
+                                onPress={() => datapickerRef.current?.open()}
+                            >
+                                <Text style={styles.datepickText}>{field.value}</Text>
+                            </TouchableOpacity>
                         )}
                     />
-                    {isCompleteErrors(errors) && errors.firstEpisodeDateTime && (
-                        <ErrorMessage error={errors.firstEpisodeDateTime} />
+                    {isCompleteErrors(errors) && errors.firstEpisodeDateTimeYYYYMMDDHHmm && (
+                        <ErrorMessage error={errors.firstEpisodeDateTimeYYYYMMDDHHmm} />
                     )}
                 </View>
             )}
-            {status === 2 && (
+            {status === EStatus.ONGOING && (
                 <View style={styles.formGroup}>
                     <Text style={styles.label}>更新周</Text>
                     <Controller
@@ -280,24 +317,26 @@ function AnimeForm() {
                     {isOngoingErrors(errors) && errors.updateWeekday && <ErrorMessage error={errors.updateWeekday} />}
                 </View>
             )}
-            <View style={styles.formGroup}>
-                <Text style={styles.label}>更新时间(HH:mm)</Text>
-                <Controller
-                    control={control}
-                    name="updateTimeHHmm"
-                    render={({ field }) => (
-                        <TextInput
-                            {...field}
-                            style={[styles.input, errors.updateTimeHHmm && styles.errorInput]}
-                            placeholder="例如: 12:00"
-                            keyboardType="numeric"
-                            onChangeText={field.onChange}
-                            value={field.value}
-                        />
-                    )}
-                />
-                {errors.updateTimeHHmm && <ErrorMessage error={errors.updateTimeHHmm} />}
-            </View>
+            {status === EStatus.ONGOING && (
+                <View style={styles.formGroup}>
+                    <Text style={styles.label}>更新时间(HH:mm)</Text>
+                    <Controller
+                        control={control}
+                        name="updateTimeHHmm"
+                        render={({ field }) => (
+                            <TextInput
+                                {...field}
+                                style={[styles.input, errors.updateTimeHHmm && styles.errorInput]}
+                                placeholder="例如: 12:00"
+                                keyboardType="numeric"
+                                onChangeText={field.onChange}
+                                value={field.value}
+                            />
+                        )}
+                    />
+                    {errors.updateTimeHHmm && <ErrorMessage error={errors.updateTimeHHmm} />}
+                </View>
+            )}
             {status === EStatus.ONGOING && (
                 <View style={styles.formGroup}>
                     <Text style={styles.label}>当前更新集数</Text>
@@ -357,7 +396,21 @@ function AnimeForm() {
                 {errors.cover && <ErrorMessage error={errors.cover} />}
             </View>
             <Button title="提交" onPress={handleSubmit(onSubmit)} />
+            <Controller
+                control={control}
+                name="firstEpisodeDateTimeYYYYMMDDHHmm"
+                render={({ field }) => (
+                    <DatePicker
+                        date={field.value}
+                        onChange={(date) => {
+                            field.onChange(dayjs(date).format('YYYY-MM-DD HH:mm'))
+                        }}
+                        ref={datapickerRef}
+                    />
+                )}
+            />
         </KeyboardAwareScrollView>
+
         //     </ScrollView>
         // </KeyboardAvoidingView>
     )
@@ -387,6 +440,7 @@ const styles = StyleSheet.create({
         borderRadius: 4,
         padding: 0,
         paddingLeft: 10,
+        paddingTop: 2,
         fontSize: 16,
         height: 40, // 固定高度
         textAlignVertical: 'center',
@@ -414,6 +468,17 @@ const styles = StyleSheet.create({
     },
     horizontalCenter: {
         justifyContent: 'center',
+    },
+    datepickBox: {
+        borderWidth: 1,
+        borderColor: '#ccc',
+        borderRadius: 4,
+        paddingLeft: 10,
+        justifyContent: 'center',
+        height: 40,
+    },
+    datepickText: {
+        fontSize: 16,
     },
 })
 

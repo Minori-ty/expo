@@ -9,7 +9,7 @@ interface IDatepickerProps {
     onClose?: () => void
 }
 
-interface IDatePickerRef {
+export interface IDatePickerRef {
     open: () => void
     close: () => void
 }
