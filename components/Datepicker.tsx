@@ -5,6 +5,7 @@ import DateTimePicker, { DateType, useDefaultStyles } from 'react-native-ui-date
 
 interface IDatepickerProps {
     date: DateType
+    hideHeader?: boolean
     onChange: (date: DateType) => void
     onClose?: () => void
 }
@@ -14,50 +15,54 @@ export interface IDatePickerRef {
     close: () => void
 }
 
-const DatePicker = forwardRef<IDatePickerRef, IDatepickerProps>(({ onChange, date, onClose }, ref) => {
-    const defaultStyles = useDefaultStyles()
-    const bottomSheetModalRef = useRef<BottomSheetModal>(null)
+const DatePicker = forwardRef<IDatePickerRef, IDatepickerProps>(
+    ({ onChange, date, onClose, hideHeader = false }, ref) => {
+        const defaultStyles = useDefaultStyles()
+        const bottomSheetModalRef = useRef<BottomSheetModal>(null)
 
-    const handlePresentModalPress = useCallback(() => {
-        bottomSheetModalRef.current?.present()
-    }, [])
+        const handlePresentModalPress = useCallback(() => {
+            bottomSheetModalRef.current?.present()
+        }, [])
 
-    const handleClose = useCallback(() => {
-        bottomSheetModalRef.current?.close()
-        onClose?.()
-    }, [onClose])
+        const handleClose = useCallback(() => {
+            bottomSheetModalRef.current?.close()
+            onClose?.()
+        }, [onClose])
 
-    useImperativeHandle(ref, () => ({
-        open: handlePresentModalPress,
-        close: handleClose,
-    }))
+        useImperativeHandle(ref, () => ({
+            open: handlePresentModalPress,
+            close: handleClose,
+        }))
 
-    return (
-        <BottomSheetModalProvider>
-            <BottomSheetModal
-                ref={bottomSheetModalRef}
-                enableContentPanningGesture={false}
-                backdropComponent={() => (
-                    <TouchableOpacity activeOpacity={1} style={styles.backdrop} onPress={handleClose} />
-                )}
-            >
-                <BottomSheetView style={styles.contentContainer}>
-                    <DateTimePicker
-                        styles={defaultStyles}
-                        mode="single"
-                        date={date}
-                        onChange={(params) => onChange(params.date)}
-                        firstDayOfWeek={6}
-                        multiRangeMode
-                        showOutsideDays
-                        timePicker
-                        locale="zh"
-                    />
-                </BottomSheetView>
-            </BottomSheetModal>
-        </BottomSheetModalProvider>
-    )
-})
+        return (
+            <BottomSheetModalProvider>
+                <BottomSheetModal
+                    ref={bottomSheetModalRef}
+                    enableContentPanningGesture={false}
+                    backdropComponent={() => (
+                        <TouchableOpacity activeOpacity={1} style={styles.backdrop} onPress={handleClose} />
+                    )}
+                >
+                    <BottomSheetView style={styles.contentContainer}>
+                        <DateTimePicker
+                            styles={defaultStyles}
+                            mode="single"
+                            date={date}
+                            onChange={(params) => onChange(params.date)}
+                            firstDayOfWeek={6}
+                            multiRangeMode
+                            showOutsideDays
+                            timePicker
+                            locale="zh"
+                            hideHeader={hideHeader}
+                            initialView={hideHeader ? 'time' : 'day'}
+                        />
+                    </BottomSheetView>
+                </BottomSheetModal>
+            </BottomSheetModalProvider>
+        )
+    }
+)
 
 DatePicker.displayName = 'DatePicker'
 

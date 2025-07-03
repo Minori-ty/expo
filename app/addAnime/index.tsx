@@ -47,7 +47,7 @@ type ToZodType<T> = {
         : ZodTypeAny
 }
 
-function createSchema(status: EStatus) {
+function createSchema(status: EStatus): ZodTypeAny {
     let dynamicFields: ToZodType<ICompleteExtera> | ToZodType<IOngoingExtera>
     if (status === EStatus.ONGOING) {
         dynamicFields = {
@@ -140,7 +140,8 @@ function AnimeForm() {
     }, [navigation])
     const [status, setStatus] = useState(EStatus.ONGOING)
     const formSchema = createSchema(status)
-    const datapickerRef = useRef<IDatePickerRef>(null)
+    const datepickerRef = useRef<IDatePickerRef>(null)
+    const timepickerRef = useRef<IDatePickerRef>(null)
     const {
         control,
         handleSubmit,
@@ -151,12 +152,12 @@ function AnimeForm() {
         defaultValues: {
             name: '章鱼哔的原罪',
             updateWeekday: EUpdateWeekday.MONDAY,
-            updateTimeHHmm: '09:00',
+            updateTimeHHmm: dayjs().format('YYYY-MM-DD HH:mm'),
             currentEpisode: 1,
             totalEpisode: 13,
             cover: 'http://lz.sinaimg.cn/large/8a65eec0gy1i295k5s0evj207i0al424.jpg',
             status: EStatus.ONGOING,
-            firstEpisodeDateTimeYYYYMMDDHHmm: '2025-07-08 00:00',
+            firstEpisodeDateTimeYYYYMMDDHHmm: dayjs().format('YYYY-MM-DD HH:mm'),
         },
     })
 
@@ -186,6 +187,7 @@ function AnimeForm() {
 
     const onSubmit = async (data: TFormData) => {
         const { cover, name, status, totalEpisode, updateTimeHHmm } = data
+        const HHmm = dayjs(updateTimeHHmm).format('HH:mm')
         if (hasFirstEpisodeDateTime(data)) {
             const { firstEpisodeDateTimeYYYYMMDDHHmm } = data
             const firstEpisodeDateTimeTimestamp = dayjs(`${firstEpisodeDateTimeYYYYMMDDHHmm}`).unix()
@@ -194,12 +196,12 @@ function AnimeForm() {
                 name,
                 status,
                 totalEpisode,
-                updateTimeHHmm,
+                updateTimeHHmm: HHmm,
                 firstEpisodeDateTime: firstEpisodeDateTimeTimestamp,
             })
         } else {
             const { currentEpisode, updateWeekday } = data
-            addAnimeMution({ cover, currentEpisode, name, status, totalEpisode, updateTimeHHmm, updateWeekday })
+            addAnimeMution({ cover, currentEpisode, name, status, totalEpisode, updateTimeHHmm: HHmm, updateWeekday })
         }
         return data
     }
@@ -281,7 +283,7 @@ function AnimeForm() {
                                         errors.firstEpisodeDateTimeYYYYMMDDHHmm &&
                                         styles.errorInput,
                                 ]}
-                                onPress={() => datapickerRef.current?.open()}
+                                onPress={() => datepickerRef.current?.open()}
                             >
                                 <Text style={styles.datepickText}>{field.value}</Text>
                             </TouchableOpacity>
@@ -324,14 +326,12 @@ function AnimeForm() {
                         control={control}
                         name="updateTimeHHmm"
                         render={({ field }) => (
-                            <TextInput
-                                {...field}
-                                style={[styles.input, errors.updateTimeHHmm && styles.errorInput]}
-                                placeholder="例如: 12:00"
-                                keyboardType="numeric"
-                                onChangeText={field.onChange}
-                                value={field.value}
-                            />
+                            <TouchableOpacity
+                                style={[styles.datepickBox, errors.updateTimeHHmm && styles.errorInput]}
+                                onPress={() => timepickerRef.current?.open()}
+                            >
+                                <Text style={styles.datepickText}>{dayjs(field.value).format('HH:mm')}</Text>
+                            </TouchableOpacity>
                         )}
                     />
                     {errors.updateTimeHHmm && <ErrorMessage error={errors.updateTimeHHmm} />}
@@ -405,7 +405,20 @@ function AnimeForm() {
                         onChange={(date) => {
                             field.onChange(dayjs(date).format('YYYY-MM-DD HH:mm'))
                         }}
-                        ref={datapickerRef}
+                    />
+                )}
+            />
+            <Controller
+                control={control}
+                name="updateTimeHHmm"
+                render={({ field }) => (
+                    <DatePicker
+                        ref={timepickerRef}
+                        date={field.value}
+                        hideHeader={true}
+                        onChange={(date) => {
+                            field.onChange(dayjs(date).format('YYYY-MM-DD HH:mm'))
+                        }}
                     />
                 )}
             />
