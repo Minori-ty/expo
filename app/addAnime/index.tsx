@@ -204,7 +204,6 @@ function AnimeForm() {
             const { currentEpisode, updateWeekday } = data
             addAnimeMution({ cover, currentEpisode, name, status, totalEpisode, updateTimeHHmm: HHmm, updateWeekday })
         }
-        return data
     }
     const weekdays = [
         { label: '周一', value: 1 },

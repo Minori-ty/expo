@@ -9,6 +9,7 @@ import { useColorScheme } from '@/hooks/useColorScheme'
 import { getCalendarPermission, getNotificationPermission } from '@/permissions'
 import { refreshScheduleAndCalendar, registerBackgroundTask, taskDefined } from '@/tasks'
 import { queryClient } from '@/utils/react-query'
+import { BottomSheetModalProvider } from '@gorhom/bottom-sheet'
 import { QueryClientProvider } from '@tanstack/react-query'
 import { useMigrations } from 'drizzle-orm/expo-sqlite/migrator'
 import { useDrizzleStudio } from 'expo-drizzle-studio-plugin'
@@ -58,13 +59,15 @@ export default function RootLayout() {
         <KeyboardProvider>
             <QueryClientProvider client={queryClient}>
                 <GestureHandlerRootView>
-                    <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-                        <Stack>
-                            <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-                            <Stack.Screen name="+not-found" />
-                        </Stack>
-                        {/* <StatusBar style="auto" /> */}
-                    </ThemeProvider>
+                    <BottomSheetModalProvider>
+                        <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
+                            <Stack>
+                                <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+                                <Stack.Screen name="+not-found" />
+                            </Stack>
+                            {/* <StatusBar style="auto" /> */}
+                        </ThemeProvider>
+                    </BottomSheetModalProvider>
                 </GestureHandlerRootView>
             </QueryClientProvider>
         </KeyboardProvider>
