@@ -118,7 +118,7 @@ interface IBaseFormData {
 }
 
 interface IOngoingExtera {
-    updateWeekday: number
+    updateWeekday: EUpdateWeekday
     currentEpisode: number
 }
 type TOngoingForm = IBaseFormData & IOngoingExtera
