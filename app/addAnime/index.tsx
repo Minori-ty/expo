@@ -1,6 +1,7 @@
 import { addAnime } from '@/api'
 import DatePicker, { type IDatePickerRef } from '@/components/Datepicker'
 import { RadioGroup } from '@/components/RadioGroup'
+import { IconSymbol } from '@/components/ui/IconSymbol'
 import { EStatus, EUpdateWeekday, insertAnimeSchema } from '@/db/schema'
 import { queryClient } from '@/utils/react-query'
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -10,7 +11,7 @@ import dayjs from 'dayjs'
 import { router, useNavigation } from 'expo-router'
 import React, { useEffect, useRef, useState } from 'react'
 import { Controller, FieldErrors, useForm } from 'react-hook-form'
-import { Button, Platform, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native'
+import { Button, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native'
 import { KeyboardAwareScrollView } from 'react-native-keyboard-controller'
 import { z, ZodArray, ZodBoolean, ZodDate, ZodIssueCode, ZodNumber, ZodString, ZodTypeAny, ZodUnion } from 'zod'
 
@@ -285,6 +286,7 @@ function AnimeForm() {
                                 ]}
                                 onPress={() => datepickerRef.current?.open()}
                             >
+                                <IconSymbol size={20} name="calendar" color={'#1f1f1f'} />
                                 <Text style={styles.datepickText}>{field.value}</Text>
                             </TouchableOpacity>
                         )}
@@ -330,6 +332,7 @@ function AnimeForm() {
                                 style={[styles.datepickBox, errors.updateTimeHHmm && styles.errorInput]}
                                 onPress={() => timepickerRef.current?.open()}
                             >
+                                <IconSymbol size={20} name="alarm" color={'#1f1f1f'} />
                                 <Text style={styles.datepickText}>{dayjs(field.value).format('HH:mm')}</Text>
                             </TouchableOpacity>
                         )}
@@ -401,6 +404,7 @@ function AnimeForm() {
                 name="firstEpisodeDateTimeYYYYMMDDHHmm"
                 render={({ field }) => (
                     <DatePicker
+                        ref={datepickerRef}
                         date={field.value}
                         onChange={(date) => {
                             field.onChange(dayjs(date).format('YYYY-MM-DD HH:mm'))
@@ -453,17 +457,11 @@ const styles = StyleSheet.create({
         borderRadius: 4,
         padding: 0,
         paddingLeft: 10,
-        paddingTop: 2,
+        paddingTop: 5,
         fontSize: 16,
         height: 40, // 固定高度
         textAlignVertical: 'center',
         lineHeight: 26,
-        ...Platform.select({
-            android: {
-                paddingTop: 0,
-                paddingBottom: 0,
-            },
-        }),
     },
     picker: {
         borderWidth: 1,
@@ -487,11 +485,13 @@ const styles = StyleSheet.create({
         borderColor: '#ccc',
         borderRadius: 4,
         paddingLeft: 10,
-        justifyContent: 'center',
+        alignItems: 'center',
         height: 40,
+        flexDirection: 'row',
     },
     datepickText: {
         fontSize: 16,
+        marginLeft: 10,
     },
 })
 

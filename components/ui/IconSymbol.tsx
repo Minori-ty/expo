@@ -21,6 +21,8 @@ const MAPPING = {
     'bookmark.fill': 'bookmark',
     'plus.app.fill': 'add',
     'text.append': 'edit-note',
+    calendar: 'calendar-today',
+    alarm: 'schedule',
 } as IconMapping
 
 /**
