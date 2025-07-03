@@ -12,7 +12,8 @@ import React, { useEffect, useRef, useState } from 'react'
 import { Controller, FieldErrors, useForm } from 'react-hook-form'
 import { Button, Platform, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native'
 import { KeyboardAwareScrollView } from 'react-native-keyboard-controller'
-import { z, ZodArray, ZodBoolean, ZodDate, ZodIssueCode, ZodNumber, ZodString, ZodTypeAny, ZodUnion } from 'zod'
+import type { ZodArray, ZodBoolean, ZodDate, ZodNumber, ZodString, ZodTypeAny, ZodUnion } from 'zod'
+import { z, ZodIssueCode } from 'zod'
 
 export const insertAnimeData = insertAnimeSchema
     .omit({ id: true, createdAt: true, lastEpisodeDateTime: true, firstEpisodeDateTime: true })
@@ -47,7 +48,7 @@ type ToZodType<T> = {
         : ZodTypeAny
 }
 
-function createSchema(status: EStatus) {
+function createSchema(status: EStatus): ZodTypeAny {
     let dynamicFields: ToZodType<ICompleteExtera> | ToZodType<IOngoingExtera>
     if (status === EStatus.ONGOING) {
         dynamicFields = {
@@ -118,7 +119,7 @@ interface IBaseFormData {
 }
 
 interface IOngoingExtera {
-    updateWeekday: number
+    updateWeekday: EUpdateWeekday
     currentEpisode: number
 }
 type TOngoingForm = IBaseFormData & IOngoingExtera
@@ -140,7 +141,8 @@ function AnimeForm() {
     }, [navigation])
     const [status, setStatus] = useState(EStatus.ONGOING)
     const formSchema = createSchema(status)
-    const datapickerRef = useRef<IDatePickerRef>(null)
+    const datepickerRef = useRef<IDatePickerRef>(null)
+    const timepickerRef = useRef<IDatePickerRef>(null)
     const {
         control,
         handleSubmit,
@@ -281,7 +283,7 @@ function AnimeForm() {
                                         errors.firstEpisodeDateTimeYYYYMMDDHHmm &&
                                         styles.errorInput,
                                 ]}
-                                onPress={() => datapickerRef.current?.open()}
+                                onPress={() => datepickerRef.current?.open()}
                             >
                                 <Text style={styles.datepickText}>{field.value}</Text>
                             </TouchableOpacity>
@@ -324,14 +326,12 @@ function AnimeForm() {
                         control={control}
                         name="updateTimeHHmm"
                         render={({ field }) => (
-                            <TextInput
-                                {...field}
-                                style={[styles.input, errors.updateTimeHHmm && styles.errorInput]}
-                                placeholder="例如: 12:00"
-                                keyboardType="numeric"
-                                onChangeText={field.onChange}
-                                value={field.value}
-                            />
+                            <TouchableOpacity
+                                style={[styles.datepickBox, errors.updateTimeHHmm && styles.errorInput]}
+                                onPress={() => timepickerRef.current?.open()}
+                            >
+                                <Text style={styles.datepickText}>{field.value}</Text>
+                            </TouchableOpacity>
                         )}
                     />
                     {errors.updateTimeHHmm && <ErrorMessage error={errors.updateTimeHHmm} />}
@@ -401,11 +401,24 @@ function AnimeForm() {
                 name="firstEpisodeDateTimeYYYYMMDDHHmm"
                 render={({ field }) => (
                     <DatePicker
+                        ref={datepickerRef}
                         date={field.value}
                         onChange={(date) => {
                             field.onChange(dayjs(date).format('YYYY-MM-DD HH:mm'))
                         }}
-                        ref={datapickerRef}
+                    />
+                )}
+            />
+            <Controller
+                control={control}
+                name="updateTimeHHmm"
+                render={({ field }) => (
+                    <DatePicker
+                        ref={timepickerRef}
+                        date={field.value}
+                        onChange={(date) => {
+                            field.onChange(dayjs(date).format('HH:mm'))
+                        }}
                     />
                 )}
             />
