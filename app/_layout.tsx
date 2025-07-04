@@ -3,6 +3,8 @@ import { useFonts } from 'expo-font'
 import { Stack } from 'expo-router'
 import 'react-native-reanimated'
 
+import Error from '@/components/lottie/Error'
+import Loading from '@/components/lottie/Loading'
 import { db, expo } from '@/db'
 import migrations from '@/drizzle/migrations'
 import { useColorScheme } from '@/hooks/useColorScheme'
@@ -15,6 +17,7 @@ import { useMigrations } from 'drizzle-orm/expo-sqlite/migrator'
 import { useDrizzleStudio } from 'expo-drizzle-studio-plugin'
 import * as Notifications from 'expo-notifications'
 import { useEffect } from 'react'
+import { ErrorBoundary } from 'react-error-boundary'
 import { Text } from 'react-native'
 import { GestureHandlerRootView } from 'react-native-gesture-handler'
 import { KeyboardProvider } from 'react-native-keyboard-controller'
@@ -45,7 +48,7 @@ export default function RootLayout() {
 
     if (!loaded) {
         // Async font loading only occurs in development.
-        return null
+        return <Loading />
     }
 
     if (error) {
@@ -57,19 +60,21 @@ export default function RootLayout() {
 
     return (
         <KeyboardProvider>
-            <QueryClientProvider client={queryClient}>
-                <GestureHandlerRootView>
-                    <BottomSheetModalProvider>
-                        <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-                            <Stack>
-                                <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-                                <Stack.Screen name="+not-found" />
-                            </Stack>
-                            {/* <StatusBar style="auto" /> */}
-                        </ThemeProvider>
-                    </BottomSheetModalProvider>
-                </GestureHandlerRootView>
-            </QueryClientProvider>
+            <ErrorBoundary FallbackComponent={Error}>
+                <QueryClientProvider client={queryClient}>
+                    <GestureHandlerRootView>
+                        <BottomSheetModalProvider>
+                            <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
+                                <Stack>
+                                    <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+                                    <Stack.Screen name="+not-found" />
+                                </Stack>
+                                {/* <StatusBar style="auto" /> */}
+                            </ThemeProvider>
+                        </BottomSheetModalProvider>
+                    </GestureHandlerRootView>
+                </QueryClientProvider>
+            </ErrorBoundary>
         </KeyboardProvider>
     )
 }
