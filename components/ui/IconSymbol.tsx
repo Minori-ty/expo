@@ -23,6 +23,8 @@ const MAPPING = {
     'text.append': 'edit-note',
     calendar: 'calendar-today',
     alarm: 'schedule',
+    'arrow.down.and.line.horizontal.and.arrow.up': 'download',
+    'arrow.up.doc.on.clipboard': 'upload',
 } as IconMapping
 
 /**

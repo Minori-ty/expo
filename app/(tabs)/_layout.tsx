@@ -42,9 +42,9 @@ export default function TabLayout() {
                 }}
             />
             <Tabs.Screen
-                name="InputText"
+                name="me"
                 options={{
-                    title: '测试input',
+                    title: '我的',
                     tabBarIcon: ({ color }) => <IconSymbol size={28} name="bookmark.fill" color={color} />,
                 }}
             />
