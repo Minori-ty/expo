@@ -123,7 +123,7 @@ function EpisodeTip({ updateTimeHHmm, currentEpisode, updateWeekday }: IEpisodeT
 }
 
 export default function MyTabs() {
-    const [index, setIndex] = useState(0)
+    const [index, setIndex] = useState(dayjs().isoWeekday() - 1)
     const [routes] = useState([
         { key: 'monday', title: '周一' },
         { key: 'tuesday', title: '周二' },
