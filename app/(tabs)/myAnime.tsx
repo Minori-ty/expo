@@ -233,6 +233,9 @@ const styles = StyleSheet.create({
     text: {
         fontSize: 12,
         marginTop: 5,
+        wordWrap: 'nowrap',
+        overflow: 'hidden',
+        textOverflow: 'ellipsis',
     },
     modalPanel: {
         backgroundColor: '#fff',

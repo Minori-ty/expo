@@ -1,8 +1,10 @@
+import ProgressBar from '@/components/ProgressBar'
 import { IconSymbol } from '@/components/ui/IconSymbol'
 import { EStatus, EUpdateWeekday } from '@/db/schema'
 import { selectAnimeById } from '@/hooks/useAnime'
 import dayjs from 'dayjs'
 import 'dayjs/locale/zh-cn'
+import { Enum } from 'enum-plus'
 import { Image } from 'expo-image'
 import { useLocalSearchParams, useNavigation, useRouter } from 'expo-router'
 import React, { useCallback, useEffect, useLayoutEffect, useState } from 'react'
@@ -75,6 +77,36 @@ function AnimeDetail() {
     const blurhash =
         '|rF?hV%2WCj[ayj[a|j[az_NaeWBj@ayfRayfQfQM{M|azj[azf6fQfQfQIpWXofj[ayj[j[fQayWCoeoeaya}j[ayfQa{oLj?j[WVj[ayayj[fQoff7azayj[ayj[j[ayofayayayj[fQj[ayayj[ayfjj[j[ayjuayj['
 
+    const mapColor = {
+        [EStatus.COMING_SOON]: '#FFD547',
+        [EStatus.ONGOING]: '#409eff',
+        [EStatus.COMPLETED]: '#f56c6c',
+    }
+
+    const mapText = {
+        [EStatus.COMING_SOON]: '即将更新',
+        [EStatus.ONGOING]: '连载中',
+        [EStatus.COMPLETED]: '已完结',
+    }
+    const statusMap = Enum({
+        Complete: {
+            value: 1,
+            label: '已完结',
+            color: '#f56c6c',
+        },
+        Ongoing: {
+            value: 2,
+            label: '连载中',
+            color: '#409eff',
+        },
+        ComingSoon: {
+            value: 3,
+            label: '即将更新',
+            color: '#FFD547',
+        },
+    } as const)
+    console.log(statusMap.raw(1).color)
+
     return (
         <SafeAreaView style={styles.container}>
             <ScrollView contentContainerStyle={styles.scrollView}>
@@ -88,20 +120,53 @@ function AnimeDetail() {
                     />
                 </View>
 
-                {/* 基本信息 */}
-                <View style={styles.infoContainer}>
-                    <Text style={styles.title}>{anime.name}</Text>
-
-                    <View>
-                        <Text>当前更新第 {anime.currentEpisode} 集</Text>
-                        <Text>总集数 {anime.totalEpisode} 话</Text>
-                        <Text>{getUpdateInfo()}</Text>
+                <View style={{ paddingHorizontal: 15 }}>
+                    <View style={{ flexDirection: 'row', alignItems: 'flex-end' }}>
+                        <Text style={styles.name}>{anime.name}</Text>
+                        <View
+                            style={{
+                                backgroundColor: statusMap.raw(anime.status).color,
+                                paddingHorizontal: 5,
+                                paddingVertical: 2,
+                                borderRadius: 5,
+                                marginLeft: 5,
+                            }}
+                        >
+                            <Text style={{ color: '#fff', fontSize: 10 }}>{statusMap.raw(anime.status).label}</Text>
+                        </View>
+                    </View>
+                    <View style={[styles.border, styles.dateContainer]}>
+                        <View style={styles.dateBox}>
+                            <IconSymbol size={16} name="calendar" color={'#6b7280'} />
+                            <View style={styles.date}>
+                                <Text>更新时间</Text>
+                                <Text>周一</Text>
+                            </View>
+                        </View>
+                        <View style={styles.dateBox}>
+                            <IconSymbol size={20} name="alarm" color={'#6b7280'} />
+                            <View style={styles.date}>
+                                <Text>更新时刻</Text>
+                                <Text>{anime.updateTimeHHmm}</Text>
+                            </View>
+                        </View>
                     </View>
 
-                    <View style={styles.dateInfo}>
-                        <Text style={styles.dateText}>首播时间: {anime.firstEpisodeDateTime}</Text>
-                        <Text style={styles.dateText}>完结时间: {anime.lastEpisodeDateTime}</Text>
+                    <View style={[styles.progressContainer, styles.border]}>
+                        <View style={styles.progressTitle}>
+                            <Text>播放进度</Text>
+                            <Text>
+                                {anime.currentEpisode}/{anime.totalEpisode}
+                            </Text>
+                        </View>
+                        <ProgressBar progress={anime.currentEpisode / anime.totalEpisode} />
+                        <View style={styles.progressTitle}>
+                            <Text>已更新{anime.currentEpisode}集</Text>
+                            <Text>{Math.round((anime.currentEpisode / anime.totalEpisode) * 100)}%完成</Text>
+                        </View>
                     </View>
+
+                    {/* <View style={[styles.border]}><CustomDatepicker /></View> */}
                 </View>
             </ScrollView>
         </SafeAreaView>
@@ -111,39 +176,53 @@ function AnimeDetail() {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#fff',
+        backgroundColor: '#f9fafb',
     },
     scrollView: {
-        padding: 16,
+        // padding: 16,
+        paddingBottom: 20,
     },
     coverContainer: {
         width: '100%',
         height: 250,
-        borderRadius: 12,
+        // borderRadius: 12,
         overflow: 'hidden',
-        marginBottom: 16,
     },
     coverImage: {
         width: '100%',
         height: '100%',
     },
-
-    infoContainer: {
-        marginBottom: 20,
+    name: {
+        fontSize: 25,
+        marginTop: 15,
+        fontWeight: '800',
     },
-    title: {
-        fontSize: 24,
-        fontWeight: 'bold',
-        marginBottom: 8,
+    progressContainer: {
+        marginTop: 15,
     },
-
-    dateInfo: {
-        flexDirection: 'column',
+    progressTitle: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
     },
-    dateText: {
-        fontSize: 14,
-        color: '#666',
-        marginBottom: 4,
+    border: {
+        padding: 15,
+        borderRadius: 10,
+        backgroundColor: '#fff',
+        borderWidth: 1,
+        borderColor: '#e5e7eb',
+        marginTop: 15,
+    },
+    dateContainer: {
+        flexDirection: 'row',
+        marginTop: 15,
+    },
+    dateBox: {
+        flex: 1,
+        flexDirection: 'row',
+        alignItems: 'center',
+    },
+    date: {
+        marginLeft: 5,
     },
 })
 

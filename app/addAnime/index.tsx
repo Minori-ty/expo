@@ -232,7 +232,7 @@ function AnimeForm() {
         // <KeyboardAvoidingView style={[styles.container]} behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
         //     <ScrollView keyboardShouldPersistTaps="handled" style={[styles.scrollView]}>
 
-        <KeyboardAwareScrollView bottomOffset={50} style={styles.container} contentContainerStyle={styles.scrollView}>
+        <KeyboardAwareScrollView bottomOffset={50} style={styles.container}>
             <View style={styles.formGroup}>
                 <Text style={styles.label}>番剧名称</Text>
                 <Controller
@@ -434,7 +434,7 @@ function AnimeForm() {
 
 const styles = StyleSheet.create({
     container: {
-        flex: 1,
+        paddingHorizontal: 16,
         backgroundColor: '#fff',
     },
     scrollView: {
