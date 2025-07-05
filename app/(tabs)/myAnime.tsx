@@ -171,7 +171,9 @@ function AnimeContainerItem({ data }: IAnimeContainerItemProps) {
                 />
                 <UpdateLabel status={data.status} />
             </View>
-            <Text style={styles.text}>{data.name}</Text>
+            <Text style={styles.text} numberOfLines={1}>
+                {data.name}
+            </Text>
             <Text style={styles.text}>更新 第{data.currentEpisode}集</Text>
         </Pressable>
     )
@@ -233,7 +235,7 @@ const styles = StyleSheet.create({
     text: {
         fontSize: 12,
         marginTop: 5,
-        wordWrap: 'nowrap',
+        width: '100%',
         overflow: 'hidden',
         textOverflow: 'ellipsis',
     },
