@@ -119,6 +119,11 @@ const config = {
                 },
             },
         ],
+        doctor: {
+            reactNativeDirectoryCheck: {
+                listUnknownPackages: false,
+            },
+        },
     },
 }
 
