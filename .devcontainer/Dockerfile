@@ -29,20 +29,21 @@ RUN $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager "platforms;android-35" \
 RUN npm install -g eas-cli expo expo-doctor expo-cli typescript
 
 WORKDIR /workspaces/expo
+RUN bash && npm i && npm run build
 # 复制 package.json 和 package-lock.json
 # COPY package*.json ./
 
 # 安装项目依赖
-RUN npm install
+# RUN npm install
 
 # 复制项目文件
 # COPY . .
 
 # 构建应用
-RUN npm run build
+# RUN npm run build
 
 # 获取版本号并重命名 APK 文件
-RUN VERSION=$(npm pkg get version | tr -d '\"') && \
-    APK_FILE=$(ls *.apk | head -n 1) && \
-    mv "$APK_FILE" "v$VERSION.apk" && \
-    echo "APK_VERSION=$VERSION" > .env
+# RUN VERSION=$(npm pkg get version | tr -d '\"') && \
+#     APK_FILE=$(ls *.apk | head -n 1) && \
+#     mv "$APK_FILE" "v$VERSION.apk" && \
+#     echo "APK_VERSION=$VERSION" > .env
