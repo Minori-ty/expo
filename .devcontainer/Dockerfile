@@ -2,7 +2,7 @@ FROM node:alpine
 
 # 安装系统依赖
 RUN apk update && \
-    apk add --no-cache openjdk17-jdk wget unzip git && \
+    apk add --no-cache openjdk17-jdk wget unzip git bash && \
     rm -rf /var/cache/apk/*
 
 # 安装 Android SDK
