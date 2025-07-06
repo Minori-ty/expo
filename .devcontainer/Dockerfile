@@ -1,8 +1,5 @@
 FROM node:alpine
 
-# 设置工作目录
-WORKDIR /app
-
 # 安装系统依赖
 RUN apk update && \
     apk add --no-cache openjdk17-jdk wget unzip git && \
@@ -38,7 +35,7 @@ COPY package*.json ./
 RUN npm install
 
 # 复制项目文件
-COPY . .
+# COPY . .
 
 # 构建应用
 RUN npm run build
