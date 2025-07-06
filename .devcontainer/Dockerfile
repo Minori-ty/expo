@@ -28,8 +28,8 @@ RUN $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager "platforms;android-35" \
 # 安装 npm 全局依赖
 RUN npm install -g eas-cli expo expo-doctor expo-cli typescript
 
-WORKDIR /workspaces/expo
-RUN bash && npm i && npm run build
+# WORKDIR /workspaces/expo
+# RUN bash && npm i && npm run build
 # 复制 package.json 和 package-lock.json
 # COPY package*.json ./
 
