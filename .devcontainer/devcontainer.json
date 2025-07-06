@@ -1,0 +1,16 @@
+{
+    "name": "Build",
+    // Or use a Dockerfile or Docker Compose file. More info: https://containers.dev/guide/dockerfile
+    "build": {
+        "dockerfile": "Dockerfile"
+    },
+    "remoteUser": "root",
+    // "envFile": ".env",
+    // "runArgs": [
+    //     "--env-file",
+    //     ".devcontainer/.env"
+    // ],
+    "secrets": {
+        "EXPO_TOKEN": "EXPO_TOKEN"
+    }
+}
