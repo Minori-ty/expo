@@ -1,3 +1,4 @@
+import CustomDatePicker3 from '@/components/CustomDatepicker'
 import { IconSymbol } from '@/components/ui/IconSymbol'
 import React from 'react'
 import { StyleSheet, Text, View } from 'react-native'
@@ -9,14 +10,15 @@ export default function InputText() {
             <View style={styles.box}>
                 <View style={[styles.button, styles.export]}>
                     <IconSymbol size={20} name="arrow.down.and.line.horizontal.and.arrow.up" color={'#fff'} />
-                    <Text style={{ color: '#fff', fontSize: 18 }}>导出数据为JSON文件</Text>
+                    <Text style={{ color: '#fff', fontSize: 18 }}>导出数据为JSON文件件</Text>
                 </View>
                 <Text>导入JSON文件</Text>
                 <View style={[styles.button, styles.upload]}>
                     <IconSymbol size={20} name="arrow.up.doc.on.clipboard" color={'#18181b'} />
-                    <Text style={{ color: '#18181b', fontSize: 18 }}>导出数据为JSON文件</Text>
+                    <Text style={{ color: '#18181b', fontSize: 18 }}>导出数据为JSON文件件</Text>
                 </View>
             </View>
+            <CustomDatePicker3 />
         </SafeAreaView>
     )
 }

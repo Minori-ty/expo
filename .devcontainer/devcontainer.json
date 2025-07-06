@@ -12,5 +12,6 @@
     // ],
     "secrets": {
         "EXPO_TOKEN": "EXPO_TOKEN"
-    }
+    },
+    "postCreateCommand": "npm i && npm run build"
 }
