@@ -10,15 +10,7 @@ import isSameOrBefore from 'dayjs/plugin/isSameOrBefore'
 import { Image } from 'expo-image'
 import { useRouter } from 'expo-router'
 import React, { createContext, useContext, useEffect, useState } from 'react'
-import {
-    Dimensions,
-    ScrollView,
-    StyleSheet,
-    Text,
-    TouchableOpacity,
-    TouchableWithoutFeedback,
-    View,
-} from 'react-native'
+import { Dimensions, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { SceneMap, TabBar, TabView } from 'react-native-tab-view'
 
@@ -123,7 +115,7 @@ function EpisodeTip({ updateTimeHHmm, currentEpisode, updateWeekday }: IEpisodeT
 }
 
 export default function MyTabs() {
-    const [index, setIndex] = useState(dayjs().isoWeekday() - 1)
+    const [index, setIndex] = useState(6)
     const [routes] = useState([
         { key: 'monday', title: '周一' },
         { key: 'tuesday', title: '周二' },
@@ -145,7 +137,7 @@ export default function MyTabs() {
     })
 
     useEffect(() => {
-        setIndex(dayjs().isoWeekday() - 1)
+        // setIndex(dayjs().isoWeekday() - 1)
     }, [])
 
     const renderScene = SceneMap({
@@ -175,30 +167,30 @@ export default function MyTabs() {
                             activeColor="#fb7299"
                             inactiveColor="#9E9E9E"
                             style={styles.tabBar}
-                            renderTabBarItem={({ route, navigationState, defaultTabWidth, onPress }) => {
-                                const focused = navigationState.routes[navigationState.index].key === route.key
+                            // renderTabBarItem={({ route, navigationState, defaultTabWidth, onPress }) => {
+                            //     const focused = navigationState.routes[navigationState.index].key === route.key
 
-                                return (
-                                    <TouchableWithoutFeedback onPress={onPress}>
-                                        <View
-                                            style={[
-                                                styles.tabBarItem,
-                                                { width: defaultTabWidth },
-                                                focused && styles.tabBarItemFocused,
-                                            ]}
-                                        >
-                                            <Text
-                                                style={[
-                                                    styles.tabBarItemTitle,
-                                                    focused && styles.tabBarItemTitleFocused,
-                                                ]}
-                                            >
-                                                {route.title}
-                                            </Text>
-                                        </View>
-                                    </TouchableWithoutFeedback>
-                                )
-                            }}
+                            //     return (
+                            //         <TouchableWithoutFeedback onPress={onPress}>
+                            //             <View
+                            //                 style={[
+                            //                     styles.tabBarItem,
+                            //                     { width: defaultTabWidth },
+                            //                     focused && styles.tabBarItemFocused,
+                            //                 ]}
+                            //             >
+                            //                 <Text
+                            //                     style={[
+                            //                         styles.tabBarItemTitle,
+                            //                         focused && styles.tabBarItemTitleFocused,
+                            //                     ]}
+                            //                 >
+                            //                     {route.title}
+                            //                 </Text>
+                            //             </View>
+                            //         </TouchableWithoutFeedback>
+                            //     )
+                            // }}
                         />
                     )}
                 ></TabView>
