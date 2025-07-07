@@ -30,10 +30,6 @@ jobs:
                     echo "EXPO_TOKEN 已设置"
                   fi
 
-            - name: 输出核心数
-              run: |
-                  echo "核心数: $(nproc --all)"
-
             - name: 启动java 17
               uses: actions/setup-java@v4
               with:
