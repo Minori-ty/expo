@@ -17,8 +17,8 @@ import { useMigrations } from 'drizzle-orm/expo-sqlite/migrator'
 import { useDrizzleStudio } from 'expo-drizzle-studio-plugin'
 import * as Notifications from 'expo-notifications'
 import { useEffect } from 'react'
-import { ErrorBoundary } from 'react-error-boundary'
 import { Text } from 'react-native'
+import ErrorBoundary from 'react-native-error-boundary'
 import { GestureHandlerRootView } from 'react-native-gesture-handler'
 import { KeyboardProvider } from 'react-native-keyboard-controller'
 
@@ -46,6 +46,10 @@ export default function RootLayout() {
         refreshScheduleAndCalendar()
     }, [])
 
+    function errorHandler(error: Error, stackTrace: string) {
+        console.log(error)
+    }
+
     if (!loaded) {
         // Async font loading only occurs in development.
         return <Loading />
@@ -60,7 +64,7 @@ export default function RootLayout() {
 
     return (
         <KeyboardProvider>
-            <ErrorBoundary FallbackComponent={Error}>
+            <ErrorBoundary FallbackComponent={Error} onError={errorHandler}>
                 <QueryClientProvider client={queryClient}>
                     <GestureHandlerRootView>
                         <BottomSheetModalProvider>
