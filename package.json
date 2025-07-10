@@ -82,8 +82,7 @@
     "expo": {
         "install": {
             "exclude": [
-                "expo-updates",
-                "expo-splash-screen"
+                "eslint-config-expo"
             ]
         }
     }
