@@ -38,10 +38,13 @@ export const animeTable = sqliteTable('anime', {
     totalEpisode: integer('total_episode').notNull(),
     status: integer('status').$type<EStatus>().notNull(),
     cover: text('cover').notNull(),
+    /** unix时间戳 */
     createdAt: integer('created_at')
         .notNull()
         .default(sql`(unixepoch())`),
+    /** unix时间戳 */
     firstEpisodeDateTime: integer('first_episode_date_time').notNull(),
+    /** unix时间戳 */
     lastEpisodeDateTime: integer('last_episode_date_time').notNull(),
 })
 
