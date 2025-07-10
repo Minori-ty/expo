@@ -67,15 +67,11 @@ export const schduleTable = sqliteTable('schdule', {
     animeId: integer('anime_id')
         .notNull()
         .references(() => animeTable.id, { onDelete: 'cascade' }),
-    isNotification: integer('is_notification', { mode: 'boolean' })
-        .notNull()
-        .default(sql`0`),
 })
 
 // 生成 Zod 验证模式
 export const insertSchduleSchema = createInsertSchema(schduleTable, {
     animeId: (schema) => schema.int().gte(0),
-    isNotification: (shema) => shema,
 })
 
 export const selectSchduleSchema = createSelectSchema(schduleTable)
