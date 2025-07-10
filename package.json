@@ -80,10 +80,14 @@
     },
     "private": true,
     "expo": {
-        "install": {
-            "exclude": [
-                "eslint-config-expo"
-            ]
+        "doctor": {
+            "reactNativeDirectoryCheck": {
+                "enabled": true,
+                "exclude": [
+                    "eslint-config-expo"
+                ],
+                "listUnknownPackages": true
+            }
         }
     }
 }
