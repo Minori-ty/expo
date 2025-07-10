@@ -12,9 +12,9 @@ const config = {
         scheme: 'app',
         userInterfaceStyle: 'automatic',
         newArchEnabled: true,
-        ios: {
-            supportsTablet: true,
-        },
+        // ios: {
+        //     supportsTablet: true,
+        // },
         // android: {
         //     adaptiveIcon: {
         //         foregroundImage: './assets/images/adaptive-icon.png',
