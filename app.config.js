@@ -15,28 +15,28 @@ const config = {
         ios: {
             supportsTablet: true,
         },
-        android: {
-            adaptiveIcon: {
-                foregroundImage: './assets/images/adaptive-icon.png',
-                backgroundColor: '#ffffff',
-            },
-            edgeToEdgeEnabled: true,
-            package: 'com.minority.app',
-            permissions: [
-                'ACCESS_NETWORK_STATE',
-                'FOREGROUND_SERVICE',
-                'RECEIVE_BOOT_COMPLETED',
-                'WAKE_LOCK',
-                'SCHEDULE_EXACT_ALARM', // 可选，用于高频任务
-                'ACCESS_COARSE_LOCATION',
-                'ACCESS_FINE_LOCATION',
-                'ACCESS_BACKGROUND_LOCATION',
-                'FOREGROUND_SERVICE_LOCATION',
-                'IGNORE_BATTERY_OPTIMIZATION',
-                'READ_CALENDAR',
-                'WRITE_CALENDAR',
-            ],
-        },
+        // android: {
+        //     adaptiveIcon: {
+        //         foregroundImage: './assets/images/adaptive-icon.png',
+        //         backgroundColor: '#ffffff',
+        //     },
+        //     edgeToEdgeEnabled: true,
+        //     package: 'com.minority.app',
+        //     permissions: [
+        //         'ACCESS_NETWORK_STATE',
+        //         'FOREGROUND_SERVICE',
+        //         'RECEIVE_BOOT_COMPLETED',
+        //         'WAKE_LOCK',
+        //         'SCHEDULE_EXACT_ALARM', // 可选，用于高频任务
+        //         'ACCESS_COARSE_LOCATION',
+        //         'ACCESS_FINE_LOCATION',
+        //         'ACCESS_BACKGROUND_LOCATION',
+        //         'FOREGROUND_SERVICE_LOCATION',
+        //         'IGNORE_BATTERY_OPTIMIZATION',
+        //         'READ_CALENDAR',
+        //         'WRITE_CALENDAR',
+        //     ],
+        // },
         web: {
             bundler: 'metro',
             output: 'static',
