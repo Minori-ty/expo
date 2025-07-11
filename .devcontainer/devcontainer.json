@@ -10,18 +10,16 @@
     //     "--env-file",
     //     ".devcontainer/.env"
     // ],
-
     "customizations": {
         "codespaces": {
             "machine": "standardLinux4core"
         }
     },
-
     "hostRequirements": {
         "cpus": 4
     },
     "environment": {
-        "EXPO_TOKEN": "${codespaces:EXPO_TOKEN}"  // 引用GitHub Codespace secret
+        "EXPO_TOKEN": "${codespaces:EXPO_TOKEN}" // 引用GitHub Codespace secret
     },
     "postCreateCommand": "npm i && npm run build"
 }

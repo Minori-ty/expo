@@ -1,15 +1,14 @@
-FROM node:20-ubuntu
+FROM node:alpine
 
-# 设置环境变量
+# 安装系统依赖
+RUN apk update && \
+    apk add --no-cache openjdk17-jdk wget unzip git bash && \
+    rm -rf /var/cache/apk/*
+
+# 安装 Android SDK
 ENV ANDROID_HOME=/opt/android-sdk
 ENV PATH=$PATH:$ANDROID_HOME/cmdline-tools/latest/bin:$ANDROID_HOME/platform-tools
 
-# 更新包索引并安装系统依赖
-RUN apt-get update && \
-    apt-get install -y openjdk-17-jdk wget unzip git bash && \
-    rm -rf /var/lib/apt/lists/*
-
-# 安装 Android SDK
 RUN mkdir -p $ANDROID_HOME/cmdline-tools && \
     wget -q https://dl.google.com/android/repository/commandlinetools-linux-10406996_latest.zip -O cmdline-tools.zip && \
     unzip -q cmdline-tools.zip -d /tmp && \
@@ -28,3 +27,23 @@ RUN $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager "platforms;android-35" \
 
 # 安装 npm 全局依赖
 RUN npm install -g eas-cli expo expo-doctor expo-cli typescript
+
+# WORKDIR /workspaces/expo
+# RUN bash && npm i && npm run build
+# 复制 package.json 和 package-lock.json
+# COPY package*.json ./
+
+# 安装项目依赖
+# RUN npm install
+
+# 复制项目文件
+# COPY . .
+
+# 构建应用
+# RUN npm run build
+
+# 获取版本号并重命名 APK 文件
+# RUN VERSION=$(npm pkg get version | tr -d '\"') && \
+#     APK_FILE=$(ls *.apk | head -n 1) && \
+#     mv "$APK_FILE" "v$VERSION.apk" && \
+#     echo "APK_VERSION=$VERSION" > .env
