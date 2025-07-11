@@ -10,6 +10,16 @@
     //     "--env-file",
     //     ".devcontainer/.env"
     // ],
+
+    "customizations": {
+        "codespaces": {
+            "machine": "standardLinux4core"
+        }
+    },
+
+    "hostRequirements": {
+        "cpus": 4
+    },
     "secrets": {
         "EXPO_TOKEN": "EXPO_TOKEN"
     },
