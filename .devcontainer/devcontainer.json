@@ -20,8 +20,8 @@
     "hostRequirements": {
         "cpus": 4
     },
-    "secrets": {
-        "EXPO_TOKEN": "EXPO_TOKEN"
+    "environment": {
+        "EXPO_TOKEN": "${codespaces:EXPO_TOKEN}"  // 引用GitHub Codespace secret
     },
     "postCreateCommand": "npm i && npm run build"
 }
