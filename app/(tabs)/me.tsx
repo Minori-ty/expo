@@ -1,5 +1,3 @@
-import CustomDatePicker3 from '@/components/CustomDatepicker'
-import { IconSymbol } from '@/components/ui/IconSymbol'
 import React from 'react'
 import { StyleSheet, Text, View } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
@@ -7,7 +5,7 @@ import { SafeAreaView } from 'react-native-safe-area-context'
 export default function InputText() {
     return (
         <SafeAreaView style={styles.container}>
-            <View style={styles.box}>
+            {/* <View style={styles.box}>
                 <View style={[styles.button, styles.export]}>
                     <IconSymbol size={20} name="arrow.down.and.line.horizontal.and.arrow.up" color={'#fff'} />
                     <Text style={{ color: '#fff', fontSize: 18 }} numberOfLines={1}>
@@ -22,7 +20,12 @@ export default function InputText() {
                     </Text>
                 </View>
             </View>
-            <CustomDatePicker3 />
+            <CustomDatePicker3 /> */}
+            <View className="justify-center items-center">
+                <View className="w-56 h-36 bg-sky-400">
+                    <Text className="text-2xl text-white">tailwindcss</Text>
+                </View>
+            </View>
         </SafeAreaView>
     )
 }
