@@ -1,3 +1,4 @@
+import { cn } from '@/utils/tailwind'
 import React from 'react'
 import { StyleSheet, Text, View } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
@@ -21,8 +22,8 @@ export default function InputText() {
                 </View>
             </View>
             <CustomDatePicker3 /> */}
-            <View className="justify-center items-center">
-                <View className="w-56 h-36 bg-sky-400">
+            <View className="items-center justify-center">
+                <View className={cn('h-40 w-56 items-center justify-center rounded-md bg-pink-400')}>
                     <Text className="text-2xl text-white">tailwindcss</Text>
                 </View>
             </View>
