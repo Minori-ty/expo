@@ -60,9 +60,7 @@ function EditAnime() {
             queryClient.invalidateQueries({
                 queryKey: ['schedule'],
             })
-            queryClient.invalidateQueries({
-                queryKey: ['anime-detail'],
-            })
+
             router.back()
         },
         onError: err => {
@@ -76,17 +74,31 @@ function EditAnime() {
         if (hasFirstEpisodeDateTime(data)) {
             const { firstEpisodeDateTimeYYYYMMDDHHmm } = data
             const firstEpisodeDateTimeTimestamp = dayjs(`${firstEpisodeDateTimeYYYYMMDDHHmm}`).unix()
-            updateAnimeMution({
-                cover,
-                name,
-                status,
-                totalEpisode,
-                updateTimeHHmm: HHmm,
-                firstEpisodeDateTime: firstEpisodeDateTimeTimestamp,
-                id: Number(id),
-            })
+
+            if (status === EStatus.COMPLETED) {
+                updateAnimeMution({
+                    cover,
+                    name,
+                    status,
+                    totalEpisode,
+                    updateTimeHHmm: HHmm,
+                    firstEpisodeDateTime: firstEpisodeDateTimeTimestamp,
+                    id: Number(id),
+                })
+            } else if (status === EStatus.COMING_SOON) {
+                updateAnimeMution({
+                    cover,
+                    name,
+                    status,
+                    totalEpisode,
+                    updateTimeHHmm: HHmm,
+                    firstEpisodeDateTime: firstEpisodeDateTimeTimestamp,
+                    id: Number(id),
+                })
+            }
         } else {
             const { currentEpisode, updateWeekday } = data
+            // 连载更新
             updateAnimeMution({
                 cover,
                 currentEpisode,

@@ -1,14 +1,11 @@
-import { addAnime } from '@/api'
 import DatePicker, { type IDatePickerRef } from '@/components/Datepicker'
 import { RadioGroup } from '@/components/RadioGroup'
 import { IconSymbol } from '@/components/ui/IconSymbol'
 import { EStatus, EUpdateWeekday, insertAnimeSchema } from '@/db/schema'
-import { queryClient } from '@/utils/react-query'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Picker } from '@react-native-picker/picker'
-import { useMutation } from '@tanstack/react-query'
 import dayjs from 'dayjs'
-import { router, useNavigation } from 'expo-router'
+import { useNavigation } from 'expo-router'
 import React, { useEffect, useRef, useState } from 'react'
 import { Controller, FieldErrors, useForm } from 'react-hook-form'
 import { Button, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native'
@@ -151,7 +148,13 @@ function BaseAnimeForm({ formData, onSubmit: submit }: IBaseAnimeFormProps) {
             headerTitleAlign: 'center',
         })
     }, [navigation])
-    const [status, setStatus] = useState(EStatus.ONGOING)
+    console.log(formData.status)
+    const [status, setStatus] = useState(formData.status)
+
+    useEffect(() => {
+        setStatus(formData.status)
+    }, [formData])
+
     const formSchema = createSchema(status)
     const datepickerRef = useRef<IDatePickerRef>(null)
     const timepickerRef = useRef<IDatePickerRef>(null)
@@ -167,44 +170,8 @@ function BaseAnimeForm({ formData, onSubmit: submit }: IBaseAnimeFormProps) {
     useEffect(() => {
         reset(formData)
     }, [formData, reset])
-    const { mutate: addAnimeMution } = useMutation({
-        mutationFn: addAnime,
-        onSuccess: () => {
-            queryClient.invalidateQueries({
-                queryKey: ['search'],
-            })
-            queryClient.invalidateQueries({
-                queryKey: ['my-anime'],
-            })
-            queryClient.invalidateQueries({
-                queryKey: ['schedule'],
-            })
-            reset()
-            router.back()
-        },
-        onError: err => {
-            alert(err)
-        },
-    })
 
     const onSubmit = async (data: TFormData) => {
-        // const { cover, name, status, totalEpisode, updateTimeHHmm } = data
-        // const HHmm = dayjs(updateTimeHHmm).format('HH:mm')
-        // if (hasFirstEpisodeDateTime(data)) {
-        //     const { firstEpisodeDateTimeYYYYMMDDHHmm } = data
-        //     const firstEpisodeDateTimeTimestamp = dayjs(`${firstEpisodeDateTimeYYYYMMDDHHmm}`).unix()
-        //     addAnimeMution({
-        //         cover,
-        //         name,
-        //         status,
-        //         totalEpisode,
-        //         updateTimeHHmm: HHmm,
-        //         firstEpisodeDateTime: firstEpisodeDateTimeTimestamp,
-        //     })
-        // } else {
-        //     const { currentEpisode, updateWeekday } = data
-        //     addAnimeMution({ cover, currentEpisode, name, status, totalEpisode, updateTimeHHmm: HHmm, updateWeekday })
-        // }
         submit(data)
         return data
     }

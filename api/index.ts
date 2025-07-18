@@ -69,8 +69,21 @@ export async function updateAnime(formData: TFormData & { id: number }) {
             console.log('找不到动漫')
             return
         }
+        const { status } = formData
         // 更新动漫数据
-        await tx.update(animeTable).set(formData).where(eq(animeTable.id, formData.id))
+        if (status === EStatus.ONGOING) {
+            await tx.update(animeTable).set(formData).where(eq(animeTable.id, formData.id))
+        } else if (status === EStatus.COMPLETED) {
+            await tx
+                .update(animeTable)
+                .set({ ...formData, currentEpisode: formData.totalEpisode })
+                .where(eq(animeTable.id, formData.id))
+        } else if (status === EStatus.COMING_SOON) {
+            await tx
+                .update(animeTable)
+                .set({ ...formData, currentEpisode: 0 })
+                .where(eq(animeTable.id, formData.id))
+        }
 
         // 更新日历
         await updateCalendar(tx, formData.id, formData)
