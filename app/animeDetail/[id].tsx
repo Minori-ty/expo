@@ -2,12 +2,13 @@ import ProgressBar from '@/components/ProgressBar'
 import { IconSymbol } from '@/components/ui/IconSymbol'
 import { EStatus, EUpdateWeekday } from '@/db/schema'
 import { selectAnimeById } from '@/hooks/useAnime'
+import { useQuery } from '@tanstack/react-query'
 import dayjs from 'dayjs'
 import 'dayjs/locale/zh-cn'
 import { Enum } from 'enum-plus'
 import { Image } from 'expo-image'
 import { useLocalSearchParams, useNavigation, useRouter } from 'expo-router'
-import React, { useCallback, useEffect, useLayoutEffect, useState } from 'react'
+import React, { useCallback, useLayoutEffect } from 'react'
 import { SafeAreaView, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 
 dayjs.locale('zh-cn')
@@ -29,20 +30,41 @@ interface Anime {
 const weekdayMap = ['一', '二', '三', '四', '五', '六', '日']
 
 function AnimeDetail() {
-    const [anime, setAnime] = useState<Anime>({
-        firstEpisodeDateTime: '-',
-        lastEpisodeDateTime: '-',
-        createdAt: '-',
-        id: -1,
-        name: '-',
-        updateWeekday: 1,
-        updateTimeHHmm: '-',
-        currentEpisode: 0,
-        totalEpisode: 0,
-        status: EStatus.ONGOING,
-        cover: '-',
+    // const [anime, setAnime] = useState<Anime>({
+    //     firstEpisodeDateTime: '-',
+    //     lastEpisodeDateTime: '-',
+    //     createdAt: '-',
+    //     id: -1,
+    //     name: '-',
+    //     updateWeekday: 1,
+    //     updateTimeHHmm: '-',
+    //     currentEpisode: 0,
+    //     totalEpisode: 0,
+    //     status: EStatus.ONGOING,
+    //     cover: '-',
+    // })
+    async function getDetail() {
+        const data = await getAnimeDetail()
+        return data
+    }
+    const {
+        data: anime = {
+            firstEpisodeDateTime: '-',
+            lastEpisodeDateTime: '-',
+            createdAt: '-',
+            id: -1,
+            name: '-',
+            updateWeekday: 1,
+            updateTimeHHmm: '-',
+            currentEpisode: 0,
+            totalEpisode: 0,
+            status: EStatus.ONGOING,
+            cover: '-',
+        },
+    } = useQuery({
+        queryKey: ['anime-detail'],
+        queryFn: getDetail,
     })
-
     const navigation = useNavigation()
     const router = useRouter()
     useLayoutEffect(() => {
@@ -57,18 +79,19 @@ function AnimeDetail() {
                 )
             },
         })
-    }, [navigation, anime.id, router])
+    }, [navigation, , anime.id, router])
     const { id } = useLocalSearchParams()
 
     const getAnimeDetail = useCallback(async () => {
         if (typeof id === 'string') {
             const data = await selectAnimeById(Number(id))
-            setAnime(data)
+            // setAnime(data)
+            return data
         }
     }, [id])
-    useEffect(() => {
-        getAnimeDetail()
-    }, [getAnimeDetail])
+    // useEffect(() => {
+    //     getAnimeDetail()
+    // }, [getAnimeDetail])
 
     const getUpdateInfo = () => {
         const weekday = weekdayMap[anime.updateWeekday - 1]

@@ -52,13 +52,16 @@ function EditAnime() {
         mutationFn: updateAnime,
         onSuccess: () => {
             queryClient.invalidateQueries({
-                queryKey: ['search'],
+                queryKey: ['anime-detail'],
             })
             queryClient.invalidateQueries({
                 queryKey: ['my-anime'],
             })
             queryClient.invalidateQueries({
                 queryKey: ['schedule'],
+            })
+            queryClient.invalidateQueries({
+                queryKey: ['anime-detail'],
             })
             router.back()
         },
