@@ -8,12 +8,41 @@ import 'dayjs/locale/zh-cn'
 import { Enum } from 'enum-plus'
 import { Image } from 'expo-image'
 import { useLocalSearchParams, useNavigation, useRouter } from 'expo-router'
-import React, { useLayoutEffect } from 'react'
+import React, { useCallback, useLayoutEffect } from 'react'
 import { SafeAreaView, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 
 dayjs.locale('zh-cn')
 
+interface Anime {
+    firstEpisodeDateTime: string
+    lastEpisodeDateTime: string
+    createdAt: string
+    id: number
+    name: string
+    updateWeekday: EUpdateWeekday
+    updateTimeHHmm: string
+    currentEpisode: number
+    totalEpisode: number
+    status: EStatus
+    cover: string
+}
+
+const weekdayMap = ['一', '二', '三', '四', '五', '六', '日']
+
 function AnimeDetail() {
+    // const [anime, setAnime] = useState<Anime>({
+    //     firstEpisodeDateTime: '-',
+    //     lastEpisodeDateTime: '-',
+    //     createdAt: '-',
+    //     id: -1,
+    //     name: '-',
+    //     updateWeekday: 1,
+    //     updateTimeHHmm: '-',
+    //     currentEpisode: 0,
+    //     totalEpisode: 0,
+    //     status: EStatus.ONGOING,
+    //     cover: '-',
+    // })
     async function getDetail() {
         const data = await getAnimeDetail()
         return data
@@ -25,7 +54,7 @@ function AnimeDetail() {
             createdAt: '-',
             id: -1,
             name: '-',
-            updateWeekday: EUpdateWeekday.MONDAY,
+            updateWeekday: 1,
             updateTimeHHmm: '-',
             currentEpisode: 0,
             totalEpisode: 0,
@@ -51,16 +80,37 @@ function AnimeDetail() {
             },
         })
     }, [navigation, , anime.id, router])
-    const { id } = useLocalSearchParams<{ id: string }>()
+    const { id } = useLocalSearchParams()
 
-    const getAnimeDetail = async () => {
-        const data = await selectAnimeById(Number(id))
-        return data
+    const getAnimeDetail = useCallback(async () => {
+        if (typeof id === 'string') {
+            const data = await selectAnimeById(Number(id))
+            // setAnime(data)
+            return data
+        }
+    }, [id])
+    // useEffect(() => {
+    //     getAnimeDetail()
+    // }, [getAnimeDetail])
+
+    const getUpdateInfo = () => {
+        const weekday = weekdayMap[anime.updateWeekday - 1]
+        return `每周${weekday} ${anime.updateTimeHHmm}更新`
     }
-
     const blurhash =
         '|rF?hV%2WCj[ayj[a|j[az_NaeWBj@ayfRayfQfQM{M|azj[azf6fQfQfQIpWXofj[ayj[j[fQayWCoeoeaya}j[ayfQa{oLj?j[WVj[ayayj[fQoff7azayj[ayj[j[ayofayayayj[fQj[ayayj[ayfjj[j[ayjuayj['
 
+    const mapColor = {
+        [EStatus.COMING_SOON]: '#FFD547',
+        [EStatus.ONGOING]: '#409eff',
+        [EStatus.COMPLETED]: '#f56c6c',
+    }
+
+    const mapText = {
+        [EStatus.COMING_SOON]: '即将更新',
+        [EStatus.ONGOING]: '连载中',
+        [EStatus.COMPLETED]: '已完结',
+    }
     const statusMap = Enum({
         Complete: {
             value: 1,
@@ -78,16 +128,7 @@ function AnimeDetail() {
             color: '#FFD547',
         },
     } as const)
-
-    const mapWeekday = {
-        1: '周一',
-        2: '周二',
-        3: '周三',
-        4: '周四',
-        5: '周五',
-        6: '周六',
-        7: '周日',
-    } as const
+    console.log(statusMap.raw(1).color)
 
     return (
         <SafeAreaView style={styles.container}>
@@ -122,7 +163,7 @@ function AnimeDetail() {
                             <IconSymbol size={16} name="calendar" color={'#6b7280'} />
                             <View style={styles.date}>
                                 <Text>更新时间</Text>
-                                <Text>{mapWeekday[anime.updateWeekday]}</Text>
+                                <Text>周一</Text>
                             </View>
                         </View>
                         <View style={styles.dateBox}>
@@ -143,8 +184,8 @@ function AnimeDetail() {
                         </View>
                         <ProgressBar progress={anime.currentEpisode / anime.totalEpisode} />
                         <View style={styles.progressTitle}>
-                            <Text>已更新{anime.currentEpisode}集</Text>
-                            <Text>{Math.round((anime.currentEpisode / anime.totalEpisode) * 100)}%完成</Text>
+                            <Text>已更新{anime.currentEpisode}集集</Text>
+                            <Text>{Math.round((anime.currentEpisode / anime.totalEpisode) * 100)}%完成成</Text>
                         </View>
                     </View>
 

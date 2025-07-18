@@ -151,6 +151,12 @@ async function onAddAnime(tx: TTx, formData: TFormData) {
             await tx.insert(calendarTable).values({ calendarId, animeId: animeData.id })
             console.log('插入日历表')
         }
+
+        if (firstEpisodeInThisWeek(firstEpisodeDateTime)) {
+            await tx.insert(schduleTable).values({
+                animeId: id,
+            })
+        }
     }
     return animeData
 }

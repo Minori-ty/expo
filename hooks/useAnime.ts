@@ -88,7 +88,7 @@ export async function selectAnime() {
 
 /**
  *
- * @param idList 动漫的id列表
+ * @param id 动漫的id
  * @returns
  */
 export async function selectAnimeById(id: number) {

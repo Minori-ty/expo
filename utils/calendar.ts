@@ -37,7 +37,7 @@ export async function createCalendarEvent({
 
     // 获得默认日历ID
     const calendars = await Calendar.getCalendarsAsync()
-    const defaultCalendar = calendars.find((cal) => cal.allowsModifications)
+    const defaultCalendar = calendars.find(cal => cal.allowsModifications)
 
     if (!defaultCalendar) {
         console.log('没有找到可修改的默认日历')
@@ -84,7 +84,7 @@ export async function deleteCalendarEvent(eventId: string) {
 
     // 获得默认日历ID
     const calendars = await Calendar.getCalendarsAsync()
-    const defaultCalendar = calendars.find((cal) => cal.allowsModifications)
+    const defaultCalendar = calendars.find(cal => cal.allowsModifications)
 
     if (!defaultCalendar) {
         console.log('没有找到可修改的默认日历')
@@ -93,6 +93,7 @@ export async function deleteCalendarEvent(eventId: string) {
 
     try {
         await Calendar.deleteEventAsync(eventId)
+        console.log('删除日历成功')
         return true
     } catch {
         return false

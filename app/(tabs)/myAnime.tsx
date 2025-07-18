@@ -62,9 +62,6 @@ function Schedual() {
         mutationFn: onDeleteAnime,
         onSuccess: () => {
             queryClient.invalidateQueries({
-                queryKey: ['search'],
-            })
-            queryClient.invalidateQueries({
                 queryKey: ['my-anime'],
             })
             queryClient.invalidateQueries({
@@ -127,7 +124,7 @@ function AnimeContainer({ list }: IAnimeContainerProps) {
     return (
         <FlatList
             data={list}
-            keyExtractor={(item) => item.id.toString()}
+            keyExtractor={item => item.id.toString()}
             numColumns={3}
             columnWrapperStyle={{ gap: GAP }}
             showsHorizontalScrollIndicator={false}
