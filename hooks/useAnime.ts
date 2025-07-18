@@ -1,3 +1,4 @@
+import { TFormData } from '@/api'
 import { db } from '@/db'
 import { animeTable, EStatus, EUpdateWeekday, insertAnimeSchema } from '@/db/schema'
 import { getFirstEpisodeDateTime, getlastEpisodeDateTime } from '@/utils/timeCalculation'
@@ -23,18 +24,44 @@ export interface IGenerateAnimeDataParams {
  * @param formData 表单数据
  * @returns
  */
-export function generateAnimeData(formData: IGenerateAnimeDataParams) {
-    const { updateTimeHHmm, updateWeekday, currentEpisode, totalEpisode } = formData
+export function generateAnimeData(formData: TFormData) {
+    let params: IGenerateAnimeDataParams
+    // 已完结/未开播 无currentEpisode和currentEpisode
+    if ('firstEpisodeDateTime' in formData) {
+        const { totalEpisode, name, status, cover, updateTimeHHmm, firstEpisodeDateTime } = formData
+        params = {
+            totalEpisode,
+            name,
+            status,
+            cover,
+            updateTimeHHmm,
+            currentEpisode: status === EStatus.COMPLETED ? totalEpisode : 0,
+            updateWeekday: dayjs.unix(firstEpisodeDateTime).isoWeekday(),
+            firstEpisodeDateTime,
+        }
+    } else {
+        const { totalEpisode, name, status, cover, updateTimeHHmm, updateWeekday, currentEpisode } = formData
+        params = {
+            totalEpisode,
+            name,
+            status,
+            cover,
+            updateTimeHHmm,
+            currentEpisode,
+            updateWeekday,
+        }
+    }
+    const { updateTimeHHmm, updateWeekday, currentEpisode, totalEpisode } = params
     // 计算第一集的日期时间
-    const firstEpisodeDateTime = formData.firstEpisodeDateTime
-        ? dayjs.unix(formData.firstEpisodeDateTime)
+    const firstEpisodeDateTime = params.firstEpisodeDateTime
+        ? dayjs.unix(params.firstEpisodeDateTime)
         : getFirstEpisodeDateTime(updateTimeHHmm, updateWeekday, currentEpisode)
-    const lastEpisodeDateTime = formData.firstEpisodeDateTime
+    const lastEpisodeDateTime = params.firstEpisodeDateTime
         ? firstEpisodeDateTime.add((totalEpisode - 1) * 7, 'day')
         : getlastEpisodeDateTime(updateTimeHHmm, updateWeekday, currentEpisode, totalEpisode)
 
     const data: z.infer<typeof formDataSchema> = {
-        ...formData,
+        ...params,
         createdAt: dayjs().unix(),
         firstEpisodeDateTime: firstEpisodeDateTime.unix(),
         lastEpisodeDateTime: lastEpisodeDateTime.unix(),
@@ -49,7 +76,7 @@ export function generateAnimeData(formData: IGenerateAnimeDataParams) {
  */
 export async function selectAnime() {
     const row = await db.select().from(animeTable)
-    return row.map((item) => {
+    return row.map(item => {
         return {
             ...item,
             firstEpisodeDateTime: dayjs.unix(item.firstEpisodeDateTime).format('YYYY-MM-DD HH:mm'),
@@ -66,7 +93,7 @@ export async function selectAnime() {
  */
 export async function selectAnimeById(id: number) {
     const result = await db.select().from(animeTable).where(eq(animeTable.id, id))
-    const data = result.map((item) => {
+    const data = result.map(item => {
         return {
             ...item,
             firstEpisodeDateTime: dayjs.unix(item.firstEpisodeDateTime).format('YYYY-MM-DD HH:mm'),

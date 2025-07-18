@@ -81,3 +81,14 @@ export function getCurrentEpisode(firstEpisodeDateTime: number, totalEpisode: nu
     const episodeNum = Math.floor(minutesPassed / updateCycle) + 1
     return Math.min(episodeNum, totalEpisode)
 }
+
+/**
+ * 首集是否在本周更新
+ * @param firstEpisodeDateTime
+ * @returns
+ */
+export function firstEpisodeInThisWeek(firstEpisodeDateTime: number) {
+    const weekStartTimestamp = dayjs().isoWeekday(1).hour(0).minute(0).second(0).unix()
+    const weekEndTimestamp = dayjs().isoWeekday(7).hour(23).minute(59).second(59).unix()
+    return firstEpisodeDateTime >= weekStartTimestamp && firstEpisodeDateTime <= weekEndTimestamp
+}

@@ -131,7 +131,19 @@ type ICompleteExtera = {
 type ICompleteForm = IBaseFormData & ICompleteExtera
 
 export type TFormData = TOngoingForm | ICompleteForm
-function AnimeForm() {
+export interface IBaseAnimeFormProps {
+    formData: TOngoingForm & ICompleteForm
+    onSubmit: (data: TFormData) => void
+}
+export interface IBaseAnimeFormRef {
+    onSubmit: (data: TFormData) => Promise<TFormData>
+}
+
+export function hasFirstEpisodeDateTime(data: TFormData): data is ICompleteForm {
+    return 'firstEpisodeDateTimeYYYYMMDDHHmm' in data
+}
+
+function BaseAnimeForm({ formData, onSubmit: submit }: IBaseAnimeFormProps) {
     const navigation = useNavigation()
     useEffect(() => {
         navigation.setOptions({
@@ -150,18 +162,11 @@ function AnimeForm() {
         reset,
     } = useForm<TFormData>({
         resolver: zodResolver(formSchema),
-        defaultValues: {
-            name: '章鱼哔的原罪',
-            updateWeekday: EUpdateWeekday.MONDAY,
-            updateTimeHHmm: dayjs().format('YYYY-MM-DD HH:mm'),
-            currentEpisode: 1,
-            totalEpisode: 13,
-            cover: 'http://lz.sinaimg.cn/large/8a65eec0gy1i295k5s0evj207i0al424.jpg',
-            status: EStatus.ONGOING,
-            firstEpisodeDateTimeYYYYMMDDHHmm: dayjs().format('YYYY-MM-DD HH:mm'),
-        },
+        defaultValues: formData,
     })
-
+    useEffect(() => {
+        reset(formData)
+    }, [formData, reset])
     const { mutate: addAnimeMution } = useMutation({
         mutationFn: addAnime,
         onSuccess: () => {
@@ -182,29 +187,28 @@ function AnimeForm() {
         },
     })
 
-    function hasFirstEpisodeDateTime(data: TFormData): data is ICompleteForm {
-        return 'firstEpisodeDateTimeYYYYMMDDHHmm' in data
+    const onSubmit = async (data: TFormData) => {
+        // const { cover, name, status, totalEpisode, updateTimeHHmm } = data
+        // const HHmm = dayjs(updateTimeHHmm).format('HH:mm')
+        // if (hasFirstEpisodeDateTime(data)) {
+        //     const { firstEpisodeDateTimeYYYYMMDDHHmm } = data
+        //     const firstEpisodeDateTimeTimestamp = dayjs(`${firstEpisodeDateTimeYYYYMMDDHHmm}`).unix()
+        //     addAnimeMution({
+        //         cover,
+        //         name,
+        //         status,
+        //         totalEpisode,
+        //         updateTimeHHmm: HHmm,
+        //         firstEpisodeDateTime: firstEpisodeDateTimeTimestamp,
+        //     })
+        // } else {
+        //     const { currentEpisode, updateWeekday } = data
+        //     addAnimeMution({ cover, currentEpisode, name, status, totalEpisode, updateTimeHHmm: HHmm, updateWeekday })
+        // }
+        submit(data)
+        return data
     }
 
-    const onSubmit = async (data: TFormData) => {
-        const { cover, name, status, totalEpisode, updateTimeHHmm } = data
-        const HHmm = dayjs(updateTimeHHmm).format('HH:mm')
-        if (hasFirstEpisodeDateTime(data)) {
-            const { firstEpisodeDateTimeYYYYMMDDHHmm } = data
-            const firstEpisodeDateTimeTimestamp = dayjs(`${firstEpisodeDateTimeYYYYMMDDHHmm}`).unix()
-            addAnimeMution({
-                cover,
-                name,
-                status,
-                totalEpisode,
-                updateTimeHHmm: HHmm,
-                firstEpisodeDateTime: firstEpisodeDateTimeTimestamp,
-            })
-        } else {
-            const { currentEpisode, updateWeekday } = data
-            addAnimeMution({ cover, currentEpisode, name, status, totalEpisode, updateTimeHHmm: HHmm, updateWeekday })
-        }
-    }
     const weekdays = [
         { label: '周一', value: 1 },
         { label: '周二', value: 2 },
@@ -496,7 +500,7 @@ const styles = StyleSheet.create({
     },
 })
 
-export default AnimeForm
+export default BaseAnimeForm
 
 function getErrorMessage(error: any): string | null {
     if (!error) return null

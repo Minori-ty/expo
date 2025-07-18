@@ -122,7 +122,6 @@ function AnimeDetail() {
 
                 <View style={{ paddingHorizontal: 15 }}>
                     <View style={{ flexDirection: 'row', alignItems: 'flex-end' }}>
-                        <Text style={styles.name}>{anime.name}</Text>
                         <View
                             style={{
                                 backgroundColor: statusMap.raw(anime.status).color,
@@ -134,6 +133,7 @@ function AnimeDetail() {
                         >
                             <Text style={{ color: '#fff', fontSize: 10 }}>{statusMap.raw(anime.status).label}</Text>
                         </View>
+                        <Text style={styles.name}>{anime.name}</Text>
                     </View>
                     <View style={[styles.border, styles.dateContainer]}>
                         <View style={styles.dateBox}>
@@ -161,8 +161,8 @@ function AnimeDetail() {
                         </View>
                         <ProgressBar progress={anime.currentEpisode / anime.totalEpisode} />
                         <View style={styles.progressTitle}>
-                            <Text>已更新{anime.currentEpisode}集</Text>
-                            <Text>{Math.round((anime.currentEpisode / anime.totalEpisode) * 100)}%完成</Text>
+                            <Text>已更新{anime.currentEpisode}集集</Text>
+                            <Text>{Math.round((anime.currentEpisode / anime.totalEpisode) * 100)}%完成成</Text>
                         </View>
                     </View>
 
